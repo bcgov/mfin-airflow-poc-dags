@@ -2,8 +2,6 @@ from datetime import datetime
 from airflow import DAG
 from airflow.providers.samba.hooks.samba import SambaHook
 from airflow.operators.python_operator import PythonOperator
-import os
-import pandas as pd
 
 
 def test_ice_connection():
@@ -18,7 +16,7 @@ def test_ice_connection():
     #files = hook.listdir(share_name, directory)
     files = hook.listdir(path)
     print("Files in the rmo_ct_prod directory:")
-    dt = str(pd.Period(datetime.datetime.now(),'%Y%m%d'))
+    #dt = str(pd.Period(datetime.datetime.now(),'%Y%m%d'))
     for f in files:
         newname = f+'_20240822.txt'
         hook.replace(f,newname)
