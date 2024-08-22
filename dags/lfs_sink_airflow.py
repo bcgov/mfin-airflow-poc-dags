@@ -53,7 +53,6 @@ with DAG(
         with open(filename,'wb') as f:
                 f.write(r.content)
 
-            print('test')
         try:
             
             with SambaHook(smb_conn_id) as hook:
