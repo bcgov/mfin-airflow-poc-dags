@@ -18,8 +18,6 @@ def test_ice_connection():
     print("Files in the rmo_ct_prod directory:")
     #dt = str(pd.Period(datetime.datetime.now(),'%Y%m%d'))
     for f in files:
-        newname = f+'_20240822.txt'
-        hook.replace(f,newname)
         print(f)
 
 default_args = {
