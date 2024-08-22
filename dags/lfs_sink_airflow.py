@@ -5,16 +5,20 @@ import datetime as dt
 import pandas as pd
 import os
 import requests
+import logging
+
+logger = logging.getLogger(__name__)
+logger.info("This is a log message")
 
 with DAG(
     dag_id='lfs_poc_download',
     start_date=dt.datetime(2024,8,22,9),
     schedule="@daily",
-    catchup=True,
+    catchup=False,
     max_active_runs=1,
     default_args={
-        "retries": 3,
-        "retry_delay" : dt.timedelta(minutes=15)
+        "retries": 1,
+        "retry_delay" : dt.timedelta(minutes=2)
     }
 ) as dag:
     #download last month's LFS file via the task API
@@ -44,13 +48,23 @@ with DAG(
             print ("OOps: Something Else",err)
         else:
             #TODO make path based on config file or tied to connection definition
-            path = os.path.join('\\\\test.fs1.fin.gov.bc.ca\DevOps\Airflow_POC_Dev\LFS',filename)
+            path = os.path.join('\\\\test.fs1.fin.gov.bc.ca\\DevOps\\Airflow_POC_Dev\\LFS',filename)
 
             #get the test FS1 connection
             smb_conn_id = 'fs1_test_conn'
+
+            print('test')
+            logger.info("Test log message")
+
+            with open(filename,'wb') as f:
+                f.write(r.content)
             
             with SambaHook(smb_conn_id) as hook:
-                hook.replace(path, r.content)
+                hook.listdir(path)
+                print("Files in the directory:")
+                for f in files:
+                    print(f)
+                #hook.replace(path, r.content)
 
     #call task
     extract_lfs()
