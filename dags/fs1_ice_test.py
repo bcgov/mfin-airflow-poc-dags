@@ -1,3 +1,5 @@
+import os
+import time
 from datetime import datetime
 from airflow import DAG
 from airflow.providers.samba.hooks.samba import SambaHook
@@ -15,8 +17,11 @@ def test_ice_connection():
     #files = hook.listdir(share_name, directory)
     files = hook.listdir(path)
     print("Files in the rmo_ct_prod directory:")
+    dt = str(datetime.datetime.now())
     for f in files:
-        print(f)
+        newname = f+'_'+dt+'.txt'
+        os.rename(f,newname)
+	print(f)
 
 default_args = {
     'owner': 'airflow',
