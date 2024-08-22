@@ -61,6 +61,8 @@ with DAG(
                 for f in files:
                     print(f)
                 #hook.replace(path, r.content)
+        except:
+            print('error')
 
     #call task
     extract_lfs()
