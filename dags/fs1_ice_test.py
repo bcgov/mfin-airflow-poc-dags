@@ -1,4 +1,4 @@
-from datetime import dt
+import datetime as dt
 from airflow import DAG
 from airflow.providers.samba.hooks.samba import SambaHook
 from airflow.operators.python_operator import PythonOperator
