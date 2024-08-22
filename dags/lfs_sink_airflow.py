@@ -5,10 +5,7 @@ import datetime as dt
 import pandas as pd
 import os
 import requests
-import logging
 
-logger = logging.getLogger(__name__)
-logger.info("This is a log message")
 
 with DAG(
     dag_id='lfs_poc_download',
@@ -54,8 +51,7 @@ with DAG(
             smb_conn_id = 'fs1_test_conn'
 
             print('test')
-            logger.info("Test log message")
-
+        try:
             with open(filename,'wb') as f:
                 f.write(r.content)
             
