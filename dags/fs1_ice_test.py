@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.providers.samba.hooks.samba import SambaHook
 from airflow.operators.python_operator import PythonOperator
 
-def test_smb_connection():
+def test_ice_connection():
     # Replace these with your SMB server details
     conn_id = 'fs1_rmo_ice'
       
@@ -14,7 +14,7 @@ def test_smb_connection():
     hook = SambaHook(conn_id)
     #files = hook.listdir(share_name, directory)
     files = hook.listdir(path)
-    print("Files in the given directory:")
+    print("Files in the rmo_ct_prod directory:")
     for f in files:
         print(f)
 
@@ -30,13 +30,13 @@ default_args = {
 dag = DAG(
     'Test_FS1_ICE_connectivity',
     default_args=default_args,
-    description='A DAG to test test FS1 connection',
+    description='A DAG to test ICE FS1 connection',
     schedule_interval=None,
 )
 
 test_task = PythonOperator(
-    task_id='test_smb_connection',
-    python_callable=test_smb_connection,
+    task_id='test_ice_connection',
+    python_callable=test_ice_connection,
     dag=dag,
 )
 
