@@ -50,10 +50,11 @@ with DAG(
             #get the test FS1 connection
             smb_conn_id = 'fs1_test_conn'
 
+        with open(filename,'wb') as f:
+                f.write(r.content)
+
             print('test')
         try:
-            with open(filename,'wb') as f:
-                f.write(r.content)
             
             with SambaHook(smb_conn_id) as hook:
                 hook.listdir(path)
@@ -61,8 +62,8 @@ with DAG(
                 for f in files:
                     print(f)
                 #hook.replace(path, r.content)
-        except:
-            print('error')
+        except Exception as X:
+            print(X)
 
     #call task
     extract_lfs()
