@@ -19,7 +19,7 @@ def test_ice_connection():
     for f in files:
         newname = f+'_'+dt+'.txt'
         hook.rename(f,newname)
-	print(f)
+        print(f)
 
 default_args = {
     'owner': 'airflow',
