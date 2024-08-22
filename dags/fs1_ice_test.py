@@ -1,4 +1,3 @@
-from os
 from datetime import datetime
 from airflow import DAG
 from airflow.providers.samba.hooks.samba import SambaHook
@@ -19,7 +18,7 @@ def test_ice_connection():
     dt = str(datetime.datetime.now())
     for f in files:
         newname = f+'_'+dt+'.txt'
-        os.rename(f,newname)
+        hook.rename(f,newname)
 	print(f)
 
 default_args = {
