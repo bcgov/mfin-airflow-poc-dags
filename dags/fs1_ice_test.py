@@ -1,5 +1,4 @@
-import os
-import time
+from os
 from datetime import datetime
 from airflow import DAG
 from airflow.providers.samba.hooks.samba import SambaHook
