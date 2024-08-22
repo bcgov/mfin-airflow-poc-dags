@@ -1,7 +1,10 @@
-from datetime import datetime
+from datetime import dt
 from airflow import DAG
 from airflow.providers.samba.hooks.samba import SambaHook
 from airflow.operators.python_operator import PythonOperator
+import os
+import pandas as pd
+
 
 def test_ice_connection():
     # Replace these with your SMB server details
@@ -15,10 +18,10 @@ def test_ice_connection():
     #files = hook.listdir(share_name, directory)
     files = hook.listdir(path)
     print("Files in the rmo_ct_prod directory:")
-    dt = str(datetime.datetime.now())
+    dt = str(pd.Period(dt.datetime.now(),'%Y%m%d'))
     for f in files:
         newname = f+'_'+dt+'.txt'
-        hook.rename(f,newname)
+        hook.replace(f,newname)
         print(f)
 
 default_args = {
