@@ -7,9 +7,10 @@ def test_smb_connection():
     # Replace these with your SMB server details
     conn_id = 'fs1_rmo_ice'
       
-    share_name = 'fs1.fin.gov.bc.ca'
+    # share_name = 'fs1.fin.gov.bc.ca'
     directory = '/rmo_ct_prod/'
-    path = share_name + directory
+    #path = share_name + directory
+    path = directory
     hook = SambaHook(conn_id)
     #files = hook.listdir(share_name, directory)
     files = hook.listdir(path)
