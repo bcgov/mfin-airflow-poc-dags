@@ -49,10 +49,10 @@ with DAG(
 
             #get the test FS1 connection
             smb_conn_id = 'fs1_test_conn'
-
+        '''
         with open(filename,'wb') as f:
                 f.write(r.content)
-
+        '''
         try:
             
             with SambaHook(smb_conn_id) as hook:
