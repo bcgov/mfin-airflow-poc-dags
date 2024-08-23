@@ -1,3 +1,4 @@
+from os import os
 from datetime import datetime
 from airflow import DAG
 from airflow.providers.samba.hooks.samba import SambaHook
@@ -17,6 +18,7 @@ def test_ice_connection():
     files = hook.listdir(path)
     print("Files in the rmo_ct_prod directory:")
     #dt = str(pd.Period(datetime.datetime.now(),'%Y%m%d'))
+    os.rename('test.txt','test-20240823.txt')
     for f in files:
         print(f)
 
