@@ -32,7 +32,7 @@ def lfs_load ():
         source_s3 = S3Hook('aws_default')
         zf = source_s3.get_key(key=filename,bucket_name=bucket_path)
         print(zf.content_type)
-        zf = zipfile.ZipFile('C:/Users/Desktop/THEZIPFILE.zip') 
+        zip_file = zipfile.ZipFile(zf) 
         #df = pd.read_csv(zf.open('pub0724.csv'))
     '''
     @task
