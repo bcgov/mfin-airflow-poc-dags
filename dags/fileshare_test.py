@@ -1,5 +1,6 @@
 from datetime import datetime
 from airflow import DAG
+from airflow.decorators import task
 from airflow.providers.samba.hooks.samba import SambaHook
 import datetime as dt
 import pandas as pd
