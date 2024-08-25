@@ -45,8 +45,8 @@ with DAG(
         else:
             print("downloaded file success")
 
-            s3_key = "test.zip"
-            s3_bucket = "FREDA_DATA"
+            s3_key = filename
+            s3_bucket = "FREDA_DATA/LFS-landing"
         
             source_s3 = S3Hook('aws_default')
             source_s3.load_bytes(bytes_data=r.content,key=s3_key,bucket_name=s3_bucket)
