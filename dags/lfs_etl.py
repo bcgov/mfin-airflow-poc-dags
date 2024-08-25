@@ -6,7 +6,7 @@ import zipfile, io
 
 #get the year-month of the prior month based on today's date
 date = str(pd.Period(dt.datetime.now(), 'M') - 1)
-filename = f"./{date}-CSV.zip"
+filename = f"{date}-CSV.zip"
 bucket_path = "FREDA_DATA"
 
 @dag(
