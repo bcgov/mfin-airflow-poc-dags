@@ -26,7 +26,7 @@ with DAG(
          #fail case
         #date = str(pd.Period(dt.datetime.now(), 'M') + 1)
 
-        filename = f"./{date}-CSV.zip"
+        filename = f"{date}-CSV.zip"
 
         url = f"https://www150.statcan.gc.ca/n1/pub/71m0001x/2021001/{filename}"
 
