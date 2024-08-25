@@ -2,6 +2,8 @@ from datetime import datetime
 from airflow import DAG
 from airflow.providers.samba.hooks.samba import SambaHook
 
+smb_conn_id = 'test_fs1'
+
 with DAG(
     dag_id='lfs_poc_download',
     start_date=dt.datetime(2024,8,22,9),
