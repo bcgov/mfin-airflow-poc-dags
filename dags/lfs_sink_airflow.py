@@ -6,8 +6,6 @@ import pandas as pd
 import os
 import requests
 
-base = ObjectStoragePath("s3://aws_default@FREDA_DATA/")
-
 with DAG(
     dag_id='lfs_poc_download',
     start_date=dt.datetime(2024,8,22,9),
@@ -45,6 +43,7 @@ with DAG(
         except requests.exceptions.RequestException as err:
             print ("OOps: Something Else",err)
         else:
+            print("downloaded file success")
             return r.content
 
     @task()
