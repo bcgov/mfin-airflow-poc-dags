@@ -1,6 +1,10 @@
 from datetime import datetime
 from airflow import DAG
 from airflow.providers.samba.hooks.samba import SambaHook
+import datetime as dt
+import pandas as pd
+import os
+import requests
 
 smb_conn_id = 'test_fs1'
 
