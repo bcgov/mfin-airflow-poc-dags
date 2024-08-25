@@ -1,5 +1,6 @@
 from airflow.decorators import task, dag
 from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
+from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 import pandas as pd
 import datetime as dt
 import zipfile, io
