@@ -10,7 +10,7 @@ import requests
 smb_conn_id = 'test_fs1'
 
 with DAG(
-    dag_id='lfs_poc_download',
+    dag_id='connect_to_fs1',
     start_date=dt.datetime(2024,8,22,9),
     schedule="@daily",
     catchup=False,
