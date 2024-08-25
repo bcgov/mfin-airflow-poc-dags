@@ -45,7 +45,7 @@ with DAG(
         else:
             print("downloaded file success")
 
-            s3_key = f"LFS-landing/{filename}"
+            s3_key = filename
             s3_bucket = "FREDA_DATA"
         
             source_s3 = S3Hook('aws_default')
