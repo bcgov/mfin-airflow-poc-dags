@@ -1,11 +1,12 @@
 from airflow import DAG
 from airflow.decorators import task
-from airflow.providers.samba.hooks.samba import SambaHook
+from airflow.io.path import ObjectStoragePath
 import datetime as dt
 import pandas as pd
 import os
 import requests
 
+base = ObjectStoragePath("s3://aws_default@FREDA_DATA/")
 
 with DAG(
     dag_id='lfs_poc_download',
@@ -17,7 +18,7 @@ with DAG(
         "retries": 1,
         "retry_delay" : dt.timedelta(minutes=2)
     }
-) as dag:
+) as dag: 
     #download last month's LFS file via the task API
     @task()
     def extract_lfs():
@@ -27,7 +28,7 @@ with DAG(
          #fail case
         #date = str(pd.Period(dt.datetime.now(), 'M') + 1)
 
-        filename = f"{date}-CSV.zip"
+        filename = f"./{date}-CSV.zip"
 
         url = f"https://www150.statcan.gc.ca/n1/pub/71m0001x/2021001/{filename}"
 
@@ -44,25 +45,14 @@ with DAG(
         except requests.exceptions.RequestException as err:
             print ("OOps: Something Else",err)
         else:
-            #TODO make path based on config file or tied to connection definition
-            path = os.path.join('\\\\test.fs1.fin.gov.bc.ca\\DevOps\\Airflow_POC_Dev\\LFS',filename)
 
-            #get the test FS1 connection
-            smb_conn_id = 'fs1_test_conn'
-        '''
-        with open(filename,'wb') as f:
-                f.write(r.content)
-        '''
-        try:
+            # ensure the bucket exists
+            base.mkdir(exist_ok=True)
             
-            with SambaHook(smb_conn_id) as hook:
-                hook.listdir(path)
-                print("Files in the directory:")
-                for f in files:
-                    print(f)
-                #hook.replace(path, r.content)
-        except Exception as X:
-            print(X)
+            path = f"{base}/{filename}"
+
+            with path.open("wb") as file:
+                file.write(r.content)
 
     #call task
     extract_lfs()
