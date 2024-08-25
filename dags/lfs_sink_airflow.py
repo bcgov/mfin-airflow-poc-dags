@@ -44,15 +44,12 @@ with DAG(
             print ("OOps: Something Else",err)
         else:
             print("downloaded file success")
-            return r.content
 
-    @task()
-    def s3_load(file):
-        s3_key = "test.csv"
-        s3_bucket = "FREDA_DATA"
+            s3_key = "test.zip"
+            s3_bucket = "FREDA_DATA"
         
-        source_s3 = S3Hook('aws_default')
-        source_s3.load_bytes(bytes_data=file,key=s3_key,bucket_name=s3_buket)
+            source_s3 = S3Hook('aws_default')
+            source_s3.load_bytes(bytes_data=r.content,key=s3_key,bucket_name=s3_buket)
 
     #call task
-    s3_load(extract_lfs())
+    extract_lfs()
