@@ -6,6 +6,17 @@ import datetime as dt
 import pandas as pd
 import os
 import requests
+import logging
+
+# Configure logging to print everything to stdout
+root = logging.getLogger()
+root.setLevel(logging.DEBUG)
+
+handler = logging.StreamHandler()
+handler.setLevel(logging.DEBUG)
+
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
 
 smb_conn_id = 'test_fs1'
 
@@ -24,9 +35,10 @@ with DAG(
     @task()
     def fileshare_test():
         hook = SambaHook(smb_conn_id)
-        files = hook.listdir('Airflow_POC_Dev/')
+        files = hook.listdir()
         print("Files in the given directory:")
         for f in files:
             print(f)
+            logging.info(f)
 
     fileshare_test()
