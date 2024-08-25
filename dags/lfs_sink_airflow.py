@@ -1,6 +1,6 @@
 from airflow import DAG
 from airflow.decorators import task
-from airflow.io.path import ObjectStoragePath
+from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 import datetime as dt
 import pandas as pd
 import os
@@ -45,14 +45,15 @@ with DAG(
         except requests.exceptions.RequestException as err:
             print ("OOps: Something Else",err)
         else:
+            return r.content
 
-            # ensure the bucket exists
-            #base.mkdir(exist_ok=True)
-            
-            path = f"{base}/{filename}"
-
-            with path.open("wb") as file:
-                file.write(r.content)
+    @task()
+    def s3_load(file):
+        s3_key = "test.csv"
+        s3_bucket = "FREDA_DATA"
+        
+        source_s3 = S3Hook('aws_default')
+        source_s3.load_file_obj(file_obj=file,key=s3_key,bucket_name=s3_buket)
 
     #call task
-    extract_lfs()
+    s3_load(extract_lfs())
