@@ -11,7 +11,7 @@ bucket_path = "FREDA_DATA"
 
 @dag(
     description="DAG to process LFS file",
-    start_date=datetime(2024, 8, 24),
+    start_date=dt.datetime(2024, 8, 24),
     schedule="@daily",
     catchup=False,
 )
