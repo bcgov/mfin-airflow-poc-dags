@@ -15,7 +15,7 @@ with DAG(
     catchup=False,
     max_active_runs=1,
     default_args={
-        "retries": 1,
+        "retries": 0,
         "retry_delay" : dt.timedelta(minutes=2)
     }
 ) as dag: 
@@ -47,7 +47,7 @@ with DAG(
         else:
 
             # ensure the bucket exists
-            base.mkdir(exist_ok=True)
+            #base.mkdir(exist_ok=True)
             
             path = f"{base}/{filename}"
 
