@@ -3,7 +3,9 @@ from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 import pandas as pd
 import datetime as dt
-import zipfile, io
+import zipfile
+import boto3
+from io import BytesIO
 
 #get the year-month of the prior month based on today's date
 date = str(pd.Period(dt.datetime.now(), 'M') - 1)
@@ -31,8 +33,11 @@ def lfs_load ():
     def get_file(filename,bucket_path):
         source_s3 = S3Hook('aws_default')
         zf = source_s3.get_key(key=filename,bucket_name=bucket_path)
+
+        #buffer = BytesIO(zf.get()["Body"].read())
+        #zipped = zipfile.ZipFile(buffer)
         print(zf.content_type)
-        zip_file = zipfile.ZipFile(zf) 
+        #zip_file = zipfile.ZipFile(zf)
         #df = pd.read_csv(zf.open('pub0724.csv'))
     '''
     @task
