@@ -42,6 +42,6 @@ def lfs_load ():
     def clean_up(filename):
         pass
     
-    waiting_for_lfs_file >> get_file(lfs_load(filename)) >> clean_up(filename)
+    waiting_for_lfs_file >> get_file(lfs_load(filename,bucket_path)) >> clean_up(filename)
 
 lfs_load()
