@@ -24,4 +24,4 @@ with DAG(
         for f in files:
             print(f)
 
-fileshare_test()
+    fileshare_test()
