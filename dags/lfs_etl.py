@@ -6,6 +6,7 @@ import datetime as dt
 import zipfile
 import boto3
 from io import BytesIO
+from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
 
 #get the year-month of the prior month based on today's date
 date = str(pd.Period(dt.datetime.now(), 'M') - 1)
@@ -39,19 +40,22 @@ def lfs_load ():
         zf.download_fileobj(filebytes)
         zip_file = zipfile.ZipFile(filebytes)
 
-        df = pd.read_csv(zip_file.open('pub0724.csv'))
+        df = pd.read_csv(zip_file.open('pub0724.csv'),nrows=100)
         return df
         
-    '''
+    
     @task
     def load_file(df):
-        pass
+        sql_hook = MsSqlHook(mssql_conn_id='test_zoneb_sql_conn', schema='FIN_SHARED_DATA_DEV')
+        engine = postgres_hook.get_sqlalchemy_engine()
+        df.to_sql("AIRFLOW_TEST_TABLE", con=engine, if_exists = 'append', index=False)
+
     
     @task
     def clean_up(filename):
         pass
-    '''
     
-    waiting_for_lfs_file >> get_file(filename,bucket_path)
+    
+    waiting_for_lfs_file >> load_file(get_file(filename,bucket_path))
 
 lfs_load()
