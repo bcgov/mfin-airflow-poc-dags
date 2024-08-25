@@ -52,7 +52,7 @@ with DAG(
         s3_bucket = "FREDA_DATA"
         
         source_s3 = S3Hook('aws_default')
-        source_s3.load_file_obj(file_obj=file,key=s3_key,bucket_name=s3_buket)
+        source_s3.load_bytes(bytes_data=file,key=s3_key,bucket_name=s3_buket)
 
     #call task
     s3_load(extract_lfs())
