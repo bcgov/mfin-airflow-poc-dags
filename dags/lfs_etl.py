@@ -39,7 +39,8 @@ def lfs_load ():
         zf.download_fileobj(filebytes)
         file = zipfile.ZipFile(filebytes)
 
-        #df = pd.read_csv(zf.open('pub0724.csv'))
+        df = pd.read_csv(zf.open('pub0724.csv'))
+        return df
         
     '''
     @task
