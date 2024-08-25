@@ -33,7 +33,7 @@ def lfs_load ():
         print(zf.content_type)
         #zf = zipfile.ZipFile('C:/Users/Desktop/THEZIPFILE.zip') 
         #df = pd.read_csv(zf.open('pub0724.csv'))
-
+    '''
     @task
     def load_file(df):
         pass
@@ -41,7 +41,8 @@ def lfs_load ():
     @task
     def clean_up(filename):
         pass
+    '''
     
-    waiting_for_lfs_file >> get_file(lfs_load(filename,bucket_path)) >> clean_up(filename)
+    waiting_for_lfs_file >> get_file(filename,bucket_path)
 
 lfs_load()
