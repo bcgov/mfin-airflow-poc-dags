@@ -5,6 +5,7 @@ import pandas as pd
 import datetime as dt
 import zipfile
 import boto3
+import sqlalchemy
 from io import BytesIO
 from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
 
@@ -47,12 +48,18 @@ def lfs_load ():
     @task
     def load_file(df):
         print(df.head())
+        '''
         #sql_hook = MsSqlHook(mssql_conn_id='test_zoneb_sql_conn', schema='FIN_SHARED_DATA_DEV')
         sql_hook = MsSqlHook(mssql_conn_id='test_zoneb_sql_conn')
         print(sql_hook.get_uri())
         engine = sql_hook.get_sqlalchemy_engine()
         #df.to_sql("AIRFLOW_TEST_TABLE", con=engine, if_exists = 'append', index=False)
-
+        '''
+        database = 'FIN_SHARED_DATA_DEV'
+        server = 'iapetus\\findata'
+        connection_string = f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server};DATABASE={database};Trusted_Connection=yes"
+        connection_url = sqlalchemy.engine.URL.create("mssql+pyodbc", query={"odbc_connect": connection_string})
+        engine = sqlalchemy.create_engine(connection_url, fast_executemany=True)
     
     @task
     def clean_up(filename):
