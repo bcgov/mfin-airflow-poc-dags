@@ -48,30 +48,34 @@ def lfs_load ():
     
     @task
     def load_file(df):
-        print(df.head())
+        #print(df.head())
         sql_hook = MsSqlHook(mssql_conn_id='test_zoneb_sql_conn')
+
+        try:
+            conn = sql_hook.get_conn()
+            cursor = conn.cursor()
+
+            cursor.execute("SELECT COUNT(1) FROM INFORMATION_SCHEMA.TABLES")
+
+            # Fetch result
+            row = cursor.fetchone()
+            print('Number of tables:', row[0])
+
+        except Exception as e:
+            print(e)
+        else:
+            cursor.close()
+            conn.close()
+
+        '''
+        #failed try
         con_uri = sql_hook.get_uri()
         print(con_uri.split('?', 1)[0])
         new_con = con_uri.split('?', 1)[0]
         engine = create_engine(new_con)
         df.to_sql("AIRFLOW_TEST_TABLE", con=engine, if_exists = 'append', index=False)
-        '''
-        conn_id = 'test_zoneb_sql_conn'  # Replace with your connection ID
-        conn = BaseHook.get_connection(conn_id)
-
-        # Construct the connection parameters
-        host = conn.host
-        database = conn.schema
-        user = conn.login
-        password = conn.password
-
-        try:
-            engine = create_engine(f"mssql+pymssql://{user}:{password}@{host}/{database}")
-            df.to_sql("AIRFLOW_TEST_TABLE", con=engine, if_exists = 'append', index=False)
-        except Exception as error:
-            # handle the exception
-            print("An exception occurred:", error)
-        '''
+        ''''
+        
 
     
     @task
