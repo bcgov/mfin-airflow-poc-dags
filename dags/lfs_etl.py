@@ -64,7 +64,7 @@ def lfs_load ():
         password = conn.password
 
         try:
-            engine = create_engine(f"mssql+pymssql://{user}:{password}@{host}:1433/{database}")
+            engine = create_engine(f"mssql+pymssql://{user}:{password}@{host}/{database}")
             df.to_sql("AIRFLOW_TEST_TABLE", con=engine, if_exists = 'append', index=False)
         except Exception as error:
             # handle the exception
