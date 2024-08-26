@@ -54,7 +54,7 @@ def lfs_load ():
         print(con_uri.split('?', 1)[0])
         new_con = con_uri.split('?', 1)[0]
         engine = create_engine(new_con)
-        #df.to_sql("AIRFLOW_TEST_TABLE", con=engine, if_exists = 'append', index=False)
+        df.to_sql("AIRFLOW_TEST_TABLE", con=engine, if_exists = 'append', index=False)
         '''
         conn_id = 'test_zoneb_sql_conn'  # Replace with your connection ID
         conn = BaseHook.get_connection(conn_id)
