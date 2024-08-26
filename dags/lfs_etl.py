@@ -49,7 +49,7 @@ def lfs_load ():
     def load_file(df):
         print(df.head())
         sql_hook = MsSqlHook(mssql_conn_id='test_zoneb_sql_conn')
-        con_uri = sql_hook.get_uri())
+        con_uri = sql_hook.get_uri()
         #engine = sql_hook.get_sqlalchemy_engine()
         #df.to_sql("AIRFLOW_TEST_TABLE", con=engine, if_exists = 'append', index=False)
 
