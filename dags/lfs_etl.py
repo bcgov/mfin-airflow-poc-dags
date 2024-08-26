@@ -67,16 +67,6 @@ def lfs_load ():
             cursor.close()
             conn.close()
 
-        '''
-        #failed try
-        con_uri = sql_hook.get_uri()
-        print(con_uri.split('?', 1)[0])
-        new_con = con_uri.split('?', 1)[0]
-        engine = create_engine(new_con)
-        df.to_sql("AIRFLOW_TEST_TABLE", con=engine, if_exists = 'append', index=False)
-        ''''
-        
-
     
     @task
     def clean_up(filename):
