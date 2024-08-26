@@ -47,7 +47,7 @@ def lfs_load ():
     @task
     def load_file(df):
         sql_hook = MsSqlHook(mssql_conn_id='test_zoneb_sql_conn', schema='FIN_SHARED_DATA_DEV')
-        engine = postgres_hook.get_sqlalchemy_engine()
+        engine = sql_hook.get_sqlalchemy_engine()
         df.to_sql("AIRFLOW_TEST_TABLE", con=engine, if_exists = 'append', index=False)
 
     
