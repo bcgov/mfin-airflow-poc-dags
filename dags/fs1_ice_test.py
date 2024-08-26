@@ -21,8 +21,8 @@ def test_ice_connection():
     #os.rename('//fs1.fin.gov.bc.ca/rmo_ct_prod/test.txt','//fs1.fin.gov.bc.ca/rmo_ct_prod/test-20240823.txt')
     for f in files:
         print(f)
-        if f == 'test.txt':
-            os.rename('test.txt','test-20240826.txt')
+        #if f == 'test.txt':
+        #    os.rename('test.txt','test-20240826.txt')
 
 default_args = {
     'owner': 'airflow',
