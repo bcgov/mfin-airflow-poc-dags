@@ -49,11 +49,12 @@ def lfs_load ():
     @task
     def load_file(df):
         print(df.head())
-        #sql_hook = MsSqlHook(mssql_conn_id='test_zoneb_sql_conn')
-        #con_uri = sql_hook.get_uri()
-        #engine = sqlalchemy.create_engine(con_uri)
+        sql_hook = MsSqlHook(mssql_conn_id='test_zoneb_sql_conn')
+        con_uri = sql_hook.get_uri()
+        print(con_uri)
+        engine = sqlalchemy.create_engine(con_uri)
         #df.to_sql("AIRFLOW_TEST_TABLE", con=engine, if_exists = 'append', index=False)
-
+        '''
         conn_id = 'test_zoneb_sql_conn'  # Replace with your connection ID
         conn = BaseHook.get_connection(conn_id)
 
@@ -69,6 +70,7 @@ def lfs_load ():
         except Exception as error:
             # handle the exception
             print("An exception occurred:", error)
+        '''
 
     
     @task
