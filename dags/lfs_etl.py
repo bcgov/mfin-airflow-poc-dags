@@ -54,9 +54,10 @@ def lfs_load ():
         try:
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
+            data = list(df.itertuples(index=False, name=None))
 
-            query = "INSERT INTO dbo.AIRFLOW_TEST (REC_NUM,SURVYEAR,SURVMNTH,LFSSTAT,PROV,FINALWT) VALUES (?, %s, %s, %s, %s, %s, %s)"
-            cursor.executemany(query, df.values.tolist())
+            query = "INSERT INTO dbo.AIRFLOW_TEST (REC_NUM,SURVYEAR,SURVMNTH,LFSSTAT,PROV,FINALWT) VALUES (%s, %s, %s, %s, %s, %s)"
+            cursor.executemany(query, data)
             conn.commit()
 
             cursor.execute("SELECT COUNT(1) FROM INFORMATION_SCHEMA.TABLES")
@@ -71,7 +72,7 @@ def lfs_load ():
             cursor.close()
             conn.close()
 
-
+        #doesn't work adaptive server error
         #engine = sql_hook.get_sqlalchemy_engine()
         #df.to_sql('AIRFLOW_TEST',con=engine,if_exists='append', index=False)
 
