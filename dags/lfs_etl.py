@@ -51,8 +51,8 @@ def lfs_load ():
         print(df.head())
         sql_hook = MsSqlHook(mssql_conn_id='test_zoneb_sql_conn')
         con_uri = sql_hook.get_uri()
-        print(con_uri)
-        engine = sqlalchemy.create_engine(con_uri)
+        print(con_uri.split('?', 1)[0])
+        engine = create_engine(con_uri)
         #df.to_sql("AIRFLOW_TEST_TABLE", con=engine, if_exists = 'append', index=False)
         '''
         conn_id = 'test_zoneb_sql_conn'  # Replace with your connection ID
