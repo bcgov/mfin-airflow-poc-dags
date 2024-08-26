@@ -49,7 +49,7 @@ def lfs_load ():
     @task
     def load_file(df):
         #print(df.head())
-        sql_hook = MsSqlHook(mssql_conn_id='test_zoneb_sql_conn')
+        sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
 
         try:
             conn = sql_hook.get_conn()
@@ -66,7 +66,6 @@ def lfs_load ():
         else:
             cursor.close()
             conn.close()
-
     
     @task
     def clean_up(filename):
