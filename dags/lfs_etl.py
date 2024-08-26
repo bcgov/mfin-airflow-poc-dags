@@ -54,8 +54,9 @@ def lfs_load ():
     @task
     def clean_up(filename):
         pass
+
+    data_df = get_file(filename,bucket_path)
     
-    
-    waiting_for_lfs_file >> load_file(get_file(filename,bucket_path))
+    waiting_for_lfs_file >> get_file(filename,bucket_path) >> load_file(data_df)
 
 lfs_load()
