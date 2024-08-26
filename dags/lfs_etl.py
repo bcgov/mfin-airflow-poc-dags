@@ -50,7 +50,7 @@ def lfs_load ():
         #sql_hook = MsSqlHook(mssql_conn_id='test_zoneb_sql_conn', schema='FIN_SHARED_DATA_DEV')
         sql_hook = MsSqlHook(mssql_conn_id='test_zoneb_sql_conn')
         engine = sql_hook.get_sqlalchemy_engine()
-        #df.to_sql("AIRFLOW_TEST_TABLE", con=engine, if_exists = 'append', index=False)
+        df.to_sql("AIRFLOW_TEST_TABLE", con=engine, if_exists = 'append', index=False)
 
     
     @task
