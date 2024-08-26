@@ -49,8 +49,8 @@ def lfs_load ():
     @task
     def load_file(df):
         print(df.head())
-        sql_hook = MsSqlHook(mssql_conn_id='test_zoneb_sql_conn')
-        con_uri = sql_hook.get_uri()
+        #sql_hook = MsSqlHook(mssql_conn_id='test_zoneb_sql_conn')
+        #con_uri = sql_hook.get_uri()
         #engine = sqlalchemy.create_engine(con_uri)
         #df.to_sql("AIRFLOW_TEST_TABLE", con=engine, if_exists = 'append', index=False)
 
@@ -63,9 +63,12 @@ def lfs_load ():
         user = conn.login
         password = conn.password
 
-        engine = create_engine(f"mssql+pymssql://{user}:{password}@{host}:1433/{database}?trusted_connection=yes")
-        df.to_sql("AIRFLOW_TEST_TABLE", con=engine, if_exists = 'append', index=False)
-
+        try:
+            engine = create_engine(f"mssql+pymssql://{user}:{password}@{host}:1433/{database}?trusted_connection=yes")
+            df.to_sql("AIRFLOW_TEST_TABLE", con=engine, if_exists = 'append', index=False)
+        except Exception as error:
+            # handle the exception
+            print("An exception occurred:", error)
 
     
     @task
