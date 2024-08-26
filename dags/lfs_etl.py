@@ -42,14 +42,14 @@ def lfs_load ():
         zf.download_fileobj(filebytes)
         zip_file = zipfile.ZipFile(filebytes)
 
-        df = pd.read_csv(zip_file.open('pub0724.csv'),nrows=100)
+        df = pd.read_csv(zip_file.open('pub0724.csv'),nrows=10)
         return df
         
     
     @task
     def load_file(df):
         #print(df.head())
-        sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
+        sql_hook = MsSqlHook(mssql_conn_id='msand_sql_server')
 
         try:
             conn = sql_hook.get_conn()
