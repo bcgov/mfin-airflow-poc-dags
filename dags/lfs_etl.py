@@ -68,7 +68,7 @@ def lfs_load ():
             conn.close()
 
         engine = sql_hook.get_sqlalchemy_engine()
-        df.to_sql('AIRFLOW_TEST',con=engine,if_exists='append' index=False)
+        df.to_sql('AIRFLOW_TEST',con=engine,if_exists='append', index=False)
     
     @task
     def clean_up(filename):
