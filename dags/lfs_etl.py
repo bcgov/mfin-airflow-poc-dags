@@ -42,7 +42,7 @@ def lfs_load ():
         zf.download_fileobj(filebytes)
         zip_file = zipfile.ZipFile(filebytes)
 
-        df = pd.read_csv(zip_file.open('pub0724.csv'),nrows=10)
+        df = pd.read_csv(zip_file.open('pub0724.csv'),nrows=10,usecols=['REC_NUM','SURVYEAR','SURVMNTH','LFSSTAT','PROV','FINALWT'], dtype='str')
         return df
         
     
@@ -54,6 +54,10 @@ def lfs_load ():
         try:
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
+
+            query = "INSERT INTO dbo.AIRFLOW_TEST (REC_NUM,SURVYEAR,SURVMNTH,LFSSTAT,PROV,FINALWT) VALUES (?, %s, %s, %s, %s, %s, %s)"
+            cursor.executemany(query, df.values.tolist())
+            conn.commit()
 
             cursor.execute("SELECT COUNT(1) FROM INFORMATION_SCHEMA.TABLES")
 
@@ -67,8 +71,10 @@ def lfs_load ():
             cursor.close()
             conn.close()
 
-        engine = sql_hook.get_sqlalchemy_engine()
-        df.to_sql('AIRFLOW_TEST',con=engine,if_exists='append', index=False)
+
+        #engine = sql_hook.get_sqlalchemy_engine()
+        #df.to_sql('AIRFLOW_TEST',con=engine,if_exists='append', index=False)
+
     
     @task
     def clean_up(filename):
