@@ -6,7 +6,7 @@ import pandas as pd
 import datetime as dt
 import zipfile
 import boto3
-import sqlalchemy
+from sqlalchemy import create_engine
 from io import BytesIO
 from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
 
