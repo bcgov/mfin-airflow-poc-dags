@@ -50,10 +50,19 @@ def lfs_load ():
         print(df.head())
         sql_hook = MsSqlHook(mssql_conn_id='test_zoneb_sql_conn')
         con_uri = sql_hook.get_uri()
-        #engine = sql_hook.get_sqlalchemy_engine()
-        #df.to_sql("AIRFLOW_TEST_TABLE", con=engine, if_exists = 'append', index=False)
-
         engine = sqlalchemy.create_engine(con_uri)
+        df.to_sql("AIRFLOW_TEST_TABLE", con=engine, if_exists = 'append', index=False)
+        
+        conn_id = 'test_zoneb_sql_conn'  # Replace with your connection ID
+        conn = BaseHook.get_connection(conn_id)
+
+        # Construct the connection parameters
+        host = conn.host
+        database = conn.schema
+        user = conn.login
+        password = conn.password
+
+
     
     @task
     def clean_up(filename):
