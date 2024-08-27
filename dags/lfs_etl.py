@@ -49,7 +49,7 @@ def lfs_load ():
     @task
     def load_file(df):
         #print(df.head())
-        sql_hook = MsSqlHook(mssql_conn_id='msand_sql_server')
+        sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
 
         try:
             conn = sql_hook.get_conn()
