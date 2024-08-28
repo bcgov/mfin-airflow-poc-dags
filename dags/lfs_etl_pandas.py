@@ -58,7 +58,7 @@ def lfs_load_pandas():
         #remove the extra info from the conn string
         uri = sql_hook.get_uri()
         print(uri)
-        con_uri = uri.splt('?',1)[0]
+        con_uri = uri.split('?',1)[0]
         enginer = create_engine(con_uri)
 
         df.to_sql('AIRFLOW_TEST',con=engine,if_exists='append', index=False)
