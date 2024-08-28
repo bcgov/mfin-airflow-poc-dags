@@ -18,7 +18,7 @@ bucket_path = "FREDA_DATA"
 @dag(
     description="DAG to process LFS file via pandas",
     start_date=dt.datetime(2024, 8, 24),
-    schedule="@daily",
+    schedule=None,
     catchup=False,
 )
 def lfs_load_pandas():
@@ -51,8 +51,16 @@ def lfs_load_pandas():
         #print(df.head())
         sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
 
-        #doesn't work adaptive server error
-        engine = sql_hook.get_sqlalchemy_engine()
+        #fails complaining about __extra__ in connection string
+        #engine = sql_hook.get_sqlalchemy_engine()
+
+        #create engine manually
+        #remove the extra info from the conn string
+        uri = sql_hook.get_uri()
+        print(uri)
+        con_uri = uri.splt('?',1)[0]
+        enginer = create_engine(con_uri)
+
         df.to_sql('AIRFLOW_TEST',con=engine,if_exists='append', index=False)
 
     
