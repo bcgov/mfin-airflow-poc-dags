@@ -16,7 +16,7 @@ filename = f"{date}-CSV.zip"
 bucket_path = "FREDA_DATA"
 
 @dag(
-    description="DAG to process LFS file",
+    description="DAG to process LFS file via pandas",
     start_date=dt.datetime(2024, 8, 24),
     schedule="@daily",
     catchup=False,
