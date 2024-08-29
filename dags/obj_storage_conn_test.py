@@ -40,7 +40,7 @@ with DAG(
     # Define the S3ListOperator task
     list_s3_objects = S3ListOperator(
         task_id='list_s3_objects',
-        bucket='FREDA_DATA',  # Replace with your bucket name
+        bucket='FIN_DATA_STORE',  # Replace with your bucket name
         aws_conn_id='aws_default',  # Replace with your AWS connection ID
         verify=False  # Disable SSL verification for testing purposes
     )
