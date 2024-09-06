@@ -14,11 +14,11 @@ from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
 date = str(pd.Period(dt.datetime.now(), 'M') - 1)
 filename = f"{date}-CSV.zip"
 bucket_path = "FREDA_DATA"
+csv = f"pub{date[5:7]}{date[2:4]}.csv"
 
 @dag(
     description="DAG to process LFS file",
-    start_date=dt.datetime(2024, 8, 24),
-    schedule="@daily",
+    schedule=None,
     catchup=False,
 )
 def lfs_load ():
@@ -42,7 +42,8 @@ def lfs_load ():
         zf.download_fileobj(filebytes)
         zip_file = zipfile.ZipFile(filebytes)
 
-        df = pd.read_csv(zip_file.open('pub0724.csv'),nrows=10,usecols=['REC_NUM','SURVYEAR','SURVMNTH','LFSSTAT','PROV','FINALWT'], dtype='str')
+        #this is not a good practice, datasets should not be passed between tasks
+        df = pd.read_csv(zip_file.open(csv),nrows=10,usecols=['REC_NUM','SURVYEAR','SURVMNTH','LFSSTAT','PROV','FINALWT'], dtype='str')
         return df
         
     
