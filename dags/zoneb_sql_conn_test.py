@@ -53,6 +53,11 @@ def test_mssql_connections_for_databases(database_list):
                 # Connection is closed automatically by 'with' block
         except Exception as e:
             print(f"Database: {database} - An error occurred: {e}")
+        finally:
+            # Ensure the connection is closed
+            if connection:
+                connection.close()
+                print(f'Database: {database} - Connection closed.')
 
 # Define the default arguments
 default_args = {
