@@ -6,29 +6,53 @@ from datetime import timedelta
 import pymssql
 
 # Define a function to test MSSQL connection
-def test_mssql_connection():
+# def test_mssql_connection():
+#     conn_id = 'mssql_default'  # Replace with your connection ID
+#     conn = BaseHook.get_connection(conn_id)
+
+#     # Construct the connection parameters
+#     host = conn.host
+#     #database = conn.schema
+#     user = conn.login
+#     password = conn.password
+
+#     try:
+#         with pymssql.connect(host=host, database=database, user=user, password=password) as connection:
+#             cursor = connection.cursor()
+#             cursor.execute("SELECT COUNT(1) FROM INFORMATION_SCHEMA.TABLES")
+
+#             # Fetch result
+#             row = cursor.fetchone()
+#             print('Number of tables:', row[0])
+
+#             # Close connection
+#             conn.close()
+#     except Exception as e:
+#         print(f"An error occurred: {e}")
+
+# Define a function to test MSSQL connection for a list of databases
+def test_mssql_connections_for_databases(database_list):
     conn_id = 'mssql_default'  # Replace with your connection ID
     conn = BaseHook.get_connection(conn_id)
 
     # Construct the connection parameters
     host = conn.host
-    database = conn.schema
     user = conn.login
     password = conn.password
 
-    try:
-        with pymssql.connect(host=host, database=database, user=user, password=password) as connection:
-            cursor = connection.cursor()
-            cursor.execute("SELECT COUNT(1) FROM INFORMATION_SCHEMA.TABLES")
+    for database in database_list:
+        try:
+            with pymssql.connect(host=host, database=database, user=user, password=password) as connection:
+                cursor = connection.cursor()
+                cursor.execute("SELECT COUNT(1) FROM INFORMATION_SCHEMA.TABLES")
 
-            # Fetch result
-            row = cursor.fetchone()
-            print('Number of tables:', row[0])
+                # Fetch result
+                row = cursor.fetchone()
+                print(f'Database: {database} - Number of tables:', row[0])
 
-            # Close connection
-            conn.close()
-    except Exception as e:
-        print(f"An error occurred: {e}")
+                # Connection is closed automatically by 'with' block
+        except Exception as e:
+            print(f"Database: {database} - An error occurred: {e}")
 
 # Define the default arguments
 default_args = {
@@ -50,10 +74,20 @@ dag = DAG(
     catchup=False,
 )
 
+# List of databases to test
+database_list = ['FIN_SHARED_LANDING_DEV', 'FIN_SHARED_STAGING_DEV', 'FIN_SHARED_DATA_DEV', 'FIN_SHARED_OPS_DEV', 'FIN_SHARED_FREDA_STATIC_PROD','TACS_BI_EXTRACT']
+
 # Define the task
-test_connection_task = PythonOperator(
-    task_id='test_mssql_connection_task',
-    python_callable=test_mssql_connection,
+# test_connection_task = PythonOperator(
+#     task_id='test_mssql_connection_task',
+#     python_callable=test_mssql_connection,
+#     dag=dag,
+# )
+
+test_connections_task = PythonOperator(
+    task_id='test_mssql_connections_task',
+    python_callable=test_mssql_connections_for_databases,
+    op_kwargs={'database_list': database_list},
     dag=dag,
 )
 
