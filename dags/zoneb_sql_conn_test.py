@@ -92,4 +92,4 @@ test_connections_task = PythonOperator(
 )
 
 # Set task dependencies
-test_connection_task
+test_connections_task
