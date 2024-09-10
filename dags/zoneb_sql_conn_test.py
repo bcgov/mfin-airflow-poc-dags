@@ -31,7 +31,36 @@ import pymssql
 #         print(f"An error occurred: {e}")
 
 # Define a function to test MSSQL connection for a list of databases
-def test_mssql_connections_for_databases(database_list):
+# def test_mssql_connections_for_databases(database_list):
+#     conn_id = 'mssql_default'  # Replace with your connection ID
+#     conn = BaseHook.get_connection(conn_id)
+
+#     # Construct the connection parameters
+#     host = conn.host
+#     user = conn.login
+#     password = conn.password
+
+#     for database in database_list:
+#         try:
+#             with pymssql.connect(host=host, database=database, user=user, password=password) as connection:
+#                 cursor = connection.cursor()
+#                 cursor.execute("SELECT COUNT(1) FROM INFORMATION_SCHEMA.TABLES")
+
+#                 # Fetch result
+#                 row = cursor.fetchone()
+#                 print(f'Database: {database} - Number of tables:', row[0])
+
+#                 # Connection is closed automatically by 'with' block
+#         except Exception as e:
+#             print(f"Database: {database} - An error occurred: {e}")
+#         finally:
+#             # Ensure the connection is closed
+#             if connection:
+#                 connection.close()
+#                 print(f'Database: {database} - Connection closed.')
+
+# Define a function to test MSSQL connection for a single database
+def test_mssql_connection_for_database(database):
     conn_id = 'mssql_default'  # Replace with your connection ID
     conn = BaseHook.get_connection(conn_id)
 
@@ -40,24 +69,23 @@ def test_mssql_connections_for_databases(database_list):
     user = conn.login
     password = conn.password
 
-    for database in database_list:
-        try:
-            with pymssql.connect(host=host, database=database, user=user, password=password) as connection:
-                cursor = connection.cursor()
-                cursor.execute("SELECT COUNT(1) FROM INFORMATION_SCHEMA.TABLES")
+    connection = None
+    try:
+        # Establish the connection
+        connection = pymssql.connect(host=host, database=database, user=user, password=password)
+        cursor = connection.cursor()
+        cursor.execute("SELECT COUNT(1) FROM INFORMATION_SCHEMA.TABLES")
 
-                # Fetch result
-                row = cursor.fetchone()
-                print(f'Database: {database} - Number of tables:', row[0])
-
-                # Connection is closed automatically by 'with' block
-        except Exception as e:
-            print(f"Database: {database} - An error occurred: {e}")
-        finally:
-            # Ensure the connection is closed
-            if connection:
-                connection.close()
-                print(f'Database: {database} - Connection closed.')
+        # Fetch result
+        row = cursor.fetchone()
+        print(f'Database: {database} - Number of tables:', row[0])
+    except Exception as e:
+        print(f"Database: {database} - An error occurred: {e}")
+    finally:
+        # Ensure the connection is closed
+        if connection:
+            connection.close()
+            print(f'Database: {database} - Connection closed.')
 
 # Define the default arguments
 default_args = {
@@ -89,12 +117,28 @@ database_list = ['FIN_SHARED_LANDING_DEV', 'FIN_SHARED_STAGING_DEV', 'FIN_SHARED
 #     dag=dag,
 # )
 
-test_connections_task = PythonOperator(
-    task_id='test_mssql_connections_task',
-    python_callable=test_mssql_connections_for_databases,
-    op_kwargs={'database_list': database_list},
-    dag=dag,
-)
+# Create a dictionary to hold the tasks
+tasks = {}
+
+# test_connections_task = PythonOperator(
+#     task_id='test_mssql_connections_task',
+#     python_callable=test_mssql_connections_for_databases,
+#     op_kwargs={'database_list': database_list},
+#     dag=dag,
+# )
+
+for database in database_list:
+    task = PythonOperator(
+        task_id=f'test_mssql_connection_{database}',
+        python_callable=test_mssql_connection_for_database,
+        op_kwargs={'database': database},
+        dag=dag,
+    )
+    tasks[database] = task
+
+# Set task dependencies (all tasks are independent)
+for task in tasks.values():
+    task  # No dependencies between tasks, so they run independently
 
 # Set task dependencies
-test_connections_task
+#test_connections_task
