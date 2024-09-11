@@ -24,7 +24,8 @@ def test_ice_connection():
     for f in files:
         if f == 'iceDB_ICE_BCMOFRMO.zip' :
             shutil.copy(f,destination)
-            print ('file copied')
+            print(f)
+            print('file copied')
         else:
             print('skipped')
             print(f)
@@ -35,16 +36,16 @@ def test_ice_connection():
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': datetime(2024, 6, 11),
+    'start_date': datetime(2024, 9, 11),
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 1,
 }
 
 dag = DAG(
-    'Test_FS1_ICE_connectivity',
+    'copy_FS1_ICE_source',
     default_args=default_args,
-    description='A DAG to test ICE FS1 connection',
+    description='Backup CT source file in the completed folder',
     schedule_interval=None,
 )
 
