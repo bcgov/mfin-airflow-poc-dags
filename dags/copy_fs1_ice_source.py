@@ -1,5 +1,5 @@
 import os
-import shutil
+import pandas as pd
 from datetime import datetime
 from airflow import DAG
 from airflow.providers.samba.hooks.samba import SambaHook
@@ -15,22 +15,18 @@ def test_ice_connection():
     #path = share_name + directory
     path = directory
     hook = SambaHook(conn_id)
-    #files = hook.listdir(share_name, directory)
     files = hook.listdir(path)
     destination = '/rmo_ct_prod/completed/'
 
     print("Files in the rmo_ct_prod directory:")
     dt = str(pd.Period(datetime.datetime.now(),'%Y%m%d'))
-    #os.rename('//fs1.fin.gov.bc.ca/rmo_ct_prod/test.txt','//fs1.fin.gov.bc.ca/rmo_ct_prod/test-20240823.txt')
+
     for f in files:
         if f == 'iceDB_ICE_BCMOFRMO.zip' :
             hook.replace(path + f, destination + 'iceDB_ICE_BCMOFRMO-' + dt)
             print('File copied ',f)
         else:
             print('File skipped', f)
-        #print(f)
-        #if f == 'test.txt':
-        #    os.rename('test.txt','test-20240826.txt')
 
 default_args = {
     'owner': 'airflow',
