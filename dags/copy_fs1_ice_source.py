@@ -20,11 +20,11 @@ def test_ice_connection():
     destination = '/rmo_ct_prod/completed/'
 
     print("Files in the rmo_ct_prod directory:")
-    #dt = str(pd.Period(datetime.datetime.now(),'%Y%m%d'))
+    dt = str(pd.Period(datetime.datetime.now(),'%Y%m%d'))
     #os.rename('//fs1.fin.gov.bc.ca/rmo_ct_prod/test.txt','//fs1.fin.gov.bc.ca/rmo_ct_prod/test-20240823.txt')
     for f in files:
         if f == 'iceDB_ICE_BCMOFRMO.zip' :
-            hook.replace(path + f, destination + 'iceDB_ICE_BCMOFRMO-20240999.zip')
+            hook.replace(path + f, destination + 'iceDB_ICE_BCMOFRMO-' + dt)
             print('File copied ',f)
         else:
             print('File skipped', f)
