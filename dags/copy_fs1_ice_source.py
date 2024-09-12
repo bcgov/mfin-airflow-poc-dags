@@ -17,19 +17,17 @@ def test_ice_connection():
     hook = SambaHook(conn_id)
     #files = hook.listdir(share_name, directory)
     files = hook.listdir(path)
-    destination = hook.path(path + '/completed/')
+    destination = '/rmo_ct_prod/completed/')
 
     print("Files in the rmo_ct_prod directory:")
     #dt = str(pd.Period(datetime.datetime.now(),'%Y%m%d'))
     #os.rename('//fs1.fin.gov.bc.ca/rmo_ct_prod/test.txt','//fs1.fin.gov.bc.ca/rmo_ct_prod/test-20240823.txt')
     for f in files:
         if f == 'iceDB_ICE_BCMOFRMO.zip' :
-            hook.shutil.copy(f,destination)
-            print(f)
-            print('file copied')
+            hook.replace(path + f, destination + 'iceDB_ICE_BCMOFRMO-20240999.zip')
+            print('File copied ',f)
         else:
-            print('skipped')
-            print(f)
+            print('File skipped', f)
         #print(f)
         #if f == 'test.txt':
         #    os.rename('test.txt','test-20240826.txt')
