@@ -17,7 +17,7 @@ def test_ice_connection():
     hook = SambaHook(conn_id)
     #files = hook.listdir(share_name, directory)
     files = hook.listdir(path)
-    destination = '/rmo_ct_prod/completed/')
+    destination = '/rmo_ct_prod/completed/'
 
     print("Files in the rmo_ct_prod directory:")
     #dt = str(pd.Period(datetime.datetime.now(),'%Y%m%d'))
