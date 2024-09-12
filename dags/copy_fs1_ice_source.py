@@ -1,6 +1,5 @@
 import os
-import pandas as pd
-from datetime import datetime
+import datetime as dt
 from airflow import DAG
 from airflow.providers.samba.hooks.samba import SambaHook
 from airflow.operators.python_operator import PythonOperator
@@ -19,11 +18,11 @@ def test_ice_connection():
     destination = '/rmo_ct_prod/completed/'
 
     print("Files in the rmo_ct_prod directory:")
-    dt = str(pd.Period(datetime.datetime.now(),'%Y%m%d'))
+    dYmd = dt.datetime.today().strftime('%Y%m%d')
 
     for f in files:
         if f == 'iceDB_ICE_BCMOFRMO.zip' :
-            hook.replace(path + f, destination + 'iceDB_ICE_BCMOFRMO-' + dt)
+            hook.replace(path + f, destination + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip')
             print('File copied ',f)
         else:
             print('File skipped', f)
