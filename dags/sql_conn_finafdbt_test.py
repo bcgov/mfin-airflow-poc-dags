@@ -40,7 +40,7 @@ default_args = {
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 1,
-    'retry_delay': timedelta(minutes=5),
+    'retry_delay': timedelta(minutes=1),
 }
 
 # Define the DAG
@@ -48,7 +48,7 @@ dag = DAG(
     'test_mssql_finafdbt_conn',
     default_args=default_args,
     description='A  DAG to test MSSQL connection for FINAFDBT',
-    schedule_interval=None,  # Set to None to run manually or specify a cron schedule
+    schedule_interval=timedelta(days=1),  # Set to None to run manually or specify a cron schedule
     start_date=days_ago(1),
     catchup=False,
 )
