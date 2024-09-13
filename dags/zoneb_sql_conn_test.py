@@ -102,7 +102,7 @@ dag = DAG(
     'test_mssql_connection',
     default_args=default_args,
     description='A simple DAG to test MSSQL connection using pymssql',
-    schedule_interval=None,  # Set to None to run manually or specify a cron schedule
+    schedule_interval=timedelta(days=1),  # Set to None to run manually or specify a cron schedule
     start_date=days_ago(1),
     catchup=False,
 )
