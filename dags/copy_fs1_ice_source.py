@@ -41,7 +41,7 @@ dag = DAG(
     'copy_fs1_ice_source',
     default_args=default_args,
     description='Backup CT source file in the completed folder',
-    schedule_interval="01 08 * * *"),
+    schedule_interval="01 08 * * *",
 )
 
 test_task = PythonOperator(
