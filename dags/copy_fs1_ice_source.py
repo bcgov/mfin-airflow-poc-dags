@@ -32,8 +32,7 @@ def test_ice_connection():
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    #'start_date': datetime(2024, 9, 19),
-    'start_date' : pendulum.datetime(2024, 09, 19, hour=8, tz="PDT")
+    'start_date': datetime(2024, 9, 19),
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 1,
