@@ -30,7 +30,8 @@ def test_ice_connection():
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
- #   'start_date': dt(2024, 9, 11),
+    'start_date': dt(2024, 9, 20),
+    'email': ['eloy.mendez@gov.bc.ca'].
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 1,
@@ -40,7 +41,7 @@ dag = DAG(
     'copy_fs1_ice_source',
     default_args=default_args,
     description='Backup CT source file in the completed folder',
-    schedule_interval=None,
+    schedule_interval="01 08 * * *"),
 )
 
 test_task = PythonOperator(
