@@ -1,5 +1,6 @@
 import os
 import datetime as dt
+import pendulum
 from airflow import DAG
 from airflow.providers.samba.hooks.samba import SambaHook
 from airflow.operators.python_operator import PythonOperator
@@ -31,7 +32,7 @@ def test_ice_connection():
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': datetime(2024, 9, 19),
+    'start_date': datetime(2024, 9, 19, tzinfo=local_tz),
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 1,
@@ -39,6 +40,7 @@ default_args = {
 
 dag = DAG(
     'copy_fs1_ice_source',
+    local_tz = pendulum.timezone("America/Vancouver")
     default_args=default_args,
     description='Backup CT source file in the completed folder',
     schedule_interval="01 08 * * *",
