@@ -32,7 +32,7 @@ def test_ice_connection():
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': datetime(2024, 9, 19, tzinfo=local_tz),
+    'start_date': datetime(2024, 9, 19, local_tz),#pendulum.timezone("America/Vancouver")),
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 1,
@@ -40,7 +40,7 @@ default_args = {
 
 dag = DAG(
     'copy_fs1_ice_source',
-    local_tz = pendulum.timezone("America/Vancouver")
+    local_tz = pendulum.timezone("America/Vancouver"),
     default_args=default_args,
     description='Backup CT source file in the completed folder',
     schedule_interval="01 15 * * *",
