@@ -43,7 +43,7 @@ dag = DAG(
     local_tz = pendulum.timezone("America/Vancouver")
     default_args=default_args,
     description='Backup CT source file in the completed folder',
-    schedule_interval="01 08 * * *",
+    schedule_interval="01 15 * * *",
 )
 
 test_task = PythonOperator(
