@@ -36,7 +36,7 @@ def etl_ice_process():
     destination_unzip = '/rmo_ct_prod/inprogress'
 
     @task
-    def etl_ice_backup:
+    def etl_ice_backup():
         # Backing up daily CT source file in \\fs1.fin.gov.bc.ca\rmo_ct_prod\completed
         dYmd = dt.datetime.today().strftime('%Y%m%d')
         for f in files:
