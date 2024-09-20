@@ -18,7 +18,7 @@ default_args = {
 }
 
 # DAG definition
-@dag = DAG(
+@dag(
     'etl_ice_process',
     default_args=default_args,
     description='Expand .zip and backup CT source file in the completed folder',
