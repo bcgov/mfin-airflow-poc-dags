@@ -22,7 +22,7 @@ default_args = {
     'etl_ice_process',
     default_args=default_args,
     description='Expand .zip and backup CT source file in the completed folder',
-    schedule_interval="01 15 * * *", # UTC 15:01 = PDT 08:01
+    schedule_interval=None
 )
 
 def etl_ice_process():
