@@ -55,7 +55,7 @@ def etl_ice_process():
 #    task_id='etl_ice_process',
 #    python_callable=etl_ice_process,
 #    dag=dag,
-)
+#)
     
     etl_ice_unzip >> etl_ice_backup
 
