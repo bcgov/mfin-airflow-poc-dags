@@ -19,6 +19,10 @@ def airflow_stress_test ():
         try:
             smb_conn_id = 'fs1_fin_data_store'
             hook = SambaHook(smb_conn_id)
+            files = hook.listdir('.')
+            print("Files in the given directory:")
+            for f in files:
+                print(f)
             file = hook.open_file("bulktest/airflow_stress_file.csv")
             
             #load data into data frame
