@@ -15,7 +15,7 @@ import time
 def airflow_stress_test ():
     @task
     def load_file():
-        sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
+        sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
         rows = 100
 
         try:
