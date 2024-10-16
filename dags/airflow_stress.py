@@ -17,7 +17,7 @@ def airflow_stress_test ():
         sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
 
         try:
-            smb_conn_id = 'test_fs1'
+            smb_conn_id = 'fs1_fin_data_store'
             hook = SambaHook(smb_conn_id)
             file = hook.open_file("bulktest\\airflow_stress_file.csv")
             
