@@ -23,7 +23,7 @@ def airflow_stress_test ():
             print("Files in the given directory:")
             for f in files:
                 print(f)
-            file = hook.open_file("bulktest/airflow_stress_file.csv")
+            file = hook.open_file("bulk_test/airflow_stress_file.csv")
             
             #load data into data frame
             print(f"loading dataframe {rows} rows test, duration:", end='', flush=True)
