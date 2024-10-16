@@ -19,7 +19,7 @@ def airflow_stress_test ():
         try:
             smb_conn_id = 'test_fs1'
             hook = SambaHook(smb_conn_id)
-            file = hook.open("bulktest\\airflow_stress_file.csv")
+            file = hook.open_file("bulktest\\airflow_stress_file.csv")
             
             #load data into data frame
             print(f"loading dataframe {rows} rows test, duration:", end='', flush=True)
