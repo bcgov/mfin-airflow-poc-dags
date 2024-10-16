@@ -15,6 +15,7 @@ def airflow_stress_test ():
     @task
     def load_file():
         sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
+        rows = 100
 
         try:
             smb_conn_id = 'fs1_fin_data_store'
@@ -28,7 +29,7 @@ def airflow_stress_test ():
             #load data into data frame
             print(f"loading dataframe {rows} rows test, duration:", end='', flush=True)
             start_time = time.time()
-            df = pd.read_csv(file, nrows=10, dtype='str')
+            df = pd.read_csv(file, nrows=rows, dtype='str')
             print("--- %s seconds ---" % (time.time() - start_time),flush=True)
             df = df.fillna("0")
             print(df.head())
