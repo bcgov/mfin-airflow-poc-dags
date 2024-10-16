@@ -5,6 +5,7 @@ import pandas as pd
 import datetime as dt
 from sqlalchemy import create_engine
 from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
+import time
 
 @dag(
     description="DAG to stress test",
@@ -69,7 +70,7 @@ def airflow_stress_test ():
                         """
             
             start_time = time.time()
-            #cursor.executemany(query, data)
+            cursor.executemany(query, data)
 
             print("--- %s seconds ---" % (time.time() - start_time),flush=True)
 
