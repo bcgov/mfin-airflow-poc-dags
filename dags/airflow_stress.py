@@ -66,7 +66,7 @@ def airflow_stress_test ():
                             ,RESIDENT_STUDENTS
                             ,NON_RESIDENT_STUDENTS
                             ,ADULT_STUDENTS)
-                            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                         """
             
             start_time = time.time()
