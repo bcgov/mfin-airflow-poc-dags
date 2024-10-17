@@ -42,7 +42,7 @@ def airflow_stress_test_bulk():
     @task
     def file_runner():
 
-        test_size = [1000,10000,100000]
+        test_size = [1000,10000,100000,1000000,4500000]
 
         for size in test_size:
             load_file(size)
