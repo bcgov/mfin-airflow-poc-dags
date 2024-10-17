@@ -21,7 +21,7 @@ def airflow_stress_test_bulk():
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
-            query = f""" BULK INSERT [dbo].[AIRFLOW_STRESS_TEST_TARGET]
+            query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[AIRFLOW_STRESS_TEST_TARGET]
                     FROM '\\\\fs1.fin.gov.bc.ca\Finance_Data_Store\\bulk_test\\airflow_stress_file.csv'
                     WITH
 	                ( FORMAT = 'CSV'
