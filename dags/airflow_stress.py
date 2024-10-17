@@ -43,7 +43,7 @@ def airflow_stress_test ():
 
             print(f"vanilla insert {rows} rows test, duration:", end='')
             
-            query = """INSERT INTO dbo.AIRFLOW_STRESS_TEST_TARGET
+            query = """INSERT INTO FIN_SHARED_LANDING_DEV.dbo.AIRFLOW_STRESS_TEST_TARGET
                             ([INDEX]
                             ,SCHOOL_YEAR
                             ,DATA_LEVEL
