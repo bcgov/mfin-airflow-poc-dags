@@ -13,10 +13,9 @@ import time
     catchup=False,
 )
 def airflow_stress_test ():
-    @task
-    def load_file():
+    
+    def load_file(rows):
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
-        rows = 1000
 
         try:
             smb_conn_id = 'fs1_fin_data_store'
@@ -28,10 +27,9 @@ def airflow_stress_test ():
             file = hook.open_file("bulk_test/airflow_stress_file.csv")
             
             #load data into data frame
-            print(f"loading dataframe {rows} rows test, duration:", end='', flush=True)
             start_time = time.time()
             df = pd.read_csv(file, nrows=rows, dtype='str')
-            print("--- %s seconds ---" % (time.time() - start_time),flush=True)
+            print(f"loading dataframe {rows} rows test, duration: --- {time.time() - start_time} seconds ---")
             df = df.fillna("0")
             print(df.head())
             data = list(df.itertuples(index=False, name=None))
@@ -40,8 +38,6 @@ def airflow_stress_test ():
         else:
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
-
-            print(f"vanilla insert {rows} rows test, duration:", end='')
             
             query = """INSERT INTO FIN_SHARED_LANDING_DEV.dbo.AIRFLOW_STRESS_TEST_TARGET
                             ([INDEX]
@@ -72,11 +68,18 @@ def airflow_stress_test ():
             start_time = time.time()
             cursor.executemany(query, data)
             conn.commit()
-
-            print("--- %s seconds ---" % (time.time() - start_time),flush=True)
+            print(f"vanilla insert {rows} rows test, duration: --- {time.time() - start_time} seconds ---")
 
             #cursor.execute("TRUNCATE TABLE dbo.AIRFLOW_STRESS_TEST_TARGET")
 
-    load_file()
+    @task
+    def file_runner():
+
+        test_size = [1000,10000,100000]
+
+        for size in test_size:
+            load_file(size)
+
+    file_runner()
 
 airflow_stress_test()
