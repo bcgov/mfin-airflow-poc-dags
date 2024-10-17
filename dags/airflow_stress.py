@@ -16,7 +16,7 @@ def airflow_stress_test ():
     @task
     def load_file():
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
-        rows = 100
+        rows = 1000
 
         try:
             smb_conn_id = 'fs1_fin_data_store'
@@ -71,6 +71,7 @@ def airflow_stress_test ():
             
             start_time = time.time()
             cursor.executemany(query, data)
+            cursor.commit()
 
             print("--- %s seconds ---" % (time.time() - start_time),flush=True)
 
