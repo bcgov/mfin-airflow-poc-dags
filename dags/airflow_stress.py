@@ -71,7 +71,7 @@ def airflow_stress_test ():
             
             start_time = time.time()
             cursor.executemany(query, data)
-            cursor.commit()
+            conn.commit()
 
             print("--- %s seconds ---" % (time.time() - start_time),flush=True)
 
