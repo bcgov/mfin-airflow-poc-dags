@@ -46,7 +46,7 @@ dag = DAG(
 
 ssh_task = SSHOperator(
     task_id = 'ssh_task',
-    ssh_conn_id = ssh,
+    ssh_conn_id = 'fs1_fin_data_store',
     command = 'echo "Hello World"',
     dag=dag,
 )
