@@ -42,7 +42,7 @@ dag = DAG(
 )
 
 ssh_task = PythonOperator(
-    task_id='ssh task',
+    task_id='ssh_task',
     python_callable=remote_powershell,
     dag=dag,
 )
