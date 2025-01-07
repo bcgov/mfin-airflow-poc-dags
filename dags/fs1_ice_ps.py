@@ -1,18 +1,21 @@
 import os
 import datetime as dt
 from airflow import DAG
+from airflow.providers.ssh.operators.ssh import SSHOperator
 from airflow.contrib.hooks.ssh_hook import SSHHook
-from airflow.operators.python_operator import PythonOperator
 from datetime import datetime
+
+conn_id = 'fs1_fin_data_store'
+ssh = SSHHook(ssh_conn_id=conn_id)
 
 
 def remote_powershell():
     # Replace these with your SMB server details
-    conn_id = 'fs1_fin_data_store'
+#    conn_id = 'fs1_fin_data_store'
       
     directory = '/rmo_ct_prod/'
     path = directory
-    ssh = SSHHook(ssh_conn_id=conn_id)
+#    ssh = SSHHook(ssh_conn_id=conn_id)
     
     ssh_client = None
     
@@ -41,9 +44,10 @@ dag = DAG(
     schedule_interval="* * * * *",
 )
 
-ssh_task = PythonOperator(
-    task_id='ssh_task',
-    python_callable=remote_powershell,
+ssh_task = SSHOperator(
+    task_id = 'ssh_task',
+    ssh_conn_id = ssh,
+    command = 'echo "Hello World"),
     dag=dag,
 )
 
