@@ -47,7 +47,7 @@ dag = DAG(
 ssh_task = SSHOperator(
     task_id = 'ssh_task',
     ssh_conn_id = ssh,
-    command = 'echo "Hello World"),
+    command = 'echo "Hello World"',
     dag=dag,
 )
 
