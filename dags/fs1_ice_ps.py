@@ -1,7 +1,7 @@
 import os
 import datetime as dt
 from airflow import DAG
-from airflow.contrib.hooks.shh_hook import SSHHook
+from airflow.contrib.hooks.ssh_hook import SSHHook
 from airflow.operators.python_operator import PythonOperator
 from datetime import datetime
 
