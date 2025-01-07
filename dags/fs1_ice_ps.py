@@ -41,7 +41,7 @@ dag = DAG(
     schedule_interval="* * * * *",
 )
 
-shh_task = PythonOperator(
+ssh_task = PythonOperator(
     task_id='ssh task',
     python_callable=remote_powershell,
     dag=dag,
