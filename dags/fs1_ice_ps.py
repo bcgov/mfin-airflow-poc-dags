@@ -6,7 +6,7 @@ from airflow.contrib.hooks.ssh_hook import SSHHook
 from datetime import datetime
 
 #conn_id = 'ssh_powershell'
-sshHook = SSHHook.get_conn("ssh_powershell")
+sshHook = SSHHook.get_conn('ssh_powershell')
 
 
 default_args = {
