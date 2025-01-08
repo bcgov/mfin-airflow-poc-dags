@@ -5,8 +5,8 @@ from airflow.providers.ssh.operators.ssh import SSHOperator
 from airflow.contrib.hooks.ssh_hook import SSHHook
 from datetime import datetime
 
-conn_id = 'fs1_rmo_ice'
-sshHook = SSHHook.get_conn(ssh_conn_id=conn_id)
+#conn_id = 'fs1_rmo_ice'
+#sshHook = SSHHook.get_conn(ssh_conn_id=conn_id)
 
 
 def remote_powershell():
@@ -46,7 +46,7 @@ dag = DAG(
 
 ssh_task = SSHOperator(
     task_id = 'ssh_task',
-    ssh_conn_id = 'sshHook',
+    ssh_conn_id = 'fs1_rmo_ice',
     command = 'dir /rmo_ct_prod/*.* > files.txt"',
     dag=dag,
 )
