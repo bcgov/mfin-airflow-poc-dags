@@ -5,8 +5,8 @@ from airflow.providers.ssh.operators.ssh import SSHOperator
 from airflow.contrib.hooks.ssh_hook import SSHHook
 from datetime import datetime
 
-#conn_id = 'fs1_rmo_ice'
-#sshHook = SSHHook.get_conn(ssh_conn_id=conn_id)
+conn_id = 'ssh_powershell'
+sshHook = SSHHook.get_conn(ssh_conn_id = conn_id)
 
 
 def remote_powershell():
@@ -41,7 +41,7 @@ dag = DAG(
     'Remote_PowerShell_script',
     default_args=default_args,
     description='Executing remote PowerShell script',
-    schedule_interval="* * * * *",
+    schedule=None,
 )
 
 ssh_task = SSHOperator(
