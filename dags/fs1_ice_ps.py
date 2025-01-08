@@ -6,7 +6,7 @@ from airflow.contrib.hooks.ssh_hook import SSHHook
 from datetime import datetime
 
 #conn_id = 'ssh_powershell'
-sshHook = SSHHook.get_conn('ssh_powershell')
+sshHook = SSHHook.get_conn(ssh_powershell)
 
 
 default_args = {
@@ -27,7 +27,7 @@ dag = DAG(
 
 ssh_task = SSHOperator(
     task_id = 'ssh_task',
-    ssh_conn_id = sshHook,
+    ssh_hook = sshHook,
     command = 'dir /rmo_ct_prod/*.* > files.txt"',
     dag=dag,
 )
