@@ -46,7 +46,7 @@ dag = DAG(
 
 ssh_task = SSHOperator(
     task_id = 'ssh_task',
-    ssh_conn_id = 'fs1_rmo_ice',
+    ssh_conn_id = 'ssh_powershell',
     command = 'dir /rmo_ct_prod/*.* > files.txt"',
     dag=dag,
 )
