@@ -42,6 +42,7 @@ def airflow_rmo_ct_bulk():
 
     @task
     def file_runner():
+        
         load_ct_source(91)
 
     file_runner()
