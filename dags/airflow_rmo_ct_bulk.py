@@ -22,7 +22,7 @@ def airflow_rmo_ct_bulk():
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
-            query = f""" BULK INSERT [ARCHITECT_SANDBOX].[dbo].[Stat_QueueActivity_M]
+            query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[Stat_QueueActivity_M]
                     FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\Stat_QueueActivity_M202410.csv'
                     WITH
 	                ( FORMAT = 'CSV'
