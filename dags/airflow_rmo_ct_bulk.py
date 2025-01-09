@@ -41,7 +41,6 @@ def airflow_rmo_ct_bulk():
 
 
     @task
-    
     load_ct_source(91)
 
 airflow_rmo_ct_bulk()
