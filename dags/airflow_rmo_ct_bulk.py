@@ -14,16 +14,16 @@ import time
 
 def airflow_rmo_ct_bulk():
     
-    def load_ct_source(rows):
+    def load_ct_source(psource_file):
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
-        myvar = "Stat_QueueActivity_M202410.csv"
+        #myvar = "Stat_QueueActivity_M202410.csv"
 
         try:
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
             query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[Stat_QueueActivity_M]
-                    FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{myvar}'
+                    FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{psource_file}'
                     WITH
 	                ( FORMAT = 'CSV'
 	                );
@@ -32,17 +32,24 @@ def airflow_rmo_ct_bulk():
             start_time = time.time()
             cursor.execute(query)
             conn.commit()
-            print(f"bulk insert {rows} rows test, duration: --- {time.time() - start_time} seconds ---")
+            
+                      
+            print(f"bulk insert duration: --- {time.time() - start_time} seconds ---")
+            #print(f"bulk insert {rows} rows test, duration: --- {time.time() - start_time} seconds ---")
+        
         
         except Exception as e:
             print(e)
 
 
     @task
-    def file_runner():
+    def load_daily():
         
-        load_ct_source(91)
+        source_file_set = ["Stat_QueueActivity_M202409","Stat_QueueActivity_M202410","Stat_QueueActivity_M202411","Stat_QueueActivity_M202412","Stat_QueueActivity_M202501"]
+        
+        for source_file in source_file_set:
+            load_ct_source(source_file)
 
-    file_runner()
+    load_daily()
     
 airflow_rmo_ct_bulk()
