@@ -23,7 +23,7 @@ def airflow_rmo_ct_bulk():
             cursor = conn.cursor()
             
             query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[Stat_QueueActivity_M]
-                    FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\'+ myvar
+                    FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{myvar}'
                     WITH
 	                ( FORMAT = 'CSV'
 	                );
