@@ -1,9 +1,8 @@
 from airflow.decorators import task, dag
-from airflow.providers.samba.hooks.samba import SambaHook
+#from airflow.providers.samba.hooks.samba import SambaHook
 from airflow.hooks.base_hook import BaseHook
 import pandas as pd
 import datetime as dt
-from sqlalchemy import create_engine
 from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
 import time
 
@@ -17,17 +16,16 @@ def airflow_rmo_ct_bulk():
     
     def load_ct_source(rows):
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
+        myvar = "Stat_QueueActivity_M202410.csv"
 
         try:
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
             query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[Stat_QueueActivity_M]
-                    FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\Stat_QueueActivity_M202410.csv'
+                    FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\'+ myvar
                     WITH
 	                ( FORMAT = 'CSV'
-	                  ,FIRSTROW = 1
-	                  ,LASTROW = {rows}
 	                );
                 """
 
