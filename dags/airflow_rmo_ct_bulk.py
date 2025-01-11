@@ -45,7 +45,7 @@ def airflow_rmo_ct_bulk():
     @task
     def load_daily():
         
-        source_file_set = ["Stat_QueueActivity_M202409","Stat_QueueActivity_M202410","Stat_QueueActivity_M202411","Stat_QueueActivity_M202412","Stat_QueueActivity_M202501"]
+        source_file_set = ["Stat_QueueActivity_M202409.csv","Stat_QueueActivity_M202410.csv","Stat_QueueActivity_M202411.csv","Stat_QueueActivity_M202412.csv","Stat_QueueActivity_M202501.csv"]
         
         for source_file in source_file_set:
             load_ct_source(source_file)
