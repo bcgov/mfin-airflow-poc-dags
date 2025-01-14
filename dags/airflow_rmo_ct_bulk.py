@@ -7,7 +7,7 @@ from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
 import time
 
 @dag(
-    description="DAG to RMO CT bulk insert",
+    description="DAG - RMO CT daily bulk insert",
     schedule=None,
     catchup=False,
 )
@@ -22,7 +22,7 @@ def airflow_rmo_ct_bulk():
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
-            query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[Stat_QueueActivity_M]
+            query = f""" BULK INSERT [RMO_ICE_HISTORY].[dbo].[Stat_AgentNotReadyBreakdown_M]
                     FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{psource_file}'
                     WITH
 	                ( FORMAT = 'CSV'
@@ -45,7 +45,8 @@ def airflow_rmo_ct_bulk():
     @task
     def load_daily():
         
-        source_file_set = ["Stat_QueueActivity_M202409.csv","Stat_QueueActivity_M202410.csv","Stat_QueueActivity_M202411.csv","Stat_QueueActivity_M202412.csv","Stat_QueueActivity_M202501.csv"]
+        source_file_set = ["Stat_AgentNotReadyBreakdown_M202408.csv","Stat_AgentNotReadyBreakdown_M202409.csv","Stat_AgentNotReadyBreakdown_M202410.csv",
+                           "Stat_AgentNotReadyBreakdown_M202411.csv","Stat_AgentNotReadyBreakdown_M202412.csv"]
         
         for source_file in source_file_set:
             load_ct_source(source_file)
