@@ -1,6 +1,6 @@
 import os
 import datetime as dt
-import pendulum
+import subprocess
 from airflow import DAG
 from airflow.providers.samba.hooks.samba import SambaHook
 from airflow.operators.python_operator import PythonOperator
@@ -9,7 +9,7 @@ from datetime import datetime
 
 def test_ice_connection():
     # Replace these with your SMB server details
-    conn_id = 'fs1_rmo_ice'
+    conn_id = 'fs1_fin_data_store'
       
     # share_name = 'fs1.fin.gov.bc.ca'
     directory = '/rmo_ct_prod/'
@@ -18,6 +18,7 @@ def test_ice_connection():
     hook = SambaHook(conn_id)
     files = hook.listdir(path)
     destination = '/rmo_ct_prod/completed/'
+
 
     print("Files in the rmo_ct_prod directory:")
     dYmd = dt.datetime.today().strftime('%Y%m%d')
