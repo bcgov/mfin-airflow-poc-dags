@@ -17,23 +17,23 @@ def ice_rmo_unzip():
     directory_zip_file = '/rmo_ct_prod/inprogress/'
     directory_unzip_file = '/rmo_ct_prod/inprogress/'
 
-    self.path_zip = directory_zip_file
-    self.path_unzip = directory_unzip_file
+    path_zip = directory_zip_file
+    path_unzip = directory_unzip_file
 
     hook = SambaHook(conn_id)
 
-    files = hook.listdir(self.path_zip)
+    files = hook.listdir(path_zip)
 
 
     dYmd = dt.datetime.today().strftime('%Y%m%d')
 
     for f in files:
         if f == 'iceDB_ICE_BCMOFRMO.zip' :
-            logging.info("Extracting all the contect to'" + str(self.path_unzip_file) +"'")
+            logging.info("Extracting all the content to'" + str(path_unzip_file) +"'")
             
             
-            with ZipFile(self.path_zip,'r') as zip_file:
-                zip_file.extractall(self.path_unzip)
+            with ZipFile(path_zip+f,'r') as zip_file:
+                zip_file.extractall(path_unzip)
                 
                 zip_file.close()
             #hook.replace(path + f, destination + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip')
