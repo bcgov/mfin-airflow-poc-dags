@@ -9,7 +9,7 @@ from datetime import datetime
 
 def test_ice_connection():
     # Replace these with your SMB server details
-    conn_id = 'fs1_fin_data_store'
+    conn_id = 'fs1_rmo_ice_dev'
       
     # share_name = 'fs1.fin.gov.bc.ca'
     directory = '/rmo_ct_prod/'
