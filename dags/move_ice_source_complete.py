@@ -33,7 +33,7 @@ def fs1_ice_connection():
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': datetime(2024, 9, 19),
+    'start_date': datetime(2025, 1, 15),
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 1,
