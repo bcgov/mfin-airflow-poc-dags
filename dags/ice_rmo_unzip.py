@@ -46,7 +46,7 @@ def ice_rmo_unzip():
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': datetime(2025, 1, 20),
+    'start_date': datetime(2025, 1, 15),
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 1,
