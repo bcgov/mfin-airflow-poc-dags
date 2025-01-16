@@ -33,7 +33,7 @@ def ice_rmo_unzip():
             
             f1 = hook.open(f)
             data = f1.read()
-            print('CSV file ='+data)
+            print('CSV file =',data)
             #with ZipFile(path_zip+f,'r') as zip_file:
                 #zip_file.extractall(path_unzip)
              #   myzip.readlines
