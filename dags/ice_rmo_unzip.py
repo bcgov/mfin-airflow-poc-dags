@@ -6,6 +6,7 @@ from zipfile import ZipFile
 from airflow import DAG
 from airflow.providers.samba.hooks.samba import SambaHook
 from airflow.operators.python_operator import PythonOperator
+from airflow.providers.samba.zipfile as myzip
 from datetime import datetime
 
 
@@ -31,11 +32,13 @@ def ice_rmo_unzip():
         if f == 'iceDB_ICE_BCMOFRMO.zip' :
             logging.info("Extracting all the content '"+ f +"' to '"+ str(path_unzip) +"'")
             
-            
-            with ZipFile(path_zip+f,'r') as zip_file:
-                zip_file.extractall(path_unzip)
-                
-                zip_file.close()
+            f1 = hook.open(f)
+            data = f1.read()
+            print('CSV file ='+data)
+            #with ZipFile(path_zip+f,'r') as zip_file:
+                #zip_file.extractall(path_unzip)
+             #   myzip.readlines
+                #zip_file.close()
             #hook.replace(path + f, destination + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip')
             #print('File copied ',f)
         else:
@@ -44,7 +47,7 @@ def ice_rmo_unzip():
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': datetime(2024, 9, 19),
+    'start_date': datetime(2025, 1, 20),
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 1,
