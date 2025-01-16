@@ -29,7 +29,7 @@ def ice_rmo_unzip():
 
     for f in files:
         if f == 'iceDB_ICE_BCMOFRMO.zip' :
-            logging.info("Extracting all the content '"+f "' to '"+ str(path_unzip) +"'")
+            logging.info("Extracting all the content '"+ f +"' to '"+ str(path_unzip) +"'")
             
             
             with ZipFile(path_zip+f,'r') as zip_file:
