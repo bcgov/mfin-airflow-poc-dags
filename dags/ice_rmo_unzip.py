@@ -6,7 +6,6 @@ from zipfile import ZipFile
 from airflow import DAG
 from airflow.providers.samba.hooks.samba import SambaHook
 from airflow.operators.python_operator import PythonOperator
-from airflow.providers.samba.zipfile as myzip
 from datetime import datetime
 
 
