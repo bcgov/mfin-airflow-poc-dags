@@ -11,7 +11,7 @@ from datetime import datetime
 
 def ice_rmo_unzip():
     # Replace these with your SMB server details
-    conn_id = 'fs1_rmo_ice_dev'
+    conn_id = 'fs1_rmo_ice_copy1'
       
     # share_name = 'fs1.fin.gov.bc.ca'
     directory_zip_file = '/rmo_ct_prod/inprogress/'
