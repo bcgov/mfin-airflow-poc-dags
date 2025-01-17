@@ -31,7 +31,7 @@ def ice_rmo_unzip():
         if f == 'iceDB_ICE_BCMOFRMO.zip' :
             logging.info("Extracting all the content '"+ f +"' to '"+ str(path_unzip) +"'")
                       
-            with ZipFile('\\142.34.235.28'+path_zip+f,'r') as zip_file:
+            with ZipFile('\\142.34.235.28\rmo_ct_prod\'+f,'r') as zip_file:
                 print('Printing all contents of the zip file')
                 zip_file.print()
                 zip_file.extractall()
