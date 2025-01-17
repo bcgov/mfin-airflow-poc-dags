@@ -14,8 +14,8 @@ def ice_rmo_unzip():
     conn_id = 'fs1_rmo_ice_copy1'
       
     # share_name = 'fs1.fin.gov.bc.ca'
-    directory_zip_file = '/rmo_ct_prod/'
-    directory_unzip_file = '/rmo_ct_prod/'
+    directory_zip_file = '\rmo_ct_prod\'
+    directory_unzip_file = '\rmo_ct_prod\'
 
     path_zip = directory_zip_file
     path_unzip = directory_unzip_file
@@ -31,7 +31,7 @@ def ice_rmo_unzip():
         if f == 'iceDB_ICE_BCMOFRMO.zip' :
             logging.info("Extracting all the content '"+ f +"' to '"+ str(path_unzip) +"'")
                       
-            with ZipFile(path_zip+f,'r') as zip_file:
+            with ZipFile('\\142.34.235.28'+path_zip+f,'r') as zip_file:
                 print('Printing all contents of the zip file')
                 zip_file.print()
                 zip_file.extractall()
