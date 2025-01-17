@@ -67,7 +67,7 @@ dag = DAG(
 
 test_unzip_task = PythonOperator(
     task_id='unzip_test',
-    python_callable=ice_rmo_unzip,
+    python_callable=unzip_test,
     dag=dag,
 )
 
