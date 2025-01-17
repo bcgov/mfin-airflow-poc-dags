@@ -34,11 +34,11 @@ def unzip_test():
         if f == 'iceDB_ICE_BCMOFRMO.zip' :
 #            logging.info("Extracting all the content '"+ f +"' to '"+ str(path_unzip) +"'")
 #            print('opening zip file')          
-            with ZipFile("'\\\\fs1.fin.gov.bc.ca\rmo_ct_prod\'",'r') as zip_file:
+            with ZipFile("'\\fs1.fin.gov.bc.ca\rmo_ct_prod\'",'r') as zip_file:
                 print('Printing all contents of the zip file')
 #                zip_file.print()
 #                zip_file.extractall()
-                zip_file.extractall("'\\\\fs1.fin.gov.bc.ca\rmo_ct_prod\'")
+                zip_file.extractall("'\\fs1.fin.gov.bc.ca\rmo_ct_prod\'")
              #   myzip.readlines
                 #zip_file.close()
             #hook.replace(path + f, destination + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip')
