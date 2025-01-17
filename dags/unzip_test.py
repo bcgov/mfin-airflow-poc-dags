@@ -3,13 +3,12 @@ import datetime as dt
 import subprocess
 import logging
 import airflow.operators
-#from zipfile import ZipFile
+from zipfile import ZipFile
 from airflow import DAG
 from airflow.providers.samba.hooks.samba import SambaHook
 from airflow.operators.python_operator import PythonOperator
 from airflow.contrib.hooks.fs_hook import FSHook
 from datetime import datetime
-from airflow.operators import UnzipOperator
 
 
 def unzip_test():
