@@ -30,11 +30,11 @@ def ice_rmo_unzip():
     for f in files:
         if f == 'iceDB_ICE_BCMOFRMO.zip' :
             logging.info("Extracting all the content '"+ f +"' to '"+ str(path_unzip) +"'")
-            
-            f1 = hook.open(f)
-            data = f1.read()
-            print('CSV file =',data)
-            #with ZipFile(path_zip+f,'r') as zip_file:
+                      
+            with ZipFile(path_zip+f,'r') as zip_file:
+                print('Printing all contents of the zip file')
+                zip_file.print()
+                zip_file.extractall()
                 #zip_file.extractall(path_unzip)
              #   myzip.readlines
                 #zip_file.close()
