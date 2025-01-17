@@ -28,10 +28,9 @@ def unzip_test():
     dYmd = dt.datetime.today().strftime('%Y%m%d')
 
     for f in files:
-        dir_path = hook.path_unzip
-        os.chdir(dir_path)
-        print('Current directory: ',str(os.getcwd()))
- #       WithZipFile(
+        dir_unzip = hook.get_path()
+ 
+        print('Current directory: ',dir_unzip)
         
 #        if f == 'iceDB_ICE_BCMOFRMO.zip' :
 #            logging.info("Extracting all the content '"+ f +"' to '"+ str(path_unzip) +"'")
