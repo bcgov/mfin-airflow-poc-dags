@@ -59,7 +59,7 @@ default_args = {
     'start_date': datetime(2025, 1, 15),
     'email_on_failure': False,
     'email_on_retry': False,
-    'retries': 1,
+    'retries': 0,
 }
 
 dag = DAG(
