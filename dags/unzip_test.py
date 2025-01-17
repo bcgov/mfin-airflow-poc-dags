@@ -9,7 +9,7 @@ from airflow.operators.python_operator import PythonOperator
 from datetime import datetime
 
 
-def ice_rmo_unzip():
+def unzip_test():
     # Replace these with your SMB server details
     conn_id = 'fs1_rmo_ice_copy1'
       
@@ -30,7 +30,7 @@ def ice_rmo_unzip():
     for f in files:
         dir_path = hook.path_unzip
         os.chdir(dir_path)
-        print("Current directory: "+str(os.getcwd()))
+        print('Current directory: ',str(os.getcwd()))
  #       WithZipFile(
         
 #        if f == 'iceDB_ICE_BCMOFRMO.zip' :
@@ -58,7 +58,7 @@ default_args = {
 }
 
 dag = DAG(
-    'ice_rmo_unzip',
+    'unzip_test',
     #local_tz=pendulum.timezone("America/Vancouver"),
     default_args=default_args,
     description='Backup CT source file in the completed folder',
@@ -66,7 +66,7 @@ dag = DAG(
 )
 
 test_unzip_task = PythonOperator(
-    task_id='ice_rmo_unzip',
+    task_id='unzip_test',
     python_callable=ice_rmo_unzip,
     dag=dag,
 )
