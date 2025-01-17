@@ -24,7 +24,7 @@ def unzip_test():
     #hook = SambaHook(conn_id)
     
     hook2 = FSHook(conn_id)
-    base_path = hook2.get_path(path_zip)
+    base_path = hook2.get_path()
     with open(os.path.join(base_path, 'iceDB_ICE_BCMOFRMO.zip'), 'r') as fp:
         print(fp.read())
     
