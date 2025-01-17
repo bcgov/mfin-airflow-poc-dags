@@ -6,6 +6,7 @@ from zipfile import ZipFile
 from airflow import DAG
 from airflow.providers.samba.hooks.samba import SambaHook
 from airflow.operators.python_operator import PythonOperator
+from airflow.contrib.hooks.fs_hook import FSHook
 from datetime import datetime
 
 
@@ -14,23 +15,28 @@ def unzip_test():
     conn_id = 'fs1_rmo_ice_copy1'
       
     # share_name = 'fs1.fin.gov.bc.ca'
-    directory_zip_file = '/rmo_ct_prod/'
-    directory_unzip_file = '/rmo_ct_prod/'
+    #directory_zip_file = '/rmo_ct_prod/'
+    #directory_unzip_file = '/rmo_ct_prod/'
 
     path_zip = directory_zip_file
-    path_unzip = directory_unzip_file
+    #path_unzip = directory_unzip_file
 
-    hook = SambaHook(conn_id)
+    #hook = SambaHook(conn_id)
+    
+    hook2 = FSHook(conn_id)
+    base_path = hook2.get_path(path_zip)
+    with open(os.path.join(base_path, 'iceDB_ICE_BCMOFRMO.zip'), 'r') as fp:
+        print(fp.read())
+    
+    #files = hook.listdir(path_zip)
 
-    files = hook.listdir(path_zip)
 
+    #dYmd = dt.datetime.today().strftime('%Y%m%d')
 
-    dYmd = dt.datetime.today().strftime('%Y%m%d')
-
-    for f in files:
-        dir_unzip = hook.get_path()
+    #for f in files:
+    #    dir_unzip = hook.path
  
-        print('Current directory: ',dir_unzip)
+     #   print('Current directory: ',dir_unzip)
         
 #        if f == 'iceDB_ICE_BCMOFRMO.zip' :
 #            logging.info("Extracting all the content '"+ f +"' to '"+ str(path_unzip) +"'")
@@ -60,7 +66,7 @@ dag = DAG(
     'unzip_test',
     #local_tz=pendulum.timezone("America/Vancouver"),
     default_args=default_args,
-    description='Backup CT source file in the completed folder',
+    description='Unzip file test',
     schedule_interval=None,
 )
 
