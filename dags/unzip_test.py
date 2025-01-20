@@ -78,9 +78,9 @@ test_unzip_task = PythonOperator(
 )
 
 @task.bash
-def nu_rmo_ct_folder = BashOperator(
+def rmo_folder = BashOperator(
     task_id="nu_rmo_ct_prod_folder",
     bash_command = "mkdir $AIRFLOW_HOME/rmo_ct_prod",
     )
 
-nu_rmo_ct_prod_folder >> test_unzip_task
+rmo_folder >> test_unzip_task
