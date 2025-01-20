@@ -34,7 +34,7 @@ def ice_rmo_unzip():
             with ZipFile(f,'r') as zip_file:
                 print('Printing all contents of the zip file')
                 zip_file.print()
-                zip_file.extractall()
+                zip_file.extractall('$AIRFLOW_HOME/rmo_ct_prod/')
                 #zip_file.extractall(path_unzip)
              #   myzip.readlines
                 #zip_file.close()
