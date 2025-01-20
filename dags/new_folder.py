@@ -6,7 +6,6 @@ from datetime import datetime
   dag_id="new_rmo_ct_folder",
   start_date=datetime(2025, 1 ,20),
   schedule=None,
-  retry=None,
   )
   
 def new_rmo_folder_dag():
