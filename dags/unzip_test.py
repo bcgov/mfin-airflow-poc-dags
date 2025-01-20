@@ -10,17 +10,18 @@ from airflow.providers.samba.hooks.samba import SambaHook
 from airflow.operators.python_operator import PythonOperator
 from airflow.contrib.hooks.fs_hook import FSHook
 from datetime import datetime
+from airflow.operators.bash import BashOpertor
 
 
 def unzip_test():
-    # Replace these with your SMB server details
+    # Replace these with your SMB serashver details
     conn_id = 'fs1_rmo_ice_copy1'
       
     # share_name = 'fs1.fin.gov.bc.ca'
-    directory_zip_file = '/rmo_ct_prod/'
+    path = '/rmo_ct_prod/'
     #directory_unzip_file = '/rmo_ct_prod/'
 
-    path_zip = directory_zip_file
+    path_zip = path
     #path_unzip = directory_unzip_file
 
     hook = SambaHook(conn_id)
@@ -35,7 +36,7 @@ def unzip_test():
         if f == 'iceDB_ICE_BCMOFRMO.zip' :
 #            logging.info("Extracting all the content '"+ f +"' to '"+ str(path_unzip) +"'")
 #            print('opening zip file')          
-            with open(f,'rb') as zf:
+            with open(path_zip + f,'rb') as zf:
                 m = mmap.mmap(zf.fileno(),0, prot=mmap.PROT_READ)
                 
                 data = m.readline()
@@ -76,4 +77,10 @@ test_unzip_task = PythonOperator(
     dag=dag,
 )
 
-test_unzip_task
+@task.bash
+def nu_rmo_ct_folder = BashOperator(
+    task_id="nu_rmo_ct_prod_folder",
+    bash_command = "mkdir $AIRFLOW_HOME/rmo_ct_prod",
+    )
+
+nu_rmo_ct_prod_folder >> test_unzip_task
