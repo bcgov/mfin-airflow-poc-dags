@@ -14,6 +14,6 @@ def new_rmo_folder_dag():
 		bash_command="mkdir $AIRFLOW_HOME/rmo_ct_prod",
 	)
 
-new_folder
+new_rmo_folder_dag
 	
 
