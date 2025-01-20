@@ -6,14 +6,15 @@ from datetime import datetime
   dag_id="new_rmo_ct_folder",
   start_date=datetime(2025, 1 ,20),
   schedule=None,
-  )
+)
   
-def new_rmo_folder_dag():
-    new_rmo_folder = BashOperator(
-	    task_kd="new_rmo_folder",
-		bash_command="mkdir $AIRFLOW_HOME/rmo_ct_prod",
+def bash_new_folder_dag():
+    # Creating new folder in Airflow server
+    execute_nu_folder = BashOperator(
+	    task_id = "new_folder",
+		bash_command = "mkdir $AIRFLOW_HOME/rmo_ct_prod",
 	)
 
-    new_rmo_folder
+    execute_nu_folder
 	
-new_rmo_folder_dag()
+bash_new_folder_dag()
