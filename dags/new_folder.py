@@ -9,11 +9,11 @@ from datetime import datetime
   )
   
 def new_rmo_folder_dag():
-    new_folder = BashOperator(
+    new_rmo_folder = BashOperator(
 	    task_kd="new_rmo_folder",
 		bash_command="mkdir $AIRFLOW_HOME/rmo_ct_prod",
 	)
 
-new_rmo_folder
+    new_rmo_folder
 	
-
+new_rmo_folder_dag()
