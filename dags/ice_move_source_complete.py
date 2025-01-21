@@ -16,7 +16,7 @@ def fs1_ice_connection():
     path = directory
     hook = SambaHook(conn_id)
     files = hook.listdir(path)
-    destination = 'rmo_ct_prod/completed/'
+    destination = '/rmo_ct_prod/completed/'
 
 
     print("Files in the rmo_ct_prod directory:")
