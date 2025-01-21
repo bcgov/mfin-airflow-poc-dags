@@ -1,6 +1,5 @@
 import os
 import datetime as dt
-import subprocess
 from airflow import DAG
 from airflow.providers.samba.hooks.samba import SambaHook
 from airflow.operators.python_operator import PythonOperator
@@ -17,7 +16,7 @@ def fs1_ice_connection():
     path = directory
     hook = SambaHook(conn_id)
     files = hook.listdir(path)
-    destination = '/rmo_ct_prod/completed/'
+    destination = 'rmo_ct_prod/completed/'
 
 
     print("Files in the rmo_ct_prod directory:")
@@ -26,7 +25,7 @@ def fs1_ice_connection():
     for f in files:
         if f == 'iceDB_ICE_BCMOFRMO.zip' :
             hook.replace(path + f, destination + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip')
-            print('File copied ',f)
+            print('File copied --> ',f)
         else:
             print('File skipped', f)
 
@@ -43,7 +42,7 @@ dag = DAG(
     'ice_move_source_complete',
     #local_tz=pendulum.timezone("America/Vancouver"),
     default_args=default_args,
-    description='Backup CT source file in the completed folder',
+    description='Copy source zip file to /rmo_ct_prod/completed/ folder',
     schedule_interval="01 15 * * *",
 )
 
