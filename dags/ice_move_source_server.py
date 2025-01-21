@@ -44,7 +44,7 @@ dag = DAG(
     #local_tz=pendulum.timezone("America/Vancouver"),
     default_args=default_args,
     description='move zip file to /$AIRFLOW/rmo_ct_prod/ folder',
-    schedule_interval="01 15 * * *",
+    schedule=None,
 )
 
 move_server_task = PythonOperator(
