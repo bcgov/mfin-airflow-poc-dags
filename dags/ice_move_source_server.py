@@ -17,7 +17,7 @@ def fs1_ice_connection():
     path = directory
     hook = SambaHook(conn_id)
     files = hook.listdir(path)
-    destination = '/$AIRFLOW/rmo_ct_prod'
+    destination = "'$AIRFLOW_HOME/rmo_ct_prod/'"
 
 
     print("Files in the rmo_ct_prod directory:")
