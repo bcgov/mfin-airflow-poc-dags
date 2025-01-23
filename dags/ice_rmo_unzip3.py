@@ -13,7 +13,7 @@ remote_path = "/rmo_ct_prod/iceDB_ICE_BCMOFRMO.zip"
 local_path = "/tmp/iceDB_ICE_BCMOFRMO.zip"
 
 total_downloaded = 0
-output_handle = open("/tmp","wb")
+output_handle = open(local_path, "wb")
 
 def print_progress(percent_progress):
     self.log.info("Percent Downloaded: %s%%" % percent_progress)
