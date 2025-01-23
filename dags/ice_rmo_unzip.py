@@ -29,17 +29,13 @@ def ice_rmo_unzip():
 
     for f in files:
         if f == 'iceDB_ICE_BCMOFRMO.zip' :
-            logging.info("Extracting all the content '"+ f +"' to '"+ str(path_unzip) +"'")
-            print('opening zip file')          
+            #logging.info("Extracting all the content '"+ f +"' to '"+ str(path_unzip) +"'")
+            #print('opening zip file')          
             with ZipFile(f,'r') as zip_file:
                 print('Printing all contents of the zip file')
                 #zip_file.print()
-                zip_file.extractall('$AIRFLOW_HOME/rmo_ct_prod/')
-                #zip_file.extractall(path_unzip)
-             #   myzip.readlines
-                #zip_file.close()
-            #hook.replace(path + f, destination + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip')
-            #print('File copied ',f)
+                zip_file.extractall('/tmp')
+           
         else:
             print('File skipped', f)
 
