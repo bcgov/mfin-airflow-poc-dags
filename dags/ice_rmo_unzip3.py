@@ -1,6 +1,6 @@
 import os
 import datetime as dt
-import subprocess
+#import subprocess
 import logging
 from zipfile import ZipFile
 from airflow import DAG
@@ -17,19 +17,26 @@ output_handle = open("/tmp","wb")
 
 def print_progress(percent_progress):
     self.log.info("Percent Downloaded: %s%%" % percent_progress)
+    
+    
+def write_to_file_with_progress(data):
+    total_download += len(data)
+    output_handle.write(data)
+    percent_progress = (total_download / total_file_size) * 100
+    print_progress(percent_progress)
+    
 
 def ice_rmo_unzip3():
     
     total_downloaded = 0
     # Replace these with your SMB server details
-    conn_id = 'fs1_rmo_ice'
-      
+    conn_id = 'fs1_rmo_ice'      
 
     hook = SambaHook(conn_id)
 
     total_file_size = hook.get_size(remote_path)
 
-    print('total_file size = ', total_file_sizef)
+    print('total_file size = ', total_file_size)
 
 default_args = {
     'owner': 'airflow',
