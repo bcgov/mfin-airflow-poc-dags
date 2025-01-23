@@ -11,7 +11,7 @@ from datetime import datetime
 
 def ice_rmo_unzip():
     # Replace these with your SMB server details
-    conn_id = 'fs1_rmo_ice_copy1'
+    conn_id = 'fs1_rmo_ice'
       
     # share_name = 'fs1.fin.gov.bc.ca'
     directory_zip_file = '/rmo_ct_prod/'
@@ -33,7 +33,7 @@ def ice_rmo_unzip():
             print('opening zip file')          
             with ZipFile(f,'r') as zip_file:
                 print('Printing all contents of the zip file')
-                zip_file.print()
+                #zip_file.print()
                 zip_file.extractall('$AIRFLOW_HOME/rmo_ct_prod/')
                 #zip_file.extractall(path_unzip)
              #   myzip.readlines
