@@ -34,9 +34,11 @@ def ice_rmo_unzip3():
 
     hook = SambaHook(conn_id)
 
-    total_file_size = hook.get_size(remote_path)
+    #total_file_size = hook.get_size(remote_path)
 
-    print('total_file size = ', total_file_size)
+    #print('total_file size = ', total_file_size)
+    
+    hook.push_from_local("/tmp/iceDB_ICE_BCMOFRMO.zip","/rmo_ct_prod/iceDB_ICE_BCMOFRMO.zip")
 
 default_args = {
     'owner': 'airflow',
