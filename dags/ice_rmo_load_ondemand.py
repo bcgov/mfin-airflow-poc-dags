@@ -22,7 +22,7 @@ def ice_rmo_load_ondemand():
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
-            query = f""" BULK INSERT [RMO_ICE_HISTORY].[dbo].[Stat_QueueActivity_D]
+            query = f""" BULK INSERT [RMO_ICE_HISTORY].[dbo].[Stat_AgentNotReadyBreakdown_D]
                     FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\ondemand\\{psource_file}'
                     WITH
 	                ( FORMAT = 'CSV'
@@ -45,8 +45,8 @@ def ice_rmo_load_ondemand():
     @task
     def ondemand_load_data():
         
-        source_file_set = ["Stat_QueueActivity_D20241126.csv","Stat_QueueActivity_D20241127.csv","Stat_QueueActivity_D20241128.csv",
-                           "Stat_QueueActivity_D20241129.csv","Stat_QueueActivity_D20241130.csv"]
+        source_file_set = ["Stat_AgentNotReadyBreakdown_D20240826.csv","Stat_AgentNotReadyBreakdown_D20240827.csv","Stat_AgentNotReadyBreakdown_D20240828.csv",
+                           "Stat_AgentNotReadyBreakdown_D20240829.csv","Stat_AgentNotReadyBreakdown_D20240830.csv","Stat_AgentNotReadyBreakdown_D20240831.csv"]
         
         for source_file in source_file_set:
             ondemand_load_source(source_file)
