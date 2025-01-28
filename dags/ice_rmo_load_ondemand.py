@@ -16,7 +16,6 @@ def ice_rmo_load_ondemand():
     
     def ondemand_load_source(psource_file):
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
-        #myvar = "Stat_QueueActivity_M202410.csv"
 
         try:
             conn = sql_hook.get_conn()
@@ -45,9 +44,10 @@ def ice_rmo_load_ondemand():
     @task
     def ondemand_load_data():
         
-        source_file_set = ["Stat_AgentNotReadyBreakdown_D20241025.csv","Stat_AgentNotReadyBreakdown_D20241026.csv","Stat_AgentNotReadyBreakdown_D20241027.csv",
-                           "Stat_AgentNotReadyBreakdown_D20241028.csv","Stat_AgentNotReadyBreakdown_D20241029.csv","Stat_AgentNotReadyBreakdown_D20241030.csv",
-                           "Stat_AgentNotReadyBreakdown_D20241031.csv"]
+        source_file_set = ["Stat_AgentNotReadyBreakdown_D20241101.csv","Stat_AgentNotReadyBreakdown_D20241102.csv","Stat_AgentNotReadyBreakdown_D20241103.csv",
+                           "Stat_AgentNotReadyBreakdown_D20241104.csv","Stat_AgentNotReadyBreakdown_D20241105.csv","Stat_AgentNotReadyBreakdown_D20241106.csv",
+                           "Stat_AgentNotReadyBreakdown_D20241107.csv","Stat_AgentNotReadyBreakdown_D20241108.csv","Stat_AgentNotReadyBreakdown_D20241109.csv",
+                           "Stat_AgentNotReadyBreakdown_D20241110.csv"]
         
         for source_file in source_file_set:
             ondemand_load_source(source_file)
