@@ -45,8 +45,8 @@ def ice_rmo_load_ondemand():
     @task
     def ondemand_load_data():
         
-        source_file_set = ["Stat_AgentNotReadyBreakdown_D20241013.csv","Stat_AgentNotReadyBreakdown_D20241014.csv","Stat_AgentNotReadyBreakdown_D20241015.csv",
-                           "Stat_AgentNotReadyBreakdown_D20241016.csv","Stat_AgentNotReadyBreakdown_D20241017.csv","Stat_AgentNotReadyBreakdown_D20241018.csv"]
+        source_file_set = ["Stat_AgentNotReadyBreakdown_D20241019.csv","Stat_AgentNotReadyBreakdown_D20241020.csv","Stat_AgentNotReadyBreakdown_D20241021.csv",
+                           "Stat_AgentNotReadyBreakdown_D20241022.csv","Stat_AgentNotReadyBreakdown_D20241023.csv","Stat_AgentNotReadyBreakdown_D20241024.csv"]
         
         for source_file in source_file_set:
             ondemand_load_source(source_file)
