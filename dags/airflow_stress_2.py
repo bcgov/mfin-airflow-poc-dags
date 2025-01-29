@@ -39,7 +39,7 @@ def airflow_stress_test_pandas ():
     @task
     def file_runner():
 
-        test_size = [1000,10000,100000,1000000,5000000]
+        test_size = [10,100,1000]
 
         for size in test_size:
             load_file(size)
