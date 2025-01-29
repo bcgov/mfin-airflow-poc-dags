@@ -8,7 +8,9 @@ from datetime import datetime
 
 def fs1_ice_connection():
     # Replace these with your SMB server details
-    conn_id = 'fs1_rmo_ice'
+    #conn_id = 'fs1_rmo_ice'
+    # testing samba connection 2
+    conn_id = 'fs1_fin_data_store'
       
     # share_name = 'fs1.fin.gov.bc.ca'
     directory = '/rmo_ct_prod/'
