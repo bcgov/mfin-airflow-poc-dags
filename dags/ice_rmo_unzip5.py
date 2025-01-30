@@ -37,7 +37,7 @@ default_args = {
     'start_date': datetime(2025, 1, 16),
     'email_on_failure': False,
     'email_on_retry': False,
-    'retries': 1,
+    'retries': 0,
 }
 
 dag = DAG(
@@ -45,7 +45,7 @@ dag = DAG(
     #local_tz=pendulum.timezone("America/Vancouver"),
     default_args=default_args,
     description='Copy source zip file to /rmo_ct_prod/completed/ folder',
-    schedule = NONE,
+    schedule = None,
 )
 
 move_rmo_unzip5 = PythonOperator(
