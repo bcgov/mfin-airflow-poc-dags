@@ -12,12 +12,12 @@ def ice_bash_dag():
     # Creating new folder in Airflow server
     execute_nu_folder = BashOperator(
 	    task_id = "new_folder",
-		bash_command = "mkdir ./tmp/rmo_ct_prod",
+		bash_command = "mkdir https://mfin-airflow-test.apps.emerald.devops.gov.bc.ca/home/tmp/rmo_ct_prod",
 	)
  
     execute_ls_folder = BashOperator(
        task_id = "ls_folder",
-       bash_command ="ls ./tmp",
+       bash_command ="ls https://mfin-airflow-test.apps.emerald.devops.gov.bc.ca/home/tmp",
     )
     
     execute_nu_folder >> execute_ls_folder
