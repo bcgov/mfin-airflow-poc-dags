@@ -8,14 +8,6 @@ from airflow.providers.samba.hooks.samba import SambaHook
 from airflow.operators.python_operator import PythonOperator
 from datetime import datetime
 
-
-remote_path = "/rmo_ct_prod/iceDB_ICE_BCMOFRMO.zip"
-local_path = "/tmp/iceDB_ICE_BCMOFRMO.zip"
-
-total_downloaded = 0
-output_handle = open(local_path, "wb")
-
-
     
 
 def ice_rmo_unzip4():    
@@ -35,7 +27,8 @@ def ice_rmo_unzip4():
 
     for f in files:
         if f == 'iceDB_ICE_BCMOFRMO.zip' :
-            hook.replace(path + f, destination + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip')
+            hook.push_from_local('\\tmp',path + f)
+            #hook.replace(path + f, destination + 'iceDB_ICE_BCMOFRMO.zip')
             print('File copied --> ',f)
         else:
             print('File skipped', f)
