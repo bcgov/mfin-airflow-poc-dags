@@ -3,7 +3,7 @@ from airflow.operators.bash import BashOperator
 from datetime import datetime
 
 @dag(
-  dag_id="ice_new_folder_bash",
+  dag_id="ice_bash_dag",
   start_date=datetime(2025, 1 ,20),
   schedule=None,
 )
