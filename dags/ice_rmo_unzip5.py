@@ -8,7 +8,7 @@ from datetime import timedelta
 import zipfile
 
 
-def fs1_ice_connection():
+def ice_rmo_unzip5():
     # Replace these with your SMB server details
     conn_id = 'fs1_rmo_ice'
       
@@ -41,17 +41,17 @@ default_args = {
 }
 
 dag = DAG(
-    'ice_move_source_complete',
+    'ice_rmo_unzip5',
     #local_tz=pendulum.timezone("America/Vancouver"),
     default_args=default_args,
     description='Copy source zip file to /rmo_ct_prod/completed/ folder',
-    schedule_interval="01 15 * * *",
+    schedule = NONE,
 )
 
-move_task = PythonOperator(
-    task_id='fs1_ice_connection',
-    python_callable=fs1_ice_connection,
+move_rmo_unzip5 = PythonOperator(
+    task_id='ice_rmo_unzip5',
+    python_callable=ice_rmo_unzip5,
     dag=dag,
 )
 
-move_task
+move_rmo_unzip5
