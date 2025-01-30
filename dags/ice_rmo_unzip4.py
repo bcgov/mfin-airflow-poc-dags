@@ -27,7 +27,7 @@ def ice_rmo_unzip4():
 
     for f in files:
         if f == 'iceDB_ICE_BCMOFRMO.zip' :
-            hook.push_from_local('\\tmp','\\rmo_ct_prod\\{f}')
+            hook.push_from_local('\\tmp',"""'\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\iceDB_ICE_BCMOFRMO.zip'""")
             #hook.replace(path + f, destination + 'iceDB_ICE_BCMOFRMO.zip')
             print('File copied --> ',f)
         else:
