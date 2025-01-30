@@ -15,12 +15,8 @@ def ice_bash_dag():
 		bash_command = "mkdir https://mfin-airflow-test.apps.emerald.devops.gov.bc.ca/home/tmp/rmo_ct_prod",
 	)
  
-    execute_ls_folder = BashOperator(
-       task_id = "ls_folder",
-       bash_command ="ls https://mfin-airflow-test.apps.emerald.devops.gov.bc.ca/home/tmp",
-    )
     
-    execute_nu_folder >> execute_ls_folder
+    execute_nu_folder
 
 	
 ice_bash_dag()
