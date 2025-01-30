@@ -10,21 +10,17 @@ from datetime import timedelta
 def fs1_ice_connection():
     # Replace these with your SMB server details
     conn_id = 'fs1_rmo_ice'
-    # testing samba connection 2
-    #conn_id = 'fs1_fin_data_store'
       
     # share_name = 'fs1.fin.gov.bc.ca'
     directory = '/rmo_ct_prod/'
-    #path = share_name + directory
     path = directory
     hook = SambaHook(conn_id)
     files = hook.listdir(path)
     destination = '/rmo_ct_prod/completed/'
 
-    #dYmd1 = dt.datetime.today() + timedelta(days=-1) # CT source file received from yesterday
     print("Files in the rmo_ct_prod directory:")
     #dYmd = dt.datetime.today().strftime('%Y%m%d')
-    dYmd = (dt.datetime.today() + timedelta(days=-1)).strftime('%Y%m%d')
+    dYmd = (dt.datetime.today() + timedelta(days=-1)).strftime('%Y%m%d') #CT source file with yesterday's date
     
     for f in files:
         if f == 'iceDB_ICE_BCMOFRMO.zip' :
