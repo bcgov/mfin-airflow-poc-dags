@@ -5,8 +5,8 @@ from airflow.providers.samba.hooks.samba import SambaHook
 from airflow.operators.python_operator import PythonOperator
 from datetime import datetime
 from datetime import timedelta
-import zipfile
-
+from zipfile import ZipFile
+ 
 
 def ice_rmo_unzip5():
     # Replace these with your SMB server details
@@ -25,9 +25,10 @@ def ice_rmo_unzip5():
     
     for f in files:
         if f == 'iceDB_ICE_BCMOFRMO.zip' :
-            with zipfile.zipfile(hook.replace(path + f, destination + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip'),'r') as zip_ref:
-                zip_ref.extractall("/tmp")
-            print('File copied --> ',f)
+            zf = ZipFile(hook.replace(path + f, destination + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip'),'r')
+            zf.extractall("/tmp")
+            zf.close()
+            print('File extracted --> ',f)
         else:
             print('File skipped', f)
 
