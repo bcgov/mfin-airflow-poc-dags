@@ -44,9 +44,11 @@ def ice_rmo_load_ondemand():
     @task
     def ondemand_load_data():
         
-        source_file_set = ["icePay_D20240921.csv", "icePay_D20240922.csv", "icePay_D20240923.csv", "icePay_D20240924.csv",
-                           "icePay_D20240925.csv", "icePay_D20240926.csv", "icePay_D20240927.csv", "icePay_D20240928.csv",
-                           "icePay_D20240929.csv", "icePay_D20240930.csv"]#, "icePay_D20240917.csv", "icePay_D20240918.csv",
+        source_file_set = ["icePay_D20241001.csv", "icePay_D20241002.csv", "icePay_D20241003.csv", "icePay_D20241004.csv",
+                           "icePay_D20241005.csv", "icePay_D20241006.csv", "icePay_D20241007.csv", "icePay_D20241008.csv",
+                           "icePay_D20241009.csv", "icePay_D20241010.csv", "icePay_D20241011.csv", "icePay_D20241012.csv",
+                           "icePay_D20241013.csv", "icePay_D20241014.csv", "icePay_D20241015.csv", "icePay_D20241016.csv"]
+
                            #"icePay_D20240919.csv", "icePay_D20240920.csv"]
         #source_file_set = ["Stat_AgentNotReadyBreakdown_D20250121.csv","Stat_AgentNotReadyBreakdown_D20250122.csv","Stat_AgentNotReadyBreakdown_D20250123.csv",
         #                   "Stat_AgentNotReadyBreakdown_D20250124.csv","Stat_AgentNotReadyBreakdown_D20250125.csv","Stat_AgentNotReadyBreakdown_D20250126.csv",
