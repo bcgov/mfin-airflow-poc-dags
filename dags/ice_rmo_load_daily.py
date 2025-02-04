@@ -64,11 +64,10 @@ def ice_rmo_load_daily():
     @task
     def daily_load_data():
         # Tables not included in the daily delete statement
-        # "ACDQueue","Agent","AgentAssignment","TeamAssignment", *** investigate further
-        # "ContactSegment",
+        # "AgentAssignment","TeamAssignment", *** investigate further
         
         
-        delete_tables_set = ["AudioMessage", "AgentSkill",
+        delete_tables_set = ["ACDQueue","Agent","AudioMessage", "AgentSkill",
                              "ContactLink",
                              "Email","EmailGroup","Eval_Contact","EvalScore","EvalCategory","EvalCategoryLangString",
                              "EvalCriteria","EvalCriteriaLangString","EvalCriteriaValue","EvalCriteriaValueLangString",
@@ -88,7 +87,7 @@ def ice_rmo_load_daily():
             daily_table_delete(delete_table)                     
                              
         
-        source_file_set = ["AudioMessage", "AgentSkill",
+        source_file_set = ["ACDQueue","Agent","AudioMessage", "AgentSkill",
                            "ContactLink","ContactSegment",
                            "Email","EmailGroup","Eval_Contact","EvalScore","EvalCategory","EvalCategoryLangString",
                            "EvalCriteria","EvalCriteriaLangString","EvalCriteriaValue","EvalCriteriaValueLangString",
@@ -102,12 +101,14 @@ def ice_rmo_load_daily():
                            "Stat_AgentActivity_D", "Stat_AgentActivity_I", "Stat_AgentActivity_M", "Stat_AgentActivity_W", "Stat_AgentActivity_Y",
                            "Stat_AgentActivityByQueue_D", "Stat_AgentActivityByQueue_I", "Stat_AgentActivityByQueue_M", "Stat_AgentActivityByQueue_W", "Stat_AgentActivityByQueue_Y",
                            "Stat_AgentLineOfBusiness_D", "Stat_AgentLineOfBusiness_I", "Stat_AgentLineOfBusiness_M", "Stat_AgentLineOfBusiness_W", "Stat_AgentLineOfBusiness_Y",
-                          #"Stat_AgentNotReadyBreakdown_D", "Stat_AgentNotReadyBreakdown_M" uncomment this line after loading all other days 
+                          #"Stat_AgentNotReadyBreakdown_D" 2024 completed; 2025 missing Jan30-Feb03, 
+                          #"Stat_AgentNotReadyBreakdown_M" 2024 completed uncomment for 2025 data
                            "Stat_AgentNotReadyBreakdown_I", "Stat_AgentNotReadyBreakdown_W", "Stat_AgentNotReadyBreakdown_Y",
                            "Stat_DNISActivity_D", "Stat_DNISActivity_I", "Stat_DNISActivity_M", "Stat_DNISActivity_W", "Stat_DNISActivity_Y",
                            "Stat_CDR","Stat_CDR_LastSummarize","Stat_CDR_Summary",
                            "Stat_ADR",
-                           #"Stat_QueueActivity_D", "Stat_QueueActivity_M" uncomment this line after loading all other days 
+                           #"Stat_QueueActivity_D", missign Sep-2024 and Oct-2024
+                           #"Stat_QueueActivity_M" 2024 completed uncomment for 2025 data 
                            "Stat_QueueActivity_I", "Stat_QueueActivity_W", "Stat_QueueActivity_Y",
                            "Stat_SkillActivity_D", "Stat_SkillActivity_I", "Stat_SkillActivity_M", "Stat_SkillActivity_W", "Stat_SkillActivity_Y",
                            "Stat_TrunckActivity_D", "Stat_TrunckActivity_I", "Stat_TrunckActivity_M", "Stat_TrunckActivity_W", "Stat_TrunckActivity_Y",    
