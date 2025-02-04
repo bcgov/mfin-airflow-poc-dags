@@ -21,7 +21,7 @@ def ice_rmo_load_ondemand():
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
-            query = f""" BULK INSERT [RMO_ICE_HISTORY].[dbo].[icePay]
+            query = f""" BULK INSERT [RMO_ICE_HISTORY].[dbo].[Stat_QueueActivity_D]
                     FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\ondemand\\{psource_file}'
                     WITH
 	                ( FORMAT = 'CSV'
