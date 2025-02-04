@@ -69,11 +69,12 @@ def ice_rmo_single():
         # Tables not included in the daily delete statement
         # "AgentAssignment","TeamAssignment", *** investigate further
         
+        single_table_delete("ACDQueue")
         
-        delete_table_set = ["ACDQueue"]
+        #delete_table_set = ["ACDQueue"]
         
-        for delete_table in delete_table_set:
-            single_table_delete(delete_table)                     
+        #for delete_table in delete_table_set:
+            #single_table_delete(delete_table)                     
                              
         
         #source_file_set = ["ACDQueue"]
