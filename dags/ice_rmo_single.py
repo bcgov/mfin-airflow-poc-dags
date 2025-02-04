@@ -21,7 +21,7 @@ def ice_rmo_single():
             
             cursor = conn.cursor()
             
-            cursor.execute("DELETE FROM [ARCHITECT_SANDBOX].[dbo].{ptable_delete}")
+            cursor.execute("DELETE FROM [ARCHITECT_SANDBOX].[dbo].[ACDQueue]")
             #query = f"""DELETE FROM [ARCHITECT_SANDBOX].[dbo].{ptable_delete};"""
 
             #start_time = time.time()
