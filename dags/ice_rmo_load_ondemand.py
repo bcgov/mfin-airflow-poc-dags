@@ -44,8 +44,9 @@ def ice_rmo_load_ondemand():
     @task
     def ondemand_load_data():
         
-        source_file_set = ["Stat_QueueActivity_D20240826.csv", "Stat_QueueActivity_D20240827.csv", "Stat_QueueActivity_D20240828.csv", "Stat_QueueActivity_D20240829.csv",
-                           "Stat_QueueActivity_D20240830.csv", "Stat_QueueActivity_D20240831"]#, "icePay_D20241231.csv"]
+        source_file_set = ["Stat_QueueActivity_D20240831.csv"]
+        #["Stat_QueueActivity_D20240826.csv", "Stat_QueueActivity_D20240827.csv", "Stat_QueueActivity_D20240828.csv", "Stat_QueueActivity_D20240829.csv",
+        #                   "Stat_QueueActivity_D20240830.csv", "Stat_QueueActivity_D20240831.csv"]#, "icePay_D20241231.csv"]
                            
                            #, "icePay_D20241220.csv",
                            #"icePay_D20241221.csv", "icePay_D20241222.csv", "icePay_D20241223.csv", "icePay_D20241224.csv"]
