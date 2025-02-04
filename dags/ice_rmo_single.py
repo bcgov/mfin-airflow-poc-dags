@@ -20,7 +20,7 @@ def ice_rmo_single():
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
-            query = f""" DELETE FROM [RMO_ICE_HISTORY].[dbo].{ptable_delete};"""
+            query = f""" DELETE FROM [ARCHITECT_SANDBOX].[dbo].{ptable_delete};"""
 
             start_time = time.time()
             cursor.execute(query)
