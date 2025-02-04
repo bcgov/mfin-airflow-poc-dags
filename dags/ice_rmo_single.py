@@ -18,14 +18,17 @@ def ice_rmo_single():
 
         try:
             conn = sql_hook.get_conn()
+            
             cursor = conn.cursor()
             
-            query = f""" DELETE FROM [ARCHITECT_SANDBOX].[dbo].{ptable_delete};"""
+            cursor.execute("DELETE FROM [ARCHITECT_SANDBOX].[dbo].{ptable_delete}")
+            #query = f"""DELETE FROM [ARCHITECT_SANDBOX].[dbo].{ptable_delete};"""
 
-            start_time = time.time()
-            cursor.execute(query)
+            #start_time = time.time()
+            #cursor.execute(query)
             conn.commit()
-            
+            cursor.close()
+            cnn.close
             #print(f"bulk insert duration: --- {time.time() - start_time} seconds ---")
             #print(f"bulk insert {rows} rows test, duration: --- {time.time() - start_time} seconds ---")
         
