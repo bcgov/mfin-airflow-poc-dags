@@ -13,7 +13,7 @@ import time
 
 def ice_rmo_load_daily():
     
-    def daily_taable_delete(ptable_delete):
+    def daily_table_delete(ptable_delete):
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
 
         try:
