@@ -14,7 +14,7 @@ import time
 def ice_rmo_single():
     
     def single_table_delete(ptable_delete):
-        sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
+        sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_finafdbt')
 
         try:
             conn = sql_hook.get_conn()
