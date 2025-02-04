@@ -4,6 +4,7 @@ import pandas as pd
 import datetime as dt
 from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
 import time
+import logging
 
 @dag(
     description="RMO CT daily table delete and bulk insert test",
@@ -21,7 +22,7 @@ def ice_rmo_single():
             
             cursor = conn.cursor()
             
-            cursor.execute("TRUNCATE FROM [ARCHITECT_SANDBOX].[dbo].[ACDQueue]")
+            cursor.execute("DELETE FROM [ARCHITECT_SANDBOX].[dbo].[ACDQueue]")
             #query = f"""DELETE FROM [ARCHITECT_SANDBOX].[dbo].{ptable_delete};"""
 
             #start_time = time.time()
