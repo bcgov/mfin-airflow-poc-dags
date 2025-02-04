@@ -67,7 +67,7 @@ def ice_rmo_single():
         # "AgentAssignment","TeamAssignment", *** investigate further
         
         
-        delete_tables_set = ["ACDQueue"]
+        delete_table_set = ["ACDQueue"]
         
         for delete_table in delete_table_set:
             single_table_delete(delete_table)                     
