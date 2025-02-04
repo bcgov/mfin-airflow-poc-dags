@@ -15,14 +15,14 @@ import logging
 def ice_rmo_single():
     
     def single_table_delete(ptable_delete):
-        sql_hook = MsSqlHook(mssql_conn_id='mssql_EM_finafdbt')
+        sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_finafdbt')
 
         try:
             conn = sql_hook.get_conn()
             
             cursor = conn.cursor()
             
-            cursor.execute("TRUNCATE TABLE [ARCHITECT_SANDBOX].[dbo].[ACDQueue]")
+            cursor.execute("TRUNCATE TABLE [RMO_ICE_HISTORY].[dbo].[ACDQueue1]")
             #query = f"""DELETE FROM [ARCHITECT_SANDBOX].[dbo].{ptable_delete};"""
 
             #start_time = time.time()
