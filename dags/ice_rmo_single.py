@@ -41,7 +41,7 @@ def ice_rmo_single():
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
-            query = f""" BULK INSERT [RMO_ICE_HISTORY].[dbo].{psource_file}
+            query = f""" BULK INSERT [ARCHITECT_SANDBOX].[dbo].{psource_file}
                     FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{psource_file}.csv'
                     WITH
 	                ( FORMAT = 'CSV'
