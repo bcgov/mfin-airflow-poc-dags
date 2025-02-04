@@ -73,11 +73,11 @@ def ice_rmo_single():
             single_table_delete(delete_table)                     
                              
         
-        source_file_set = ["ACDQueue"]
+        #source_file_set = ["ACDQueue"]
 
         
-        for source_file in source_file_set:
-            single_load_source(source_file)
+        #for source_file in source_file_set:
+            #single_load_source(source_file)
 
     single_load_test()
     
