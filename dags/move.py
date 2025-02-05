@@ -1,7 +1,6 @@
 import os
 from airflow.decorators import dag, task
 from airflow.providers.samba.hooks.samba import SambaHook
-from airflow.providers.samba.transfers import SambaFileOperator
 from airflow.utils.dates import days_ago
 import zipfile
 import logging
