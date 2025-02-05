@@ -1,6 +1,7 @@
 import os
 from airflow.decorators import dag, task
 from airflow.providers.samba.hooks.samba import SambaHook
+from airflow.providers.samba.transfers import SambaFileOperator
 from airflow.utils.dates import days_ago
 import zipfile
 import logging
@@ -14,7 +15,6 @@ import logging
     tags=["example", "move_file", "unzip"]
 )
 def move_and_unzip_file():
-    
     # Log all steps at INFO level
     logging.basicConfig(level=logging.INFO)
 
@@ -22,16 +22,14 @@ def move_and_unzip_file():
     @task
     def move_file():
         source_path = r'\\fs1.fin.gov.bc.ca\Finance_data_Store\bulk_test\fabric_test'
-        source_file = 'titleEventExport_2025-1-1-0-0-0___2025-1-1-23-59-59.zip'
-        dest_path = r'\tmp\destination\file.zip'
+        file = 'titleEventExport_2025-1-1-0-0-0___2025-1-1-23-59-59.zip'
+        dest_path = r'\\fs1.fin.gov.bc.ca\Finance_data_Store\bulk_test\\airflow_test'
         
         # Initialize SambaHook with your credentials and connection details
-        #samba_hook = SambaHook(conn_id="your_samba_connection_id")
-        for f in os.listdir(source_path):
-            logging.info(f"{f}")
+        samba_hook = SambaHook(conn_id="fs1_test")
         
         # Fetch the file from source and move to the destination
-        #samba_hook.get(source_path, dest_path)
+        samba_hook.get(os.path.join(source_path,file), os.path.join(dest_path,file))
         logging.info(f"File moved from {source_path} to {dest_path}")
         
         return dest_path
