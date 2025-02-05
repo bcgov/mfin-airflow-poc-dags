@@ -25,7 +25,7 @@ def move_and_unzip_file():
         dest_path = r'\\fs1.fin.gov.bc.ca\Finance_data_Store\bulk_test\\airflow_test'
         
         # Initialize SambaHook with your credentials and connection details
-        samba_hook = SambaHook(conn_id="fs1_test")
+        samba_hook = SambaHook(samba_conn_id="fs1_test")
         
         # Fetch the file from source and move to the destination
         samba_hook.get(os.path.join(source_path,file), os.path.join(dest_path,file))
