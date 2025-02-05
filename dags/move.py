@@ -20,15 +20,14 @@ def move_and_unzip_file():
     # Task 1: Move file from source to destination (using SambaHook)
     @task
     def move_file():
-        source_path = r'\\fs1.fin.gov.bc.ca\Finance_data_Store\bulk_test\fabric_test'
+        source_path = r'\\fs1.fin.gov.bc.ca\Finance_data_Store\bulk_test\fabric_test\'
         file = 'titleEventExport_2025-1-1-0-0-0___2025-1-1-23-59-59.zip'
-        dest_path = r'\\fs1.fin.gov.bc.ca\Finance_data_Store\bulk_test\\airflow_test'
+        dest_path = r'\\fs1.fin.gov.bc.ca\Finance_data_Store\bulk_test\\airflow_test\'
         
         # Initialize SambaHook with your credentials and connection details
-        samba_hook = SambaHook(samba_conn_id="FS1_test")
+        with SambaHook(samba_conn_id="FS1_test") as fs_hook:
+            fs_hook.replace(source_path + file, dest_path + file)
         
-        # Fetch the file from source and move to the destination
-        samba_hook.get(os.path.join(source_path,file), os.path.join(dest_path,file))
         logging.info(f"File moved from {source_path} to {dest_path}")
         
         return dest_path
