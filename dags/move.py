@@ -33,9 +33,9 @@ def move_and_unzip_file():
                     logging.info(thing.filename)
                     
         
-        logging.info(f"File moved from {source_path} to {dest_path}")
+        #logging.info(f"File moved from {source_path} to {dest_path}")
         
-        return dest_path
+        return
 
     # Task 2: Unzip the file after it's moved
     @task
