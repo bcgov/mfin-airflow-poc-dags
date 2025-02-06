@@ -35,7 +35,7 @@ def move_and_unzip_file():
                     logging.info(thing.filename)
                     z.extract(thing.filename,path=zip_loc)
 
-                    fs_hook.push_from_local(dest_path, os.path.join(zip_loc,thing.filename))
+                    fs_hook.push_from_local(dest_path+thing.filename, os.path.join(zip_loc,thing.filename))
                     
         
         #logging.info(f"File moved from {source_path} to {dest_path}")
