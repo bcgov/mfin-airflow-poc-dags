@@ -42,24 +42,8 @@ def move_and_unzip_file():
         
         return
 
-    # Task 2: Unzip the file after it's moved
-    @task
-    def unzip_file(file_path):
-        dest_unzip_dir = '/tmp/destination/unzipped/'
-        
-        # Ensure the destination unzip directory exists
-        os.makedirs(dest_unzip_dir, exist_ok=True)
-        
-        # Unzip the file
-        with zipfile.ZipFile(file_path, 'r') as zip_ref:
-            zip_ref.extractall(dest_unzip_dir)
-            logging.info(f"File unzipped to {dest_unzip_dir}")
-        
-        return dest_unzip_dir
-
     # Task orchestration
     moved_file_path = move_file()
-    #unzip_file(moved_file_path)
 
 # Instantiate the DAG
 dag_instance = move_and_unzip_file()
