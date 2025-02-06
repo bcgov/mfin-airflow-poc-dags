@@ -4,6 +4,8 @@ from airflow.providers.samba.hooks.samba import SambaHook
 from airflow.utils.dates import days_ago
 import zipfile
 import logging
+import io
+import zipfile
 
 # Define the DAG
 @dag(
@@ -22,12 +24,14 @@ def move_and_unzip_file():
     def move_file():
         source_path = r'/bulk_test/fabric_test/'
         file = 'titleEventExport_2025-1-1-0-0-0___2025-1-1-23-59-59.zip'
-        #dest_path = r'/bulk_test/airflow_test/'
-        dest_path = r'/tmp/'
-        
+
         # Initialize SambaHook with your credentials and connection details
         with SambaHook(samba_conn_id="FS1_test") as fs_hook:
-            fs_hook.replace(source_path + file, dest_path + file)
+            with fs_hook.open(source_path + file,'b') as f:
+                z = zipfile.ZipFile(io.BytesIO(buffer))
+                for thing in z.infolist():
+                    logging.info(thing.filename)
+                    
         
         logging.info(f"File moved from {source_path} to {dest_path}")
         
