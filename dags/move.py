@@ -28,7 +28,7 @@ def move_and_unzip_file():
         # Initialize SambaHook with your credentials and connection details
         with SambaHook(samba_conn_id="FS1_test") as fs_hook:
             with fs_hook.open_file(source_path + file,'rb') as f:
-                z = zipfile.ZipFile(io.BytesIO(f))
+                z = zipfile.ZipFile(f)
                 for thing in z.infolist():
                     logging.info(thing.filename)
                     
