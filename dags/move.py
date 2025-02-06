@@ -23,6 +23,7 @@ def move_and_unzip_file():
     @task
     def move_file():
         source_path = r'/bulk_test/fabric_test/'
+        dest_path = r'/bulk_test/airflow_test/'
         file = 'titleEventExport_2025-1-1-0-0-0___2025-1-1-23-59-59.zip'
         zip_loc = '/tmp'
 
@@ -33,6 +34,8 @@ def move_and_unzip_file():
                 for thing in z.infolist():
                     logging.info(thing.filename)
                     z.extract(thing.filename,path=zip_loc)
+
+                    fs_hook.push_from_local(dest_path, os.path.join(zip_loc,thing.filename))
                     
         
         #logging.info(f"File moved from {source_path} to {dest_path}")
