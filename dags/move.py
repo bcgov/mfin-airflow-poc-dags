@@ -29,9 +29,9 @@ def move_and_unzip_file():
         with SambaHook(samba_conn_id="FS1_test") as fs_hook:
             with fs_hook.open_file(source_path + file,'rb') as f:
                 z = zipfile.ZipFile(f)
-                print(z.infolist())
                 for thing in z.infolist():
                     logging.info(thing.filename)
+                    z.extract(thing.filename)
                     
         
         #logging.info(f"File moved from {source_path} to {dest_path}")
