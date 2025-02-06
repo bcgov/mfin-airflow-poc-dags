@@ -24,7 +24,7 @@ def move_and_unzip_file():
     def move_file():
         source_path = r'/bulk_test/fabric_test/'
         file = 'titleEventExport_2025-1-1-0-0-0___2025-1-1-23-59-59.zip'
-        zip_loc = '/tmp/'
+        zip_loc = '/tmp'
 
         # Initialize SambaHook with your credentials and connection details
         with SambaHook(samba_conn_id="FS1_test") as fs_hook:
@@ -32,7 +32,7 @@ def move_and_unzip_file():
                 z = zipfile.ZipFile(f)
                 for thing in z.infolist():
                     logging.info(thing.filename)
-                    z.extract(zip_loc + thing.filename)
+                    z.extract(thing.filename,path=zip_loc)
                     
         
         #logging.info(f"File moved from {source_path} to {dest_path}")
