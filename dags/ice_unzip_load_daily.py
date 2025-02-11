@@ -34,7 +34,7 @@ def ice_unzip_load_daily():
                     logging.info(iceTable.filename)
                     z.extract(iceTable.filename,path=zip_loc)
 
-                    fs_hook.push_from_local(dest_path+thing.filename, os.path.join(zip_loc,iceTable.filename))
+                    fs_hook.push_from_local(dest_path+iceTable.filename, os.path.join(zip_loc,iceTable.filename))
                     
         
         #logging.info(f"File moved from {source_path} to {dest_path}")
