@@ -8,7 +8,7 @@ import io
 
 # Define the DAG
 @dag(
-    dag_id="move_and_unzip_file_dag",
+    dag_id="ice_unzip_load_daily_dag",
     schedule_interval=None,  # Set your schedule interval or leave as None for manual trigger
     start_date=days_ago(1),
     catchup=False,
