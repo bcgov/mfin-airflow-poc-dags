@@ -5,14 +5,17 @@ import pandas as pd
 import datetime as dt
 from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
 import time
+import logging
 
 @dag(
-    description="DAG - RMO CT daily bulk insert",
+    description="DAG - RMO CT specific dates bulk insert",
     schedule=None,
     catchup=False,
+    tag=["ice","load","specific data date","source file"]
 )
 
 def ice_rmo_load_ondemand():
+    logging.basicConfig(level=logging.INFO)
     
     def ondemand_load_source(psource_file):
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
@@ -27,7 +30,7 @@ def ice_rmo_load_ondemand():
 	                ( FORMAT = 'CSV'
 	                );
                 """
-
+            logging.info("Loading {psource_file}")
             start_time = time.time()
             cursor.execute(query)
             conn.commit()
@@ -38,15 +41,15 @@ def ice_rmo_load_ondemand():
         
         
         except Exception as e:
-            print(e)
+            logging.info(f"Error bulk loading {psource_file}")
  
 
     @task
     def ondemand_load_data():
         
-        source_file_set = ["Stat_QueueActivity_D20240831.csv"]
-        #["Stat_QueueActivity_D20240826.csv", "Stat_QueueActivity_D20240827.csv", "Stat_QueueActivity_D20240828.csv", "Stat_QueueActivity_D20240829.csv",
-        #                   "Stat_QueueActivity_D20240830.csv", "Stat_QueueActivity_D20240831.csv"]#, "icePay_D20241231.csv"]
+        source_file_set = ["Stat_QueueActivity_D20240901.csv", "Stat_QueueActivity_D20240902.csv", "Stat_QueueActivity_D20240903.csv", "Stat_QueueActivity_D20240904.csv",
+                           "Stat_QueueActivity_D20240905.csv", "Stat_QueueActivity_D20240906.csv", "Stat_QueueActivity_D20240907.csv", "Stat_QueueActivity_D20240908.csv",
+                           "Stat_QueueActivity_D20240909.csv", "Stat_QueueActivity_D20240910.csv", "Stat_QueueActivity_D20240911.csv", "Stat_QueueActivity_D20240912.csv"]
                            
                            #, "icePay_D20241220.csv",
                            #"icePay_D20241221.csv", "icePay_D20241222.csv", "icePay_D20241223.csv", "icePay_D20241224.csv"]
