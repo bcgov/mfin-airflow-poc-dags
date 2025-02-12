@@ -49,7 +49,11 @@ def ice_rmo_load_ondemand():
         
         source_file_set = ["Stat_QueueActivity_D20241013.csv", "Stat_QueueActivity_D20241014.csv", "Stat_QueueActivity_D20241015.csv", "Stat_QueueActivity_D20241016.csv",
                            "Stat_QueueActivity_D20241017.csv", "Stat_QueueActivity_D20241018.csv", "Stat_QueueActivity_D20241019.csv", "Stat_QueueActivity_D20241020.csv",
-                           "Stat_QueueActivity_D20241021.csv", "Stat_QueueActivity_D20241022.csv", "Stat_QueueActivity_D20241023.csv", "Stat_QueueActivity_D20241024.csv"]
+                           "Stat_QueueActivity_D20241021.csv", "Stat_QueueActivity_D20241022.csv", "Stat_QueueActivity_D20241023.csv", "Stat_QueueActivity_D20241024.csv",
+                           "Stat_QueueActivity_D20241025.csv", "Stat_QueueActivity_D20241026.csv", "Stat_QueueActivity_D20241027.csv", "Stat_QueueActivity_D20241028.csv",
+                           "Stat_QueueActivity_D20241029.csv", "Stat_QueueActivity_D20241030.csv", "Stat_QueueActivity_D20241031.csv"]
+                           
+]
                            
                            #, "icePay_D20241220.csv",
                            #"icePay_D20241221.csv", "icePay_D20241222.csv", "icePay_D20241223.csv", "icePay_D20241224.csv"]
