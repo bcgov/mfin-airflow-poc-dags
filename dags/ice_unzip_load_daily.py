@@ -148,7 +148,7 @@ def ice_etl_load_daily():
     #backup_file()
     daily_load_data()
     
-    unzip_move_file >> load_data
+    unzip_move_file >> daily_load_data
 
 # Instantiate the DAG
 dag_instance = ice_etl_load_daily()
