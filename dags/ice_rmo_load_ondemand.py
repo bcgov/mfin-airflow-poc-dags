@@ -11,7 +11,7 @@ import logging
     description="DAG - RMO CT specific dates bulk insert",
     schedule=None,
     catchup=False,
-    tags=["ice","load","specific data date","source file"]
+    tags=["ice","ondemand","load","source file"]
 )
 
 def ice_rmo_load_ondemand():
@@ -30,7 +30,7 @@ def ice_rmo_load_ondemand():
 	                ( FORMAT = 'CSV'
 	                );
                 """
-            logging.info("Loading {psource_file}")
+            logging.info({psource_file})
             start_time = time.time()
             cursor.execute(query)
             conn.commit()
@@ -47,9 +47,9 @@ def ice_rmo_load_ondemand():
     @task
     def ondemand_load_data():
         
-        source_file_set = ["Stat_QueueActivity_D20240901.csv", "Stat_QueueActivity_D20240902.csv", "Stat_QueueActivity_D20240903.csv", "Stat_QueueActivity_D20240904.csv",
-                           "Stat_QueueActivity_D20240905.csv", "Stat_QueueActivity_D20240906.csv", "Stat_QueueActivity_D20240907.csv", "Stat_QueueActivity_D20240908.csv",
-                           "Stat_QueueActivity_D20240909.csv", "Stat_QueueActivity_D20240910.csv", "Stat_QueueActivity_D20240911.csv", "Stat_QueueActivity_D20240912.csv"]
+        source_file_set = ["Stat_QueueActivity_D20240913.csv", "Stat_QueueActivity_D20240914.csv", "Stat_QueueActivity_D20240915.csv", "Stat_QueueActivity_D20240916.csv",
+                           "Stat_QueueActivity_D20240917.csv", "Stat_QueueActivity_D20240918.csv", "Stat_QueueActivity_D20240919.csv", "Stat_QueueActivity_D20240920.csv",
+                           "Stat_QueueActivity_D20240921.csv", "Stat_QueueActivity_D20240922.csv", "Stat_QueueActivity_D20240923.csv", "Stat_QueueActivity_D20240924.csv"]
                            
                            #, "icePay_D20241220.csv",
                            #"icePay_D20241221.csv", "icePay_D20241222.csv", "icePay_D20241223.csv", "icePay_D20241224.csv"]
