@@ -53,7 +53,7 @@ def ice_rmo_load_ondemand():
                            "Stat_QueueActivity_D20241025.csv", "Stat_QueueActivity_D20241026.csv", "Stat_QueueActivity_D20241027.csv", "Stat_QueueActivity_D20241028.csv",
                            "Stat_QueueActivity_D20241029.csv", "Stat_QueueActivity_D20241030.csv", "Stat_QueueActivity_D20241031.csv"]
                            
-]
+
                            
                            #, "icePay_D20241220.csv",
                            #"icePay_D20241221.csv", "icePay_D20241222.csv", "icePay_D20241223.csv", "icePay_D20241224.csv"]
