@@ -13,7 +13,7 @@ from datetime import datetime
     schedule_interval=None,  # Set your schedule interval or leave as None for manual trigger
     start_date=days_ago(1),
     catchup=False,
-    tags=["ice", "etl", "daily process"]
+    tags=["ice", "etl", "unzip","load","inprogress_folder"]
 )
 def ice_etl_load_daily():
     # Log all steps at INFO level
@@ -53,7 +53,8 @@ def ice_etl_load_daily():
         conn_id = 'fs1_rmo_ice'
         file = 'iceDB_ICE_BCMOFRMO.zip'
         hook = SambaHook(conn_id)
-        dYmd = (dt.datetime.today() + timedelta(days=-1)).strftime('Y%m%d) #Set dYmd for yesterday's date
+        #Set dYmd to yesterdays date
+        dYmd = (dt.datetime.today() + timedelta(days=-1)).strftime('Y%m%d)
         
         try:
             files = hook.listdir(source_path)
