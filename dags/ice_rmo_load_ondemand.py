@@ -11,7 +11,7 @@ import logging
     description="DAG - RMO CT specific dates bulk insert",
     schedule=None,
     catchup=False,
-    tag=["ice","load","specific data date","source file"]
+    tags=["ice","load","specific data date","source file"]
 )
 
 def ice_rmo_load_ondemand():
