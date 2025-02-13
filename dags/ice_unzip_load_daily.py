@@ -74,11 +74,13 @@ def ice_etl_load_daily():
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
 
         try:
+            xlen = len(psource_file)-4
+            pTableName = psource_file[:xlen]
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
-            query = f""" BULK INSERT [RMO_ICE_HISTORY].[dbo].{psource_file}
-                    FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{psource_file}.csv'
+            query = f""" BULK INSERT [RMO_ICE_HISTORY].[dbo].{pTableName}
+                    FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{psource_file}'
                     WITH
 	                ( FORMAT = 'CSV'
 	                );
@@ -103,50 +105,47 @@ def ice_etl_load_daily():
     def daily_load_data():
         # Slowly changin dimension TBD on AgentAssignment, TeamAssignment
                 
-        source_file_set = ["ACDQueue","Agent","AudioMessage", "AgentAssignment", "AgentSkill",
-                           "ContactLink","ContactSegment",
-                           "Email","EmailGroup","Eval_Contact","EvalScore","EvalCategory","EvalCategoryLangString",
-                           "EvalCriteria","EvalCriteriaLangString","EvalCriteriaValue","EvalCriteriaValueLangString",
-                           "EvalEvaluation","EvalForm","EvalFormLangString",
-                           "Holiday","IMRecording","icePay",
-                           "Languages","LOBCategory","LOBCategoryLangString","LOBCode","LOBCodeLangString",
-                           "Node","NotReadyReason","NotReadyReasonLangString",
-                           "OperatingDates",
-                           "Recordings","RecordingsFaultedFiles","RequiredSkill", 
-                           "SegmentAgent","SegmentQueue","Server","Site","Skill","Stat_CDR_LastSummarized","Switch",
-                           "Stat_AgentActivity_D", "Stat_AgentActivity_I", "Stat_AgentActivity_M", "Stat_AgentActivity_W", "Stat_AgentActivity_Y",
-                           "Stat_AgentActivityByQueue_D", "Stat_AgentActivityByQueue_I", "Stat_AgentActivityByQueue_M", "Stat_AgentActivityByQueue_W", "Stat_AgentActivityByQueue_Y",
-                           "Stat_AgentLineOfBusiness_D", "Stat_AgentLineOfBusiness_I", "Stat_AgentLineOfBusiness_M", "Stat_AgentLineOfBusiness_W", "Stat_AgentLineOfBusiness_Y",
+        source_file_set = ["ACDQueue.csv","Agent.csv","AudioMessage.csv", "AgentAssignment.csv", "AgentSkill.csv",
+                           "ContactLink.csv","ContactSegment.csv",
+                           "Email.csv","EmailGroup.csv","Eval_Contact.csv","EvalScore.csv","EvalCategory.csv","EvalCategoryLangString.csv",
+                           "EvalCriteria.csv","EvalCriteriaLangString.csv","EvalCriteriaValue.csv","EvalCriteriaValueLangString.csv",
+                           "EvalEvaluation.csv","EvalForm.csv","EvalFormLangString.csv",
+                           "Holiday.csv","IMRecording.csv","icePay.csv",
+                           "Languages.csv","LOBCategory.csv","LOBCategoryLangString.csv","LOBCode.csv","LOBCodeLangString.csv",
+                           "Node.csv","NotReadyReason.csv","NotReadyReasonLangString.csv",
+                           "OperatingDates.csv",
+                           "Recordings.csv","RecordingsFaultedFiles.csv","RequiredSkill.csv", 
+                           "SegmentAgent.csv","SegmentQueue.csv","Server.csv","Site.csv","Skill.csv","Stat_CDR_LastSummarized.csv","Switch.csv",
+                           "Stat_AgentActivity_D.csv", "Stat_AgentActivity_I.csv", "Stat_AgentActivity_M.csv", "Stat_AgentActivity_W.csv", "Stat_AgentActivity_Y.csv",
+                           "Stat_AgentActivityByQueue_D.csv", "Stat_AgentActivityByQueue_I.csv", "Stat_AgentActivityByQueue_M.csv", "Stat_AgentActivityByQueue_W.csv", "Stat_AgentActivityByQueue_Y.csv",
+                           "Stat_AgentLineOfBusiness_D.csv", "Stat_AgentLineOfBusiness_I.csv", "Stat_AgentLineOfBusiness_M.csv", "Stat_AgentLineOfBusiness_W.csv", "Stat_AgentLineOfBusiness_Y.csv",
                           #"Stat_AgentNotReadyBreakdown_D" 2024 missing Jan30-Feb, 
-                           "Stat_AgentNotReadyBreakdown_M",
-                           "Stat_AgentNotReadyBreakdown_I", "Stat_AgentNotReadyBreakdown_W", "Stat_AgentNotReadyBreakdown_Y",
-                           "Stat_DNISActivity_D", "Stat_DNISActivity_I", "Stat_DNISActivity_M", "Stat_DNISActivity_W", "Stat_DNISActivity_Y",
-                           "Stat_CDR","Stat_CDR_LastSummarize","Stat_CDR_Summary",
-                           "Stat_ADR",
-                           "Stat_QueueActivity_D",
-                           "Stat_QueueActivity_M", 
-                           "Stat_QueueActivity_I", "Stat_QueueActivity_W", "Stat_QueueActivity_Y",
-                           "Stat_SkillActivity_D", "Stat_SkillActivity_I", "Stat_SkillActivity_M", "Stat_SkillActivity_W", "Stat_SkillActivity_Y",
-                           "Stat_TrunckActivity_D", "Stat_TrunckActivity_I", "Stat_TrunckActivity_M", "Stat_TrunckActivity_W", "Stat_TrunckActivity_Y",    
-                           "Stat_WorkflowActionActivity_D", "Stat_WorkflowActionActivity_I", "Stat_WorkflowActionActivity_M", "Stat_WorkflowActionActivity_W", "Stat_WorkflowActionActivity_Y",
-                           "Team","TeamAssignment",
-                           "UCAddress","UCGroup",
-                           "WfAttributeDetail","WfLinkDetail","WfLink","WfAction","WfPage","WfGraph",
-                           "WfSubAppMethod","WfSubApplication","WfVariables"]
+                           "Stat_AgentNotReadyBreakdown_M.csv",
+                           "Stat_AgentNotReadyBreakdown_I.csv", "Stat_AgentNotReadyBreakdown_W.csv", "Stat_AgentNotReadyBreakdown_Y.csv",
+                           "Stat_DNISActivity_D.csv", "Stat_DNISActivity_I.csv", "Stat_DNISActivity_M.csv", "Stat_DNISActivity_W.csv", "Stat_DNISActivity_Y.csv",
+                           "Stat_CDR.csv","Stat_CDR_LastSummarize.csv","Stat_CDR_Summary.csv",
+                           "Stat_ADR.csv",
+                           "Stat_QueueActivity_D.csv","Stat_QueueActivity_M.csv","Stat_QueueActivity_I.csv", "Stat_QueueActivity_W.csv", "Stat_QueueActivity_Y.csv",
+                           "Stat_SkillActivity_D.csv", "Stat_SkillActivity_I.csv", "Stat_SkillActivity_M.csv", "Stat_SkillActivity_W.csv", "Stat_SkillActivity_Y.csv",
+                           "Stat_TrunckActivity_D.csv", "Stat_TrunckActivity_I.csv", "Stat_TrunckActivity_M.csv", "Stat_TrunckActivity_W.csv", "Stat_TrunckActivity_Y.csv",    
+                           "Stat_WorkflowActionActivity_D.csv", "Stat_WorkflowActionActivity_I.csv", "Stat_WorkflowActionActivity_M.csv", "Stat_WorkflowActionActivity_W.csv", "Stat_WorkflowActionActivity_Y.csv",
+                           "Team.csv","TeamAssignment.csv",
+                           "UCAddress.csv","UCGroup.csv",
+                           "WfAttributeDetail.csv","WfLinkDetail.csv","WfLink.csv","WfAction.csv","WfPage.csv","WfGraph.csv",
+                           "WfSubAppMethod.csv","WfSubApplication.csv","WfVariables.csv"]
 
         
         for source_file in source_file_set:
             daily_load_source(source_file)
-
+ 
                 
         return
 
 
 
     # Task orchestration
-    unzip_move_file() 
-    #backup_file()
-    daily_load_data()
+    unzip_file = unzip_move_file() 
+    load_daily = daily_load_data()
     
     
 # Instantiate the DAG
