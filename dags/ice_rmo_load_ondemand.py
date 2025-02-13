@@ -34,6 +34,7 @@ def ice_rmo_load_ondemand():
 	                ( FORMAT = 'CSV'
 	                );
                 """
+            logging.info(f"query: {query}")
             logging.info(f"inserting table:  {psource_file}")
             start_time = time.time()
             cursor.execute(query)
@@ -46,7 +47,7 @@ def ice_rmo_load_ondemand():
         
         
         except Exception as e:
-            logging.info(f"Error bulk loading {psource_file}")
+            logging.info(f"Error bulk loading {psource_file} {e}")
  
 
     @task
