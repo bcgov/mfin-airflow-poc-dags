@@ -21,22 +21,27 @@ def ice_rmo_load_ondemand():
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
 
         try:
+            xlen = len(psource_file)-4
+            pTableName = psource_file[:xlen]
+            logging.info(f"loading table: {pTableName}")
+            
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
-            query = f""" BULK INSERT [RMO_ICE_HISTORY].[dbo].[Stat_QueueActivity_D]
+            query = f""" BULK INSERT [RMO_ICE_HISTORY].[dbo].[{pTable}]
                     FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\ondemand\\{psource_file}'
                     WITH
 	                ( FORMAT = 'CSV'
 	                );
                 """
-            logging.info({psource_file})
+            logging.info(f"inserting table:  {psource_file}")
             start_time = time.time()
             cursor.execute(query)
             conn.commit()
             
                       
-            print(f"bulk insert duration: --- {time.time() - start_time} seconds ---")
+            logging.info(f"bulk insert {time.time() - start_time} seconds")
+            #print(f"bulk insert duration: --- {time.time() - start_time} seconds ---")
             #print(f"bulk insert {rows} rows test, duration: --- {time.time() - start_time} seconds ---")
         
         
@@ -47,21 +52,35 @@ def ice_rmo_load_ondemand():
     @task
     def ondemand_load_data():
         
-        source_file_set = ["Stat_QueueActivity_D20241013.csv", "Stat_QueueActivity_D20241014.csv", "Stat_QueueActivity_D20241015.csv", "Stat_QueueActivity_D20241016.csv",
-                           "Stat_QueueActivity_D20241017.csv", "Stat_QueueActivity_D20241018.csv", "Stat_QueueActivity_D20241019.csv", "Stat_QueueActivity_D20241020.csv",
-                           "Stat_QueueActivity_D20241021.csv", "Stat_QueueActivity_D20241022.csv", "Stat_QueueActivity_D20241023.csv", "Stat_QueueActivity_D20241024.csv",
-                           "Stat_QueueActivity_D20241025.csv", "Stat_QueueActivity_D20241026.csv", "Stat_QueueActivity_D20241027.csv", "Stat_QueueActivity_D20241028.csv",
-                           "Stat_QueueActivity_D20241029.csv", "Stat_QueueActivity_D20241030.csv", "Stat_QueueActivity_D20241031.csv"]
+        source_file_set = ["ACDQueue.csv","Agent.csv","AudioMessage.csv", "AgentAssignment.csv", "AgentSkill.csv",
+                           "ContactLink.csv","ContactSegment.csv",
+                           "Email.csv","EmailGroup.csv","Eval_Contact.csv","EvalScore.csv","EvalCategory.csv","EvalCategoryLangString.csv",
+                           "EvalCriteria.csv","EvalCriteriaLangString.csv","EvalCriteriaValue.csv","EvalCriteriaValueLangString.csv",
+                           "EvalEvaluation.csv","EvalForm.csv","EvalFormLangString.csv",
+                           "Holiday.csv","IMRecording.csv","icePay.csv",
+                           "Languages.csv","LOBCategory.csv","LOBCategoryLangString.csv","LOBCode.csv","LOBCodeLangString.csv",
+                           "Node.csv","NotReadyReason.csv","NotReadyReasonLangString.csv",
+                           "OperatingDates.csv",
+                           "Recordings.csv","RecordingsFaultedFiles.csv","RequiredSkill.csv", 
+                           "SegmentAgent.csv","SegmentQueue.csv","Server.csv","Site.csv","Skill.csv","Stat_CDR_LastSummarized.csv","Switch.csv",
+                           "Stat_AgentActivity_D.csv", "Stat_AgentActivity_I.csv", "Stat_AgentActivity_M.csv", "Stat_AgentActivity_W.csv", "Stat_AgentActivity_Y.csv",
+                           "Stat_AgentActivityByQueue_D.csv", "Stat_AgentActivityByQueue_I.csv", "Stat_AgentActivityByQueue_M.csv", "Stat_AgentActivityByQueue_W.csv", "Stat_AgentActivityByQueue_Y.csv",
+                           "Stat_AgentLineOfBusiness_D.csv", "Stat_AgentLineOfBusiness_I.csv", "Stat_AgentLineOfBusiness_M.csv", "Stat_AgentLineOfBusiness_W.csv", "Stat_AgentLineOfBusiness_Y.csv",
+                          #"Stat_AgentNotReadyBreakdown_D" 2024 missing Jan30-Feb, 
+                           "Stat_AgentNotReadyBreakdown_M.csv",
+                           "Stat_AgentNotReadyBreakdown_I.csv", "Stat_AgentNotReadyBreakdown_W.csv", "Stat_AgentNotReadyBreakdown_Y.csv",
+                           "Stat_DNISActivity_D.csv", "Stat_DNISActivity_I.csv", "Stat_DNISActivity_M.csv", "Stat_DNISActivity_W.csv", "Stat_DNISActivity_Y.csv",
+                           "Stat_CDR.csv","Stat_CDR_LastSummarize.csv","Stat_CDR_Summary.csv",
+                           "Stat_ADR.csv",
+                           "Stat_QueueActivity_D.csv","Stat_QueueActivity_M.csv","Stat_QueueActivity_I.csv", "Stat_QueueActivity_W.csv", "Stat_QueueActivity_Y.csv",
+                           "Stat_SkillActivity_D.csv", "Stat_SkillActivity_I.csv", "Stat_SkillActivity_M.csv", "Stat_SkillActivity_W.csv", "Stat_SkillActivity_Y.csv",
+                           "Stat_TrunckActivity_D.csv", "Stat_TrunckActivity_I.csv", "Stat_TrunckActivity_M.csv", "Stat_TrunckActivity_W.csv", "Stat_TrunckActivity_Y.csv",    
+                           "Stat_WorkflowActionActivity_D.csv", "Stat_WorkflowActionActivity_I.csv", "Stat_WorkflowActionActivity_M.csv", "Stat_WorkflowActionActivity_W.csv", "Stat_WorkflowActionActivity_Y.csv",
+                           "Team.csv","TeamAssignment.csv",
+                           "UCAddress.csv","UCGroup.csv",
+                           "WfAttributeDetail.csv","WfLinkDetail.csv","WfLink.csv","WfAction.csv","WfPage.csv","WfGraph.csv",
+                           "WfSubAppMethod.csv","WfSubApplication.csv","WfVariables.csv"]
                            
-
-                           
-                           #, "icePay_D20241220.csv",
-                           #"icePay_D20241221.csv", "icePay_D20241222.csv", "icePay_D20241223.csv", "icePay_D20241224.csv"]
-                           
-                           #"icePay_D20240919.csv", "icePay_D20240920.csv"]
-        #source_file_set = ["Stat_AgentNotReadyBreakdown_D20250121.csv","Stat_AgentNotReadyBreakdown_D20250122.csv","Stat_AgentNotReadyBreakdown_D20250123.csv",
-        #                   "Stat_AgentNotReadyBreakdown_D20250124.csv","Stat_AgentNotReadyBreakdown_D20250125.csv","Stat_AgentNotReadyBreakdown_D20250126.csv",
-        #                   "Stat_AgentNotReadyBreakdown_D20250127.csv","Stat_AgentNotReadyBreakdown_D20250128.csv"]
         
         for source_file in source_file_set:
             ondemand_load_source(source_file)
