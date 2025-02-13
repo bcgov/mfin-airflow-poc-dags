@@ -29,7 +29,7 @@ def ice_rmo_load_ondemand():
             cursor = conn.cursor()
             
             query = f""" BULK INSERT [RMO_ICE_HISTORY].[dbo].[{pTable}]
-                    FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\ondemand\\{psource_file}'
+                    FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{psource_file}'
                     WITH
 	                ( FORMAT = 'CSV'
 	                );
