@@ -28,7 +28,7 @@ def ice_rmo_load_ondemand():
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
-            query = f""" BULK INSERT [RMO_ICE_HISTORY].[dbo].[{pTable}]
+            query = f""" BULK INSERT [RMO_ICE_HISTORY].[dbo].[{pTableName}]
                     FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{psource_file}'
                     WITH
 	                ( FORMAT = 'CSV'
@@ -47,7 +47,7 @@ def ice_rmo_load_ondemand():
         
         
         except Exception as e:
-            logging.info(f"Error bulk loading {psource_file} {e}")
+            logging.info(f"Error bulk loading table: {pTableName} source file: {psource_file} {e}")
  
 
     @task
