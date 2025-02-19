@@ -50,10 +50,11 @@ def ice_etl_load_daily():
     @task
     def daily_load_source(psource_file):
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
+        logging.info(f"mssql_conn_bulk started")
 
         try:            
             xlen = len(psource_file) - 4
-            pTableName = 'ICE_' + psource_file[:xlen]
+            pTableName = "ICE_" + psource_file[:xlen]
             logging.info(pTableName)
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
@@ -70,7 +71,7 @@ def ice_etl_load_daily():
             conn.commit()
             end_time = time.time()
             
-            logging.info(f"bulk insert lapse: --- {psoiurce_file}.csv {time.time() - start_time} seconds ---")          
+            logging.info(f"bulk insert lapse: --- {psource_file}.csv {time.time() - start_time} seconds ---")          
             #print(f"bulk insert duration: --- {time.time() - start_time} seconds ---")
         
         
@@ -123,8 +124,14 @@ def ice_etl_load_daily():
 
 
     # Task orchestration
+    logging.info(f"unzipping process starting")  
     unzip_file = unzip_move_file() 
+    logging.info(f"unzipping process ending")  
+    
+    logging.info(f"loading process starting")  
     load_daily = daily_load_data()
+    logging.info(f"loading process ending")  
+    
     
     
 # Instantiate the DAG
