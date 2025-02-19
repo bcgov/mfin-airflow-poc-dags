@@ -52,8 +52,8 @@ def ice_etl_load_daily():
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
 
         try:            
-            xlen = len(psource_file)-4
-            pTableName = psource_file[:xlen]
+            xlen = len(psource_file) - 4
+            pTableName = 'ICE_' + psource_file[:xlen]
             logging.info(pTableName)
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
