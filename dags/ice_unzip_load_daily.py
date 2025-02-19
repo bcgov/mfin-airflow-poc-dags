@@ -46,40 +46,19 @@ def ice_etl_load_daily():
         
         return
 
-    # Task 2: Backup iceDB_ICE_BCMOFRMO-YYYYMMDD.zip to the copleted folder 
-    @task
-    def backup_file():
-        source_path = 'r/rmo_ct_prod/'
-        dest_path = r'/rmo_ct_prod/completed/'
-        conn_id = 'fs1_rmo_ice'
-        file = 'iceDB_ICE_BCMOFRMO.zip'
-        hook = SambaHook(conn_id)
-        #Set dYmd to yesterdays date
-        dYmd = (dt.datetime.today() + timedelta(days=-1)).strftime('%Y%m%d')
-        
-        try:
-            files = hook.listdir(source_path)
-            for f in files:
-                if f == 'iceDB_ICE_BCMOFRMO.zip':
-                    hook.replace(source_path + f, dest_path + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip') 
-                    
-        except Exception as e:
-                logging.info(f"Error backing up {dYmd} source file")
-                
-        return
-
-    # Task 3: Loading 103 csv data files to [IAPETUS\FINDATA].[dbo].[RMO_ICE_HISTORY]      
+    # Task 2: Loading 103 csv data files to [IAPETUS\FINDATA].[dbo].[FIN_SHARED_LANDING_DEV]      
     @task
     def daily_load_source(psource_file):
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
 
-        try:
+        try:            
             xlen = len(psource_file)-4
             pTableName = psource_file[:xlen]
+            logging.info(pTableName)
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
-            query = f""" BULK INSERT [RMO_ICE_HISTORY].[dbo].{pTableName}
+            query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{pTableName}]
                     FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{psource_file}'
                     WITH
 	                ( FORMAT = 'CSV'
@@ -96,7 +75,7 @@ def ice_etl_load_daily():
         
         
         except Exception as e:
-            print(f"Error loading {psource_file}.csv")
+            print(f"Error loading {psource_file}")
             
         return
     
