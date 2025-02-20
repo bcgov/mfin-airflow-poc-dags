@@ -7,7 +7,7 @@ import logging
 import io
 from datetime import datetime
 from datetime import timedelta
-fromw airflow.operators.python import PythonOperator
+from airflow.operators.python import PythonOperator
 
 # Define the DAG
 @dag(
