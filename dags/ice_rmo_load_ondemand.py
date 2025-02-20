@@ -22,13 +22,13 @@ def ice_rmo_load_ondemand():
 
         try:
             xlen = len(psource_file)-4
-            pTableName = psource_file[:xlen]
+            pTableName = "ICE_" + psource_file[:xlen]
             logging.info(f"loading table: {pTableName}")
             
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
-            query = f""" BULK INSERT [RMO_ICE_HISTORY].[dbo].[ICE_Holiday]
+            query = f""" BULK INSERT [RMO_ICE_HISTORY].[dbo].[{pTableName}]
                     FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{psource_file}'
                     WITH
 	                ( FORMAT = 'CSV'
