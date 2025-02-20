@@ -125,11 +125,11 @@ def daily_load_data():
                 conn.commit()
                 end_time = time.time()
             
-                logging.info(f"bulk insert lapse: --- {psoiurce_file}.csv {time.time() - start_time} seconds ---")          
+                logging.info(f"bulk insert lapse: --- {source_file}.csv {time.time() - start_time} seconds ---")          
                 #print(f"bulk insert duration: --- {time.time() - start_time} seconds ---")
         
         except Exception as e:
-            print(f"Error loading {psource_file}.csv")
+            print(f"Error loading {source_file}.csv")
         
    
     
