@@ -116,9 +116,9 @@ def daily_load_data():
                 query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{pTableName}]
                         FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{source_file}'
                         WITH
-                      ( FORMAT = 'CSV'
+                        ( FORMAT = 'CSV'
                         );
-                        """
+                    """
 
                 start_time = time.time()
                 cursor.execute(query)
@@ -129,7 +129,7 @@ def daily_load_data():
                 #print(f"bulk insert duration: --- {time.time() - start_time} seconds ---")
         
             except Exception as e:
-                print(f"Error loading {source_file} in table {pTableName}")
+                print(f"Error {e} loading {source_file} in table {pTableName}")
                 continue
         
    
