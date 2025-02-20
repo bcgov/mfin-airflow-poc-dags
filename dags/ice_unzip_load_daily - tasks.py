@@ -117,17 +117,18 @@ def daily_load_data():
                 query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{pTableName}]
                         FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{source_file}'
                         WITH
-                        ( FORMAT = 'CSV'
+                       ( FORMAT = 'CSV'
                         );
                     """
-
+                BEGIN TRANSACTION ICE
                 start_time = time.time()
                 cursor.execute(query)
-                conn.commit()
+                conn.commit() TRANSACTION ICE
                 end_time = time.time()
             
                 logging.info(f"bulk insert lapse: --- {source_file}.csv {time.time() - start_time} seconds ---")          
                 #print(f"bulk insert duration: --- {time.time() - start_time} seconds ---")
+                
         
             except Exception as e:
                 print(f"Error {e} loading {source_file} in table {pTableName}")
