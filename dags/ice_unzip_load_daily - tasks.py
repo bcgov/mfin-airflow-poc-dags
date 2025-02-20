@@ -109,7 +109,8 @@ def daily_load_data():
                            "WfSubAppMethod.csv","WfSubApplication.csv","WfVariables.csv"]
 
         try:
-            for source_file in source_file_set:
+        for source_file in source_file_set:
+            try:
                 xlen = len(source_file) - 4
                 pTableName = "ICE_" + source_file[:xlen]
             
@@ -128,8 +129,9 @@ def daily_load_data():
                 logging.info(f"bulk insert lapse: --- {source_file}.csv {time.time() - start_time} seconds ---")          
                 #print(f"bulk insert duration: --- {time.time() - start_time} seconds ---")
         
-        except Exception as e:
-            print(f"Error loading {source_file} in table {pTableName}")
+            except Exception as e:
+                print(f"Error loading {source_file} in table {pTableName}")
+                continue
         
    
     
