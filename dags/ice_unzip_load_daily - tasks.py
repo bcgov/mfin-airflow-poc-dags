@@ -8,6 +8,7 @@ import io
 from datetime import datetime
 from datetime import timedelta
 from airflow.operators.python import PythonOperator
+from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
 
 
 @dag(
