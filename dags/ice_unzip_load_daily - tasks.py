@@ -110,7 +110,7 @@ def daily_load_data():
 
         try:
             for source_file in source_file_set:
-                xlen = len(source_file)-4
+                xlen = len(source_file) - 4
                 pTableName = "ICE_" + source_file[:xlen]
             
                 query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].{pTableName}
@@ -129,7 +129,7 @@ def daily_load_data():
                 #print(f"bulk insert duration: --- {time.time() - start_time} seconds ---")
         
         except Exception as e:
-            print(f"Error loading {source_file}.csv")
+            print(f"Error loading {source_file} in table {pTableName}")
         
    
     
