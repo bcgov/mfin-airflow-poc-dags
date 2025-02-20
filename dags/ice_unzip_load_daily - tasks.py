@@ -76,9 +76,37 @@ def daily_load_data():
     @task
     # Slowly changin dimension TBD on AgentAssignment, TeamAssignment
     def daily_load_source():
-        sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
-        conn = sql_hook.get_conn()
-        cursor = conn.cursor()
+        
+        def load_db_source(psource_file):
+            sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
+
+            try:
+                xlen = len(psource_file)-4
+                pTableName = "ICE_" + psource_file[:xlen]
+                logging.info(f"loading table: {pTableName}")
+            
+                conn = sql_hook.get_conn()
+                cursor = conn.cursor()
+            
+                query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{pTableName}]
+                             FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{psource_file}'
+                             WITH
+	                         ( FORMAT = 'CSV'
+	                         );
+                         """
+                logging.info(f"query: {query}")
+                logging.info(f"inserting table:  {psource_file}")
+                start_time = time.time()
+                cursor.execute(query)
+                conn.commit()
+                                  
+                logging.info(f"bulk insert {time.time() - start_time} seconds")
+        
+            except Exception as e:
+                logging.info(f"Error bulk loading table: {pTableName} source file: {psource_file} {e}")
+                continue
+                
+            return
             
         source_file_set = ["ACDQueue.csv","Agent.csv","AudioMessage.csv", "AgentAssignment.csv", "AgentSkill.csv",
                            "ContactLink.csv","ContactSegment.csv",
@@ -110,30 +138,8 @@ def daily_load_data():
                            "WfSubAppMethod.csv","WfSubApplication.csv","WfVariables.csv"]
 
         for source_file in source_file_set:
-            try:
-                xlen = len(source_file) - 4
-                pTableName = "ICE_" + source_file[:xlen]
+            load_db_source(source_file)
             
-                query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{pTableName}]
-                        FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{source_file}'
-                        WITH
-                       ( FORMAT = 'CSV'
-                        );
-                    """
-                BEGIN TRANSACTION ICE
-                start_time = time.time()
-                cursor.execute(query)
-                conn.commit() TRANSACTION ICE
-                end_time = time.time()
-            
-                logging.info(f"bulk insert lapse: --- {source_file}.csv {time.time() - start_time} seconds ---")          
-                #print(f"bulk insert duration: --- {time.time() - start_time} seconds ---")
-                
-        
-            except Exception as e:
-                print(f"Error {e} loading {source_file} in table {pTableName}")
-                continue
-        
    
     
 
