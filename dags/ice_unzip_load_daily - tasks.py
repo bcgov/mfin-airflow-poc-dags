@@ -144,19 +144,18 @@ def daily_load_data():
    # Task 4: Removing 103 csv data files from \\fs1.fin.gov.bc.ca\rmo_ct_prod\inprogress\ subfolder
     @task        
     def remove_csv_inprogress():
-    conn_id = 'fs1_rmo_ice'
+        conn_id = 'fs1_rmo_ice'
       
-    # share_name = 'fs1.fin.gov.bc.ca'
-    delete_path = r'/rmo_ct_prod/inprogress/'
-    hook = SambaHook(conn_id)
-    files = hook.listdir(delete_path)
+        delete_path = r'/rmo_ct_prod/inprogress/'
+        hook = SambaHook(conn_id)
+        files = hook.listdir(delete_path)
 
-    try:
-        for file in files:
-            file_path = f"{delete_path}/{file}"
-            hook.remove(file_path)
-    except:
-        logging.info(f"Error {e} removing file: {file_path}")
+        try:
+            for file in files:
+                file_path = f"{delete_path}/{file}"
+                hook.remove(file_path)
+        except:
+            logging.info(f"Error {e} removing file: {file_path}")
 
 
 #Set task dependencies
