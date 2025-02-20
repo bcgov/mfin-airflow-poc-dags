@@ -72,7 +72,7 @@ def daily_load_data():
                 
     
 
-    # Task 3: Loading 103 csv data files to [IAPETUS\FINDATA].[dbo].[RMO_ICE_HISTORY]      
+    # Task 3: Loading 103 csv data files to [IAPETUS\FINDATA].[dbo].[FIN_SHARED_LANDING_DEV]      
     @task
     # Slowly changin dimension TBD on AgentAssignment, TeamAssignment
     def daily_load_source():
@@ -118,20 +118,20 @@ def daily_load_data():
                            "Node.csv","NotReadyReason.csv","NotReadyReasonLangString.csv",
                            "OperatingDates.csv",
                            "Recordings.csv","RecordingsFaultedFiles.csv","RequiredSkill.csv", 
-                           "SegmentAgent.csv","SegmentQueue.csv","Server.csv","Site.csv","Skill.csv","Stat_CDR_LastSummarized.csv","Switch.csv",
+                           "Stat_ADR.csv",
+                           "SegmentAgent.csv","SegmentQueue.csv","Server.csv","Site.csv","Skill.csv",
                            "Stat_AgentActivity_D.csv", "Stat_AgentActivity_I.csv", "Stat_AgentActivity_M.csv", "Stat_AgentActivity_W.csv", "Stat_AgentActivity_Y.csv",
                            "Stat_AgentActivityByQueue_D.csv", "Stat_AgentActivityByQueue_I.csv", "Stat_AgentActivityByQueue_M.csv", "Stat_AgentActivityByQueue_W.csv", "Stat_AgentActivityByQueue_Y.csv",
                            "Stat_AgentLineOfBusiness_D.csv", "Stat_AgentLineOfBusiness_I.csv", "Stat_AgentLineOfBusiness_M.csv", "Stat_AgentLineOfBusiness_W.csv", "Stat_AgentLineOfBusiness_Y.csv",
                       #    "Stat_AgentNotReadyBreakdown_D" 2024 missing Jan30-Feb, 
-                           "Stat_AgentNotReadyBreakdown_M.csv",
-                           "Stat_AgentNotReadyBreakdown_I.csv", "Stat_AgentNotReadyBreakdown_W.csv", "Stat_AgentNotReadyBreakdown_Y.csv",
+                           "Stat_AgentNotReadyBreakdown_M.csv","Stat_AgentNotReadyBreakdown_I.csv", "Stat_AgentNotReadyBreakdown_W.csv", "Stat_AgentNotReadyBreakdown_Y.csv",
+                           "Stat_CDR.csv","Stat_CDR_LastSummarized.csv","Stat_CDR_Summary.csv",                           
                            "Stat_DNISActivity_D.csv", "Stat_DNISActivity_I.csv", "Stat_DNISActivity_M.csv", "Stat_DNISActivity_W.csv", "Stat_DNISActivity_Y.csv",
-                           "Stat_CDR.csv","Stat_CDR_LastSummarize.csv","Stat_CDR_Summary.csv",
-                           "Stat_ADR.csv",
                            "Stat_QueueActivity_D.csv","Stat_QueueActivity_M.csv","Stat_QueueActivity_I.csv", "Stat_QueueActivity_W.csv", "Stat_QueueActivity_Y.csv",
                            "Stat_SkillActivity_D.csv", "Stat_SkillActivity_I.csv", "Stat_SkillActivity_M.csv", "Stat_SkillActivity_W.csv", "Stat_SkillActivity_Y.csv",
-                           "Stat_TrunckActivity_D.csv", "Stat_TrunckActivity_I.csv", "Stat_TrunckActivity_M.csv", "Stat_TrunckActivity_W.csv", "Stat_TrunckActivity_Y.csv",    
+                           "Stat_TrunkActivity_D.csv", "Stat_TrunkActivity_I.csv", "Stat_TrunckActivity_M.csv", "Stat_TrunkActivity_W.csv", "Stat_TrunkActivity_Y.csv",    
                            "Stat_WorkflowActionActivity_D.csv", "Stat_WorkflowActionActivity_I.csv", "Stat_WorkflowActionActivity_M.csv", "Stat_WorkflowActionActivity_W.csv", "Stat_WorkflowActionActivity_Y.csv",
+                           "Switch.csv",
                            "Team.csv","TeamAssignment.csv",
                            "UCAddress.csv","UCGroup.csv",
                            "WfAttributeDetail.csv","WfLinkDetail.csv","WfLink.csv","WfAction.csv","WfPage.csv","WfGraph.csv",
@@ -139,11 +139,27 @@ def daily_load_data():
 
         for source_file in source_file_set:
             load_db_source(source_file)
-            
-   
-    
+ 
+ 
+   # Task 4: Removing 103 csv data files from \\fs1.fin.gov.bc.ca\rmo_ct_prod\inprogress\ subfolder
+    @task        
+    def remove_csv_inprogress():
+    conn_id = 'fs1_rmo_ice'
+      
+    # share_name = 'fs1.fin.gov.bc.ca'
+    delete_path = r'/rmo_ct_prod/inprogress/'
+    hook = SambaHook(conn_id)
+    files = hook.listdir(delete_path)
+
+    try:
+        for file in files:
+            file_path = f"{delete_path}/{file}"
+            hook.remove(file_path)
+    except:
+        logging.info(f"Error {e} removing file: {file_path}")
+
 
 #Set task dependencies
-    unzip_move_file() >> daily_load_source()
+    unzip_move_file() >> daily_load_source() >> remove_csv_inprogress()
     
 dag = daily_load_data()
