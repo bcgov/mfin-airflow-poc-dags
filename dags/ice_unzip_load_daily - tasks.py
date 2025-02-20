@@ -104,7 +104,7 @@ def daily_load_data():
         
             except Exception as e:
                 logging.info(f"Error bulk loading table: {pTableName} source file: {psource_file} {e}")
-                continue
+               
                 
             return
             
