@@ -41,9 +41,8 @@ def unzip_move_file():
         
             #logging.info(f"File moved from {source_path} to {dest_path}")
     except Exception as e:
-        logging.info(f"Error unzipping files: {e}")
-        
-return
+        logging.info(f"Error unzipping files: {e}")        
+    return
 
 # Task 2: Backup iceDB_ICE_BCMOFRMO-YYYYMMDD.zip to the copleted folder 
 @task
@@ -65,7 +64,7 @@ def backup_file():
     except Exception as e:
         logging.info(f"Error backing up {dYmd} source file")
                 
-return
+    return
 
 # Task 3: Loading 103 csv data files to [IAPETUS\FINDATA].[dbo].[RMO_ICE_HISTORY]      
 @task
@@ -100,7 +99,7 @@ def daily_load_data():
         except Exception as e:
             print(f"Error loading {psource_file}.csv")
             
-    return
+        return
     
     source_file_set = ["ACDQueue.csv","Agent.csv","AudioMessage.csv", "AgentAssignment.csv", "AgentSkill.csv",
                        "ContactLink.csv","ContactSegment.csv",
@@ -131,15 +130,10 @@ def daily_load_data():
                        "WfAttributeDetail.csv","WfLinkDetail.csv","WfLink.csv","WfAction.csv","WfPage.csv","WfGraph.csv",
                        "WfSubAppMethod.csv","WfSubApplication.csv","WfVariables.csv"]
 
-        
     for source_file in source_file_set:
         daily_load_source(source_file)
  
-                
-return
-
-
-
+    return
 
 
 #Define Tasks
