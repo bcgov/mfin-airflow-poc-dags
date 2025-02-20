@@ -73,7 +73,6 @@ def daily_load_data():
     # Task 3: Loading 103 csv data files to [IAPETUS\FINDATA].[dbo].[RMO_ICE_HISTORY]      
     @task
     # Slowly changin dimension TBD on AgentAssignment, TeamAssignment
-    
     def daily_load_source():
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
         conn = sql_hook.get_conn()
@@ -135,6 +134,6 @@ def daily_load_data():
     
 
 #Set task dependencies
-        unzip_move_file() >> daily_load_source()
+    unzip_move_file() >> daily_load_source()
     
 dag = daily_load_data()
