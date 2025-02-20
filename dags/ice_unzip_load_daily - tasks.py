@@ -113,7 +113,7 @@ def daily_load_data():
                 xlen = len(source_file) - 4
                 pTableName = "ICE_" + source_file[:xlen]
             
-                query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].{pTableName}
+                query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{pTableName}]
                         FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{source_file}'
                         WITH
                       ( FORMAT = 'CSV'
