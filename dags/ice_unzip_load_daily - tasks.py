@@ -100,7 +100,7 @@ def daily_load_data():
         except Exception as e:
             print(f"Error loading {psource_file}.csv")
         
-        return
+       
             
         
     
