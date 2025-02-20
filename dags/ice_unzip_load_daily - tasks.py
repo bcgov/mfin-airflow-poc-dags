@@ -9,14 +9,6 @@ from datetime import datetime
 from datetime import timedelta
 from airflow.operators.python import PythonOperator
 
-# Define the DAG
-@dag(
-    dag_id="ice_etl_load_daily_tasks",
-    schedule_interval=None,  # Set your schedule interval or leave as None for manual trigger
-    start_date=days_ago(1),
-    catchup=False,
-    tags=["ice", "etl", "unzip","load","inprogress_folder"]
-)
 # Task 1: Unzip and Move files from source to destination (using SambaHook)
 @task
 def unzip_move_file():
@@ -137,24 +129,32 @@ def daily_load_data():
         daily_load_source(source_file)
  
     
-
+# Define the DAG
+@dag
+    DAG (
+    dag_id="ice_etl_load_daily_tasks",
+    schedule_interval=None,  # Set your schedule interval or leave as None for manual trigger
+    start_date=days_ago(1),
+    catchup=False,
+    tags=["ice", "etl", "unzip","load","inprogress_folder"]
+)
 
 #Define Tasks
-task1 = PythonOperator(
-    task_id = 'unzip_move_file',
-    python_callable = unzip_move_file,
-    dag = dag,
-)
+    task1 = PythonOperator(
+        task_id = 'unzip_move_file',
+        python_callable = unzip_move_file,
+        provide_context = True,
+        dag = dag,
+    )
 
-task3 = PythonOperator(
-    task_id = 'daily_load_data',
-    python_callable = daily_load_data,
-    dag = dag,
-)
+    task3 = PythonOperator(
+        task_id = 'daily_load_data',
+        python_callable = daily_load_data,
+        provide_context = True,
+        dag = dag,
+    )
     
     
- 
-
 
 #Set task dependencies
 task1 >> task3
