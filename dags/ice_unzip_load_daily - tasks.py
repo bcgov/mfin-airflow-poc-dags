@@ -108,7 +108,6 @@ def daily_load_data():
                            "WfAttributeDetail.csv","WfLinkDetail.csv","WfLink.csv","WfAction.csv","WfPage.csv","WfGraph.csv",
                            "WfSubAppMethod.csv","WfSubApplication.csv","WfVariables.csv"]
 
-        try:
         for source_file in source_file_set:
             try:
                 xlen = len(source_file) - 4
