@@ -79,6 +79,7 @@ def daily_load_data():
         
         def load_db_source(psource_file):
             sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
+            dYmd = (dt.datetime.today() + timedelta(days=0)).strftime('%Y%m%d')
 
             try:
                 xlen = len(psource_file)-4
@@ -91,7 +92,8 @@ def daily_load_data():
                 query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{pTableName}]
                              FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{psource_file}'
                              WITH
-	                         ( FORMAT = 'CSV'
+	                         ( FORMAT = 'CSV', ERRORFILE = '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\',
+                               ERRORFILE_DATA_SOURCE = 'ICE_ErrorLog_{pTableName}_{dYmd}.txt'
 	                         );
                          """
                 logging.info(f"query: {query}")
@@ -107,31 +109,34 @@ def daily_load_data():
                
                 
             return
+        # Annual table load
+        # Holiday, Server, Site, Switch, OperatingDates, QueueIDLookup        
             
         source_file_set = ["ACDQueue.csv","Agent.csv","AudioMessage.csv", "AgentAssignment.csv", "AgentSkill.csv",
                            "ContactLink.csv","ContactSegment.csv",
                            "Email.csv","EmailGroup.csv","Eval_Contact.csv","EvalScore.csv","EvalCategory.csv","EvalCategoryLangString.csv",
                            "EvalCriteria.csv","EvalCriteriaLangString.csv","EvalCriteriaValue.csv","EvalCriteriaValueLangString.csv",
                            "EvalEvaluation.csv","EvalForm.csv","EvalFormLangString.csv",
-                           "Holiday.csv","IMRecording.csv","icePay.csv",
+                           #"Holiday.csv",
+                           "IMRecording.csv","icePay.csv",
                            "Languages.csv","LOBCategory.csv","LOBCategoryLangString.csv","LOBCode.csv","LOBCodeLangString.csv",
                            "Node.csv","NotReadyReason.csv","NotReadyReasonLangString.csv",
-                           "OperatingDates.csv",
+                           #"OperatingDates.csv",
                            "Recordings.csv","RecordingsFaultedFiles.csv","RequiredSkill.csv", 
                            "Stat_ADR.csv",
-                           "SegmentAgent.csv","SegmentQueue.csv","Server.csv","Site.csv","Skill.csv",
+                           "SegmentAgent.csv","SegmentQueue.csv","Skill.csv",
+                           #"Server.csv","Site.csv","Switch.csv",
                            "Stat_AgentActivity_D.csv", "Stat_AgentActivity_I.csv", "Stat_AgentActivity_M.csv", "Stat_AgentActivity_W.csv", "Stat_AgentActivity_Y.csv",
                            "Stat_AgentActivityByQueue_D.csv", "Stat_AgentActivityByQueue_I.csv", "Stat_AgentActivityByQueue_M.csv", "Stat_AgentActivityByQueue_W.csv", "Stat_AgentActivityByQueue_Y.csv",
                            "Stat_AgentLineOfBusiness_D.csv", "Stat_AgentLineOfBusiness_I.csv", "Stat_AgentLineOfBusiness_M.csv", "Stat_AgentLineOfBusiness_W.csv", "Stat_AgentLineOfBusiness_Y.csv",
-                      #    "Stat_AgentNotReadyBreakdown_D" 2024 missing Jan30-Feb, 
+                      #    "Stat_AgentNotReadyBreakdown_D" 2024 missing Jan30-Mar, 
                            "Stat_AgentNotReadyBreakdown_M.csv","Stat_AgentNotReadyBreakdown_I.csv", "Stat_AgentNotReadyBreakdown_W.csv", "Stat_AgentNotReadyBreakdown_Y.csv",
                            "Stat_CDR.csv","Stat_CDR_LastSummarized.csv","Stat_CDR_Summary.csv",                           
                            "Stat_DNISActivity_D.csv", "Stat_DNISActivity_I.csv", "Stat_DNISActivity_M.csv", "Stat_DNISActivity_W.csv", "Stat_DNISActivity_Y.csv",
                            "Stat_QueueActivity_D.csv","Stat_QueueActivity_M.csv","Stat_QueueActivity_I.csv", "Stat_QueueActivity_W.csv", "Stat_QueueActivity_Y.csv",
                            "Stat_SkillActivity_D.csv", "Stat_SkillActivity_I.csv", "Stat_SkillActivity_M.csv", "Stat_SkillActivity_W.csv", "Stat_SkillActivity_Y.csv",
-                           "Stat_TrunkActivity_D.csv", "Stat_TrunkActivity_I.csv", "Stat_TrunckActivity_M.csv", "Stat_TrunkActivity_W.csv", "Stat_TrunkActivity_Y.csv",    
+                           "Stat_TrunkActivity_D.csv", "Stat_TrunkActivity_I.csv", "Stat_TrunkActivity_M.csv", "Stat_TrunkActivity_W.csv", "Stat_TrunkActivity_Y.csv",    
                            "Stat_WorkflowActionActivity_D.csv", "Stat_WorkflowActionActivity_I.csv", "Stat_WorkflowActionActivity_M.csv", "Stat_WorkflowActionActivity_W.csv", "Stat_WorkflowActionActivity_Y.csv",
-                           "Switch.csv",
                            "Team.csv","TeamAssignment.csv",
                            "UCAddress.csv","UCGroup.csv",
                            "WfAttributeDetail.csv","WfLinkDetail.csv","WfLink.csv","WfAction.csv","WfPage.csv","WfGraph.csv",
@@ -159,6 +164,6 @@ def daily_load_data():
 
 
 #Set task dependencies
-    unzip_move_file() >> daily_load_source() >> remove_csv_inprogress()
+    unzip_move_file() >> daily_load_source() #>> remove_csv_inprogress()
     
 dag = daily_load_data()
