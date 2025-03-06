@@ -94,7 +94,7 @@ def daily_load_data():
                              FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{psource_file}'
                              WITH
 	                         ( FORMAT = 'CSV', 
-                               ERRORFILE = '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{psource_file}_LOG.log'
+                               ERRORFILE = '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{pTableName}_{dYmd}.log'
 	                         );
                          """
                 logging.info(f"query: {query}")
