@@ -93,7 +93,7 @@ def daily_load_data():
                 query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{pTableName}]
                              FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{psource_file}'
                              WITH
-	                         ( FORMAT = 'CSV', ERRORFILE = '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\',
+	                         ( FORMAT = 'CSV, ERRORFILE = '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\',
                                ERRORFILE_DATA_SOURCE = 'ICE_ErrorLog_{pTableName}_{dYmd}.txt'
 	                         );
                          """
