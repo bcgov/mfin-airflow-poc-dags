@@ -80,7 +80,7 @@ def daily_load_data():
         
         def load_db_source(psource_file):
             sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
-            dYmd = (dt.datetime.today() + timedelta(days=0)).strftime('%Y%m%d')
+            dYmd = (dt.datetime.today() + timedelta(days=-1)).strftime('%Y%m%d')
 
             try:
                 xlen = len(psource_file)-4
