@@ -110,17 +110,30 @@ def daily_load_data():
                
                 
             return
-        # Annual table load
-        # Holiday, Server, Site, Switch, OperatingDates, QueueIDLookup        
+
+        # Date: Mar 06, 2025
+        # Annual table load 
+        #     Holiday, 
+        #     Server,
+        #     Site,
+        #     Switch,
+        #     OperatingDates,
+        #     QueueIDLookup
+        
+        # Preloaded tables - need to be reviewed on a regular basis: 
+        #     ICE_CriteriaLangString
+        #     ICE_LOBCodeLangString        
             
         source_file_set = ["ACDQueue.csv","Agent.csv","AudioMessage.csv", "AgentAssignment.csv", "AgentSkill.csv",
                            "ContactLink.csv","ContactSegment.csv",
                            "Email.csv","EmailGroup.csv","Eval_Contact.csv","EvalScore.csv","EvalCategory.csv","EvalCategoryLangString.csv",
-                           "EvalCriteria.csv","EvalCriteriaLangString.csv","EvalCriteriaValue.csv","EvalCriteriaValueLangString.csv",
+                           "EvalCriteria.csv","EvalCriteriaValue.csv","EvalCriteriaValueLangString.csv",
+                           #"EvalCriteriaLangString.csv",
                            "EvalEvaluation.csv","EvalForm.csv","EvalFormLangString.csv",
                            #"Holiday.csv",
                            "IMRecording.csv","icePay.csv",
-                           "Languages.csv","LOBCategory.csv","LOBCategoryLangString.csv","LOBCode.csv","LOBCodeLangString.csv",
+                           "Languages.csv","LOBCategory.csv","LOBCategoryLangString.csv","LOBCode.csv",
+                           #"LOBCodeLangString.csv",
                            "Node.csv","NotReadyReason.csv","NotReadyReasonLangString.csv",
                            #"OperatingDates.csv",
                            "Recordings.csv","RecordingsFaultedFiles.csv","RequiredSkill.csv", 
