@@ -215,7 +215,9 @@ def daily_load_data():
         
         # Data fixes required for relevant daily table process 
         #Agent_Datafix
+        logging.info(f"Calling Stat_CDR_Datafix")
         Stat_CDR_Datafix()
+        logging.info(f"Returning from Stat_CDR_Datafix")
         #Stat_CDR_Summary_Datafix
         
         for source_file in source_file_set:
