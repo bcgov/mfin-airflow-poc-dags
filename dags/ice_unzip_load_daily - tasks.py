@@ -97,10 +97,10 @@ def daily_load_data():
             try:
                 # Initialize SambaHook with your credentials and connection details
                 with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
-                    with fs_hook.open_file(source_path + output_file, 'wb') as outfile:
+                    with fs_hook.open_file(source_path + output_file, 'w') as outfile:
                         #writer = csv.writer(outfile)
                         
-                        with fs_hook.open_file(source_path + file,'rb') as f:
+                        with fs_hook.open_file(source_path + file,'r') as f:
                             csv_reader = csv.reader(f)
                             lst = ['']
                             for row in csv_reader:
