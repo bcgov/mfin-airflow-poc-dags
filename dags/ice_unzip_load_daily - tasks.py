@@ -178,7 +178,9 @@ def daily_load_data():
         #             - WfVariables.csv
                  
             
-        source_file_set = ["ACDQueue.csv","Agent.csv","AudioMessage.csv", "AgentAssignment.csv", "AgentSkill.csv",
+        source_file_set = ["ACDQueue.csv","Agent.csv",
+                           #"AudioMessage.csv", 
+                           "AgentAssignment.csv", "AgentSkill.csv",
                            "ContactLink.csv","ContactSegment.csv",
                            "Email.csv","EmailGroup.csv","Eval_Contact.csv","EvalScore.csv","EvalCategory.csv","EvalCategoryLangString.csv",
                            "EvalCriteria.csv","EvalCriteriaValue.csv","EvalCriteriaValueLangString.csv",
