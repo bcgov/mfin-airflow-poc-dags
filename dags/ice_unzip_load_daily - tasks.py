@@ -97,8 +97,8 @@ def daily_load_data():
             try:
                 # Initialize SambaHook with your credentials and connection details
                 with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
-                    with fs_hook.open_file(source_path + output_file, 'w') as outfile:
-                        writer = csv.writer(outfile)
+                    with fs_hook.open_file(source_path + output_file, 'wb') as outfile:
+                        #writer = csv.writer(outfile)
                         
                         with fs_hook.open_file(source_path + file,'rb') as f:
                             csv_reader = csv.reader(f)
@@ -108,10 +108,12 @@ def daily_load_data():
                                     new_lst = [row[x] for x in range(19)]
                                     new_lst = new_lst + lst
                                     new_lst = new_lst + [row[x] for x in range(20,23)]
-                                    writer.writerow(new_lst)
+                                    outfile.write("new_lst\n")
+                                    #writer.writerow(new_lst)
                                 else:
                                     new_lst = [row[x] for x in range(21)]
-                                    writer.writerow(new_lst)
+                                    outfile.write("new_lst\n")
+                                    #writer.writerow(new_lst)
                                 
             except Exception as e:
                 logging.error(f"Error data fixing table Stat_CDR: {e}")
