@@ -1,3 +1,4 @@
+import csv, sys, argparse
 import os
 from airflow.decorators import dag, task
 from airflow.providers.samba.hooks.samba import SambaHook
@@ -78,6 +79,36 @@ def daily_load_data():
     # Slowly changin dimension TBD on AgentAssignment, TeamAssignment
     def daily_load_source():
         
+        def Stat_CDR_Datafix():
+            source_path = r'/rmo_ct_prod/inprogress/'
+            file = 'Stat_CDR.csv'
+            output_file = 'Stat_CDR_fixed.csv'
+
+            try:
+                # Initialize SambaHook with your credentials and connection details
+                with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+                    with fs_hook.open_file(source_path + output_file, mode='w', newlines='') as outfile:
+                        writer = csv.writer(outfile)
+                        
+                        with fs_hook.open_file(source_path + file,'rb') as f:
+                            csv_reader = csv.reader(f)
+                            lst = ['']
+                            for row in csv_reader:
+                                if 'sip:' in row[19]:
+                                    new_lst = [row[x] for x in range(19)]
+                                    new_lst = new_lst + lst
+                                    new_lst = new_lst + [row[x] for x in range(20,23)]
+                                    writer.writerow(new_lst)
+                                else:
+                                    new_lst = [row[x] for x in range(21)]
+                                    writer.writerow(new_lst)
+                                
+            except Exception as e:
+                logging.info(f"Error data fixing table: Stat_CDR {e}")
+                
+            return                    
+            
+        
         def load_db_source(psource_file):
             sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
             dYmd = (dt.datetime.today() + timedelta(days=-1)).strftime('%Y%m%d')
@@ -122,7 +153,20 @@ def daily_load_data():
         
         # Preloaded tables - need to be reviewed on a regular basis: 
         #     ICE_CriteriaLangString
-        #     ICE_LOBCodeLangString        
+        #     ICE_LOBCodeLangString   
+        #
+        # Implemented data fix processes:
+        #             - Agent.csv --> Agent_fixed.csv
+        #             - Stat_CDR.csv --> Stat_CDR_fixed.csv
+        #             - Stat_CDR-Summary.csv --> Stat_CDR-Summary_fixed.csv
+        # RMO resource (Sofia Polar) implementing data fix code:
+        #             - WfAction.csv
+        #             - WfAttributeDetail.csv
+        #             - WfLink.csv
+        #             - WfSubAppMethod.csv
+        #             - WfSubApplication.csv
+        #             - WfVariables.csv
+                 
             
         source_file_set = ["ACDQueue.csv","Agent.csv","AudioMessage.csv", "AgentAssignment.csv", "AgentSkill.csv",
                            "ContactLink.csv","ContactSegment.csv",
@@ -145,7 +189,7 @@ def daily_load_data():
                            "Stat_AgentLineOfBusiness_D.csv", "Stat_AgentLineOfBusiness_I.csv", "Stat_AgentLineOfBusiness_M.csv", "Stat_AgentLineOfBusiness_W.csv", "Stat_AgentLineOfBusiness_Y.csv",
                       #    "Stat_AgentNotReadyBreakdown_D" 2024 missing Jan30-Mar, 
                            "Stat_AgentNotReadyBreakdown_M.csv","Stat_AgentNotReadyBreakdown_I.csv", "Stat_AgentNotReadyBreakdown_W.csv", "Stat_AgentNotReadyBreakdown_Y.csv",
-                           "Stat_CDR.csv","Stat_CDR_LastSummarized.csv","Stat_CDR_Summary.csv",                           
+                           "Stat_CDR_fixed.csv","Stat_CDR_LastSummarized.csv","Stat_CDR_Summary.csv",                           
                            "Stat_DNISActivity_D.csv", "Stat_DNISActivity_I.csv", "Stat_DNISActivity_M.csv", "Stat_DNISActivity_W.csv", "Stat_DNISActivity_Y.csv",
                            "Stat_QueueActivity_D.csv","Stat_QueueActivity_M.csv","Stat_QueueActivity_I.csv", "Stat_QueueActivity_W.csv", "Stat_QueueActivity_Y.csv",
                            "Stat_SkillActivity_D.csv", "Stat_SkillActivity_I.csv", "Stat_SkillActivity_M.csv", "Stat_SkillActivity_W.csv", "Stat_SkillActivity_Y.csv",
@@ -156,6 +200,12 @@ def daily_load_data():
                            "WfAttributeDetail.csv","WfLinkDetail.csv","WfLink.csv","WfAction.csv","WfPage.csv","WfGraph.csv",
                            "WfSubAppMethod.csv","WfSubApplication.csv","WfVariables.csv"]
 
+        
+        # Data fixes required for relevant daily table process 
+        #Agent_Datafix
+        Stat_CDR_Datafix
+        #Stat_CDR_Summary_Datafix
+        
         for source_file in source_file_set:
             load_db_source(source_file)
  
