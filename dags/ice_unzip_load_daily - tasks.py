@@ -14,6 +14,14 @@ from airflow.operators.python import PythonOperator
 from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
 
 
+root = logging.getLogger()
+root.setLevel(logging.DEBUG)
+handler = logging.StreamHandler()
+handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s -%(message)s')
+handler.setFormatter(formatter)
+root.addHandler(handler) 
+
 @dag(
     dag_id="ice_etl_load_daily_tasks",
     schedule_interval=None,  # Set your schedule interval or leave as None for manual trigger
@@ -87,7 +95,7 @@ def daily_load_data():
             try:
                 # Initialize SambaHook with your credentials and connection details
                 with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
-                    with fs_hook.open_file(source_path + output_file, mode='w', newlines='') as outfile:
+                    with fs_hook.open_file(source_path + output_file, 'w') as outfile:
                         writer = csv.writer(outfile)
                         
                         with fs_hook.open_file(source_path + file,'rb') as f:
