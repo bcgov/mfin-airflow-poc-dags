@@ -37,14 +37,15 @@ def daily_load_data():
     @task
     def unzip_move_file():
         # Log all steps at INFO level
-        logging.basicConfig(level=logging.INFO)
+        #logging.basicConfig(level=logging.INFO)
 
         source_path = r'/rmo_ct_prod/'
         dest_path = r'/rmo_ct_prod/inprogress/'
         file = 'iceDB_ICE_BCMOFRMO.zip'
         zip_loc = '/tmp'
-
-        try:
+        
+        logging.info("Unzip daily file")        
+        try:            
             # Initialize SambaHook with your credentials and connection details
             with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
                 with fs_hook.open_file(source_path + file,'rb') as f:
@@ -57,7 +58,7 @@ def daily_load_data():
                     
                 #logging.info(f"File moved from {source_path} to {dest_path}")
         except Exception as e:
-            logging.info(f"Error unzipping files: {e}")        
+            logging.error(f"Error unzipping files: {e}")        
     
 
     # Task 2: Backup iceDB_ICE_BCMOFRMO-YYYYMMDD.zip to the copleted folder 
@@ -78,7 +79,7 @@ def daily_load_data():
                     hook.replace(source_path + f, dest_path + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip') 
                     
         except Exception as e:
-            logging.info(f"Error backing up {dYmd} source file")
+            logging.error(f"Error backing up {dYmd} source file")
                 
     
 
@@ -92,6 +93,7 @@ def daily_load_data():
             file = 'Stat_CDR.csv'
             output_file = 'Stat_CDR_fixed.csv'
 
+            logging.info("Stat_CDR fixing code")
             try:
                 # Initialize SambaHook with your credentials and connection details
                 with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
@@ -112,7 +114,7 @@ def daily_load_data():
                                     writer.writerow(new_lst)
                                 
             except Exception as e:
-                logging.info(f"Error data fixing table: Stat_CDR {e}")
+                logging.error(f"Error data fixing table Stat_CDR: {e}")
                 
             return                    
             
@@ -145,7 +147,7 @@ def daily_load_data():
                 logging.info(f"bulk insert {time.time() - start_time} seconds")
         
             except Exception as e:
-                logging.info(f"Error bulk loading table: {pTableName} source file: {psource_file} {e}")
+                logging.error(f"Error bulk loading table: {pTableName} source file: {psource_file} {e}")
                
                 
             return
@@ -232,7 +234,7 @@ def daily_load_data():
                 file_path = f"{delete_path}/{file}"
                 hook.remove(file_path)
         except:
-            logging.info(f"Error {e} removing file: {file_path}")
+            logging.error(f"Error {e} removing file: {file_path}")
 
 
 #Set task dependencies
