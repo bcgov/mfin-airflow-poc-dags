@@ -105,16 +105,28 @@ def daily_load_data():
                             lst = ['']
                             for row in csv_reader:
                                 if 'sip:' in row[19]:
-                                    new_lst = [row[x] for x in range(19)]
-                                    new_lst = new_lst + lst
-                                    new_lst = new_lst + [row[x] for x in range(20,23)]
-                                    str_from_lst = str(new_lst)
-                                    outfile.write({str_from_lst})
+                                    for x in range(19):
+                                        outfile.write(row[x])
+                                        outfile.write(","')
+                                    #new_lst = [row[x] for x in range(19)]
+                                    outfile.write(" ,")
+                                    #new_lst = new_lst + lst
+                                    for x in range(20,22):
+                                        outfile.write(row[x])
+                                        outfile(",")
+                                    outfile.write(row[23])
+                                    #new_lst = new_lst + [row[x] for x in range(20,23)]
+                                    outfile.write("\n")
                                     #writer.writerow(new_lst)
                                 else:
-                                    new_lst = [row[x] for x in range(21)]
-                                    str_from_lst = str(new_lst)
-                                    outfile.write({str_from_lst})
+                                    for x in range(20):
+                                        outfile.write(row[x])
+                                        outfile.write(",")
+                                    outfile.write(row[21])
+                                    outfile.write("\n")
+                                    #new_lst = [row[x] for x in range(21)]
+                                    #str_from_lst = str(new_lst)
+                                    #outfile.write({str_from_lst})
                                     #writer.writerow(new_lst) 
                                 
             except Exception as e:
