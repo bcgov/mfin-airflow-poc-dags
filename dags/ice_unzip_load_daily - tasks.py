@@ -87,7 +87,7 @@ def daily_load_data():
     @task
     # Slowly changin dimension TBD on AgentAssignment, TeamAssignment
     def daily_load_source():
-        
+                
         def Stat_CDR_Datafix():
             source_path = r'/rmo_ct_prod/inprogress/'
             file = 'Stat_CDR.csv'
@@ -98,7 +98,7 @@ def daily_load_data():
                 # Initialize SambaHook with your credentials and connection details
                 with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
                     with fs_hook.open_file(source_path + output_file, 'w') as outfile:
-                        #writer = csv.writer(outfile)
+                        writer = csv.writer(outfile)
                         
                         with fs_hook.open_file(source_path + file,'r') as f:
                             csv_reader = csv.reader(f)
@@ -109,7 +109,6 @@ def daily_load_data():
                                     new_lst = new_lst + lst
                                     new_lst = new_lst + [row[x] for x in range(20,23)]
                                     writer.writerows(new_lst)
-                                    #writer.writerows(new_lst)
                                 else:
                                     new_lst = [row[x] for x in range(21)]
                                     writer.writerows(new_lst)
