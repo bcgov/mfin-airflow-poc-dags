@@ -112,8 +112,8 @@ def daily_load_data():
                                     new_lst = new_lst + [row[x] for x in range(20,23)]
                                     writer.writerows(new_lst)
                                 else:
-                                    new_lst = [row[x] for x in range(21)]
-                                    writer.writerows(new_lst)
+                                    #new_lst = [row[x] for x in range(21)]
+                                    writer.writerows(row)
                                 
             except Exception as e:
                 logging.error(f"Error data fixing table Stat_CDR: {e}")
