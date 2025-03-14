@@ -107,7 +107,7 @@ def daily_load_data():
                                 if 'sip:' in row[19]:
                                     for x in range(19):
                                         outfile.write(row[x])
-                                        outfile.write(","')
+                                        outfile.write(",")
                                     #new_lst = [row[x] for x in range(19)]
                                     outfile.write(" ,")
                                     #new_lst = new_lst + lst
