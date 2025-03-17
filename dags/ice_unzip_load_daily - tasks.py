@@ -97,6 +97,7 @@ def daily_load_data():
             logging.info("Stat_CDR fixing code")
             try:
                 # Initialize SambaHook with your credentials and connection details
+                included_cols = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,20,21,22,23]
                 with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
                     with fs_hook.open_file(source_path + output_file, 'w') as outfile:
                         writer = csv.writer(outfile)
@@ -106,15 +107,17 @@ def daily_load_data():
                             
                             lst = ['']
                             for row in csv_reader:
-                                if 'sip:' in row[19]:
-                                    new_lst = [row[x] for x in range(19)]
-                                    new_lst = new_lst + lst
-                                    new_lst = new_lst + [row[x] for x in range(20,23)]
-                                    writer.writerow(new_lst)
-                                else:
-                                    new_lst = column
+                                content = list(row[i] for i in included_cols)
+                                write.writerows(content)
+                                #if 'sip:' in row[19]:
+                                #    new_lst = [row[x] for x in range(19)]
+                                #    new_lst = new_lst + lst
+                                #    new_lst = new_lst + [row[x] for x in range(20,23)]
+                                #    writer.writerow(new_lst)
+                                #else:
+                                #    new_lst = column
                                     #new_lst = [row[x] for x in range(21)]
-                                    writer.writerow(column)
+                                #    writer.writerow(column)
                                 
             except Exception as e:
                 logging.error(f"Error data fixing table Stat_CDR: {e}")
