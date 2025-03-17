@@ -97,17 +97,17 @@ def daily_load_data():
             logging.info("Stat_CDR fixing code")
             try:
                 # Initialize SambaHook with your credentials and connection details
-                included_cols = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,20,21,22,23]
                 with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
-                    with fs_hook.open_file(source_path + output_file, 'w',newline='',quoting=csv.QUOTE_ALL) as outfile:
-                        writer = csv.writer(outfile)
+                    
                         
-                        with fs_hook.open_file(source_path + file,'r') as f:
-                            csv_reader = csv.reader(f)
+                    with fs_hook.open_file(source_path + file,'r') as f:
+                        csv_reader = csv.reader(f)
                             
-                            lst = ['']
-                            for row in csv_reader:
-                                writer.writerows(row)
+                        lst = ['']
+                        for row in csv_reader:
+                            with fs_hook.open_file(source_path + output_file, mode="a",newline='',quoting=csv.QUOTE_ALL) as outfile:
+                                writer = csv.writer(outfile)            
+                                writer.writerow(row)
                                 #if 'sip:' in row[19]:
                                 #    new_lst = [row[x] for x in range(19)]
                                 #    new_lst = new_lst + lst
