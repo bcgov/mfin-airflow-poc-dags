@@ -108,15 +108,14 @@ def daily_load_data():
                             lst = ['']
                             for row in csv_reader:
                                 if 'sip:' in row[19]:
-                                    new_lst = [row[x] for x in range(0,19)]
+                                    new_lst = [row[x] for x in range(19)]
                                     new_lst = new_lst + lst
                                     new_lst = new_lst + [row[x] for x in range(20,23)]
-                                    #writer.writerow(new_lst)
+                                    writer.writerow(new_lst)
                                 else:
-                                    new_lst = column
                                     new_lst = [row[x] for x in range(21)]
-                                    #writer.writerow(column)
-                                writer.writerow(new_lst)
+                                    writer.writerow(new_lst)
+                                
                                 
             except Exception as e:
                 logging.error(f"Error data fixing table Stat_CDR: {e}")
