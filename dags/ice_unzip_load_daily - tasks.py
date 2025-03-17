@@ -107,7 +107,7 @@ def daily_load_data():
                             
                             lst = ['']
                             for row in csv_reader:
-                                writer.writerow(row)
+                                writer.writerows(row)
                                 #if 'sip:' in row[19]:
                                 #    new_lst = [row[x] for x in range(19)]
                                 #    new_lst = new_lst + lst
