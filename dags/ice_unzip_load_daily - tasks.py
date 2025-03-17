@@ -99,15 +99,18 @@ def daily_load_data():
                 # Initialize SambaHook with your credentials and connection details
                 with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
                     
-                        
+                    usecols = ["PrimaryKey","EventTime","DSTStatus","ContactID","EventID","SwithID","ContactType","CurrentState",
+                               "LastState","lastStateDuration","QueueID","  IntData1","InData2","IntDate3","IntData4", 
+                               "StrData1","StrData2","StrData3","StrData4","EventSequence","serviceId","RolledUp"]
                     with fs_hook.open_file(source_path + file,'r') as f:
-                        csv_reader = csv.reader(f)
+                        csv_reader = pd.read_csv(f, usecols = usecols)
+                        #csv_reader = csv.reader(f)
                             
-                        lst = ['']
-                        for row in csv_reader:
-                            with fs_hook.open_file(source_path + output_file, 'a') as outfile:
+                        #lst = ['']
+                        for index, row in csv_reader.iterrows():
+                            with fs_hook.open_file(source_path + output_file, 'w') as outfile:
                                 writer = csv.writer(outfile)            
-                                writer.writerow(row)
+                                writer.writerow(row['PrimaryKey'], row['EventTime'], row['DSStatus'])
                                 #if 'sip:' in row[19]:
                                 #    new_lst = [row[x] for x in range(19)]
                                 #    new_lst = new_lst + lst
