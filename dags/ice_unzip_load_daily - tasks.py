@@ -105,7 +105,7 @@ def daily_load_data():
                             
                         lst = ['']
                         for row in csv_reader:
-                            with fs_hook.open_file(source_path + output_file, mode="a",newline='',quoting=csv.QUOTE_ALL) as outfile:
+                            with fs_hook.open_file(source_path + output_file, mode="a") as outfile:
                                 writer = csv.writer(outfile)            
                                 writer.writerow(row)
                                 #if 'sip:' in row[19]:
