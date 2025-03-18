@@ -100,21 +100,19 @@ def daily_load_data():
                 with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
                     
                     usecols = ["PrimaryKey","EventTime","DSTStatus","ContactID","EventID","SwitchID","ContactType","CurrentState",
-                               "LastState","LastStateDuration","QueueID","IntData1","InData2","IntDate3","IntData4", 
-                               "StrData1","StrData2","StrData3","StrData4","EventSequence","ServerId","RolledUp"]
+                               "LastState","LastStateDuration","QueueID","IntData1","InData2","IntDate3","IntData4",
+                               "StrData1","StrData2","StrData3","StrData4","EventSequence","ServerId","RolledUp","Extra"]
                     with fs_hook.open_file(source_path + file,'r') as f:
-                        csv_reader = pd.read_csv(f, header = None, names =["PrimaryKey","EventTime","DSTStatus","ContactID","EventID","SwitchID","ContactType","CurrentState",
-                                                                      "LastState","LastStateDuration","QueueID","IntData1","InData2","IntDate3","IntData4",
-                                                                      "StrData1","StrData2","StrData3","StrData4","EventSequence","ServerId","RolledUp","Extra"],
-                                                 on_bad_lines = "skip")
+                        csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(22)], on_bad_lines = "skip")
                         #csv_reader = csv.reader(f)
                             
                         #lst = ['']
-                        for index, row in csv_reader.iterrows():
-                            with fs_hook.open_file(source_path + output_file, 'w') as outfile:
+                        #for index, row in csv_reader.iterrows():
+                        with fs_hook.open_file(source_path + output_file, 'w') as outfile:
+                            csv_reader.to_csv(outfile, index=False)
                                 
-                                writer = csv.writer(outfile)
-                                writer.writerows(row["PrimaryKey"])
+                                #writer = csv.writer(outfile)
+                                #writer.writerows(row["PrimaryKey"])
                                 #if 'sip:' in row['EventSequence']:
                                 #    d = ','.join(str(e) for e in row)
                                     
