@@ -100,8 +100,8 @@ def daily_load_data():
                 with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
                     
                     usecols = ["PrimaryKey","EventTime","DSTStatus","ContactID","EventID","SwithID","ContactType","CurrentState",
-                               "LastState","lastStateDuration","QueueID","  IntData1","InData2","IntDate3","IntData4", 
-                               "StrData1","StrData2","StrData3","StrData4","EventSequence","serviceId","RolledUp"]
+                               "LastState","lastStateDuration","QueueID","IntData1","InData2","IntDate3","IntData4", 
+                               "StrData1","StrData2","StrData3","StrData4","EventSequence","ServiceId","RolledUp"]
                     with fs_hook.open_file(source_path + file,'r') as f:
                         csv_reader = pd.read_csv(f, usecols = usecols)
                         #csv_reader = csv.reader(f)
@@ -109,8 +109,24 @@ def daily_load_data():
                         #lst = ['']
                         for index, row in csv_reader.iterrows():
                             with fs_hook.open_file(source_path + output_file, 'w') as outfile:
-                                writer = csv.writer(outfile)            
-                                writer.writerow(row['PrimaryKey'], row['EventTime'], row['DSStatus'])
+                                if 'sip:' in row['EventSequence']:
+                                    write.writerow(row["PrimaryKey"],row["EventTime"],row["DSTStatus"],row["ContactID"],
+                                                   row["EventID"],row["SwithID"],row["ContactType"],row["CurrentState"],
+                                                   row["LastState"],row["lastStateDuration"],row["QueueID"],row["IntData1"],
+                                                   row["InData2"],row["IntDate3"],row["IntData4"],row["StrData1"],row["StrData2"],
+                                                   row["StrData3"],row["StrData4"],row["ServiceId"],row["RolledUp"],1)
+                                else:
+                                    write.writerow(row["PrimaryKey"],row["EventTime"],row["DSTStatus"],row["ContactID"],
+                                                   row["EventID"],row["SwithID"],row["ContactType"],row["CurrentState"],
+                                                   row["LastState"],row["lastStateDuration"],row["QueueID"],row["IntData1"],
+                                                   row["InData2"],row["IntDate3"],row["IntData4"],row["StrData1"],row["StrData2"],
+                                                   row["StrData3"],row["StrData4"],row["EventSequence"],row["ServiceId"],row["RolledUp"])
+                                    
+                                     
+                                     
+                                
+                                #writer = csv.writer(outfile)            
+                                #writer.writerow(row['PrimaryKey'], row['EventTime'], row['DSStatus'])
                                 #if 'sip:' in row[19]:
                                 #    new_lst = [row[x] for x in range(19)]
                                 #    new_lst = new_lst + lst
