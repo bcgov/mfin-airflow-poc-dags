@@ -104,6 +104,11 @@ def daily_load_data():
                                "StrData1","StrData2","StrData3","StrData4","EventSequence","ServerId","RolledUp","Extra"]
                     with fs_hook.open_file(source_path + file,'r') as f:
                         csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(22)], on_bad_lines = "skip")
+                        csv_reader[12] = csv_reader[12].astype(int)
+                        csv_reader[13] = csv_reader[13].astype(int)
+                        csv_reader[14] = csv_reader[14].astype(int)
+                        csv_reader[15] = csv_reader[15].astype(int)
+                        
                         #csv_reader = csv.reader(f)
                             
                         #lst = ['']
