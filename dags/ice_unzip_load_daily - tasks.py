@@ -112,6 +112,7 @@ def daily_load_data():
                         #lst = ['']
                         for index, row in csv_reader.iterrows():
                             with fs_hook.open_file(source_path + output_file, 'w') as outfile:
+                                writer = csv.writer(outfile)
                                 if 'sip:' in row['EventSequence']:
                                     write.writerow(row["PrimaryKey"],row["EventTim"],row["DSStatus"],row["ContactID"],
                                                    row["EventID"],row["SwitchID"],row["ContactType"],row["CurrentState"],
