@@ -103,15 +103,17 @@ def daily_load_data():
                                "LastState","LastStateDuration","QueueID","IntData1","InData2","IntDate3","IntData4", 
                                "StrData1","StrData2","StrData3","StrData4","EventSequence","ServerId","RolledUp"]
                     with fs_hook.open_file(source_path + file,'r') as f:
-                        csv_reader = pd.read_csv(f, usecols = usecols)
+                        csv_reader = pd.read_csv(f, header=0, names =["PrimaryKey","EventTime","DSTStatus","ContactID","EventID","SwitchID","ContactType","CurrentState",
+                                                                      "LastState","LastStateDuration","QueueID","IntData1","InData2","IntDate3","IntData4",
+                                                                      "StrData1","StrData2","StrData3","StrData4","EventSequence","ServerId","RolledUp"])
                         #csv_reader = csv.reader(f)
                             
                         #lst = ['']
                         for index, row in csv_reader.iterrows():
                             with fs_hook.open_file(source_path + output_file, 'w') as outfile:
                                 if 'sip:' in row['EventSequence']:
-                                    write.writerow(row["PrimaryKey"],row["EventTime"],row["DSTStatus"],row["ContactID"],
-                                                   row["EventID"],row["SwitchID"],row["ContactType"],row["CurrentState"],
+                                    write.writerow(row["PrimaryKey"],row["EventTim"],row["DSStatus"],row["ContactID"],
+                                                   row["EventID"],row["SwitchID"],row["ContactType],row["CurrentState"],
                                                    row["LastState"],row["LastStateDuration"],row["QueueID"],row["IntData1"],
                                                    row["InData2"],row["IntDate3"],row["IntData4"],row["StrData1"],row["StrData2"],
                                                    row["StrData3"],row["StrData4"],row["ServiceId"],row["RolledUp"],row["ContactType"])
