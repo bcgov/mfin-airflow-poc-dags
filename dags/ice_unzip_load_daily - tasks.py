@@ -109,7 +109,7 @@ def daily_load_data():
                         #lst = ['']
                         #for index, row in csv_reader.iterrows():
                         with fs_hook.open_file(source_path + output_file, 'w') as outfile:
-                            csv_reader.to_csv(outfile, index=False)
+                            csv_reader.to_csv(outfile, header=False,index=False)
                                 
                                 #writer = csv.writer(outfile)
                                 #writer.writerows(row["PrimaryKey"])
@@ -155,8 +155,19 @@ def daily_load_data():
             dYmd = (dt.datetime.today() + timedelta(days=-1)).strftime('%Y%m%d')
 
             try:
-                xlen = len(psource_file)-4
-                pTableName = "ICE_" + psource_file[:xlen]
+                if psource_file == 'Stat_CDR.csv':
+                    psource_file = 'Stat_CDR_fixed.csv'
+                    pTableName = 'ICE_Stat_CDR'
+                elif psource_file == 'Stat_CDR_Summary.csv':
+                    psource_file = 'Stat_CDR_SSmmary_fixed.csv'
+                    pTableName = 'ICE_Stat_CDR'
+                elif psource_file == 'Agent.csv':
+                    psource_file = 'Agent_fixed.csv'
+                    pTableName = 'ICE_Agent'
+                else:
+                    xlen = len(psource_file) - 4    
+                    pTableName = "ICE_" + psource_file[:xlen]
+                
                 logging.info(f"loading table: {pTableName}")
             
                 conn = sql_hook.get_conn()
@@ -232,7 +243,7 @@ def daily_load_data():
                            "Stat_AgentLineOfBusiness_D.csv", "Stat_AgentLineOfBusiness_I.csv", "Stat_AgentLineOfBusiness_M.csv", "Stat_AgentLineOfBusiness_W.csv", "Stat_AgentLineOfBusiness_Y.csv",
                       #    "Stat_AgentNotReadyBreakdown_D" 2024 missing Jan30-Mar, 
                            "Stat_AgentNotReadyBreakdown_M.csv","Stat_AgentNotReadyBreakdown_I.csv", "Stat_AgentNotReadyBreakdown_W.csv", "Stat_AgentNotReadyBreakdown_Y.csv",
-                           "Stat_CDR_fixed.csv","Stat_CDR_LastSummarized.csv","Stat_CDR_Summary.csv",                           
+                           "Stat_CDR.csv","Stat_CDR_LastSummarized.csv","Stat_CDR_Summary.csv",                           
                            "Stat_DNISActivity_D.csv", "Stat_DNISActivity_I.csv", "Stat_DNISActivity_M.csv", "Stat_DNISActivity_W.csv", "Stat_DNISActivity_Y.csv",
                            "Stat_QueueActivity_D.csv","Stat_QueueActivity_M.csv","Stat_QueueActivity_I.csv", "Stat_QueueActivity_W.csv", "Stat_QueueActivity_Y.csv",
                            "Stat_SkillActivity_D.csv", "Stat_SkillActivity_I.csv", "Stat_SkillActivity_M.csv", "Stat_SkillActivity_W.csv", "Stat_SkillActivity_Y.csv",
