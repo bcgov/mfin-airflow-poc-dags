@@ -106,7 +106,7 @@ def daily_load_data():
                         csv_reader = pd.read_csv(f, header = None, names =["PrimaryKey","EventTime","DSTStatus","ContactID","EventID","SwitchID","ContactType","CurrentState",
                                                                       "LastState","LastStateDuration","QueueID","IntData1","InData2","IntDate3","IntData4",
                                                                       "StrData1","StrData2","StrData3","StrData4","EventSequence","ServerId","RolledUp","Extra"],
-                                                 error_bad_lines = False)
+                                                 on_bad_lines = "skip")
                         #csv_reader = csv.reader(f)
                             
                         #lst = ['']
