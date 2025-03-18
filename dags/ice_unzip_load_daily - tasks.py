@@ -113,7 +113,7 @@ def daily_load_data():
                             with fs_hook.open_file(source_path + output_file, 'w') as outfile:
                                 if 'sip:' in row['EventSequence']:
                                     write.writerow(row["PrimaryKey"],row["EventTim"],row["DSStatus"],row["ContactID"],
-                                                   row["EventID"],row["SwitchID"],row["ContactType],row["CurrentState"],
+                                                   row["EventID"],row["SwitchID"],row["ContactType"],row["CurrentState"],
                                                    row["LastState"],row["LastStateDuration"],row["QueueID"],row["IntData1"],
                                                    row["InData2"],row["IntDate3"],row["IntData4"],row["StrData1"],row["StrData2"],
                                                    row["StrData3"],row["StrData4"],row["ServiceId"],row["RolledUp"],row["ContactType"])
