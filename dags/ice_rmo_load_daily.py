@@ -31,7 +31,8 @@ root.addHandler(handler)
 )
 
 def ice_rmo_load_daily():
-    
+   
+   @task   
    def daily_load_source(psource_file):
        sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
        
@@ -60,7 +61,7 @@ def ice_rmo_load_daily():
            END TRY
            
            BEGIN CATCH
-             logging.info(f"skipping failed insert');
+             logging.error(f"skipping failed insert');
            END CATCH;
            """
            
@@ -73,6 +74,11 @@ def ice_rmo_load_daily():
            conn.commit()
            cursor.close()
            conn.close()
+           
+       except Exception as d:
+           logging.error(f"Error opening source folder {d}")
+       
+       return
            
 
     @task
