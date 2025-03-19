@@ -46,37 +46,42 @@ def daily_load_data():
            with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
                with fs_hook.open_file(source_path + file,'r') as f:
                    csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(22)])
+        
+       except Exception as e:
+           logging.error(f"Error opening source folder {e}")         
                    
-                   sql = f"""
-                         BEGIN TRY
-                           INSERT INTO [FIN_SHARED_LANDING_DEV].[dbo].[Stat_CDR]
-                               (PrimaryKey,EventTime,DSTStatus,ContactID,EventID,
-                                SwitchID,ContactType,CurrentState,LastState,
-                                LastStateDuration,QueueID,
-                                IntData1,IntData2,IntData3,IntData4,
-                                StrData1,StrData2,StrData3,StrData4, 
-                                EventSequence,ServerId,RolledUp) 
-                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,
-                                        %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
-                         END TRY
+       sql = f"""
+                BEGIN TRY
+                  INSERT INTO [FIN_SHARED_LANDING_DEV].[dbo].[Stat_CDR]
+                      (PrimaryKey,EventTime,DSTStatus,ContactID,EventID,
+                       SwitchID,ContactType,CurrentState,LastState,
+                       LastStateDuration,QueueID,
+                       IntData1,IntData2,IntData3,IntData4,
+                       StrData1,StrData2,StrData3,StrData4, 
+                       EventSequence,ServerId,RolledUp) 
+                       VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,
+                               %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
+                END TRY
            
-                         BEGIN CATCH
-                           logging.error(f"skipping failed insert');
-                         END CATCH;
-                         """
+                BEGIN CATCH
+                  logging.error(f"skipping failed insert');
+                END CATCH;
+              """
            
-                   for record in csv_reader:
-                       try:
-                           cursor.execute(sql,record)
-                       except Expection as e:
-                           logging.error(f"Skipping record {record} due to error:{e}")
+       for record in csv_reader:
+           try:
+               cursor.execute(sql, record)                   
+               
+           except Expection as e:
+               logging.error(f"Skipping record {record} due to error:{e}")
+           
+       conn.commit()
                    
-                   conn.commit()
+#                   conn.commit()
 #                   cursor.close()
 #                   conn.close()
            
-       except Exception as e:
-           logging.error(f"Error opening source folder {e}")
+       
        
        return
            
