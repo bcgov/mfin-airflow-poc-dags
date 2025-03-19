@@ -166,18 +166,18 @@ def daily_load_data():
             dYmd = (dt.datetime.today() + timedelta(days=-1)).strftime('%Y%m%d')
 
             try:
-                if psource_file == 'Stat_CDR_fixed.csv':
-                    psource_file = 'Stat_CDR_fixed.csv'
-                    pTableName = 'ICE_Stat_CDR'
-                elif psource_file == 'Stat_CDR_Summary.csv':
-                    psource_file = 'Stat_CDR_Summary_fixed.csv'
-                    pTableName = 'ICE_Stat_CDR'
-                elif psource_file == 'Agent.csv':
-                    psource_file = 'Agent_fixed.csv'
-                    pTableName = 'ICE_Agent'
-                else:
-                    xlen = len(psource_file) - 4    
-                    pTableName = "ICE_" + psource_file[:xlen]
+                #if psource_file == 'Stat_CDR_fixed.csv':
+                #    psource_file = 'Stat_CDR_fixed.csv'
+                #    pTableName = 'ICE_Stat_CDR'
+                #elif psource_file == 'Stat_CDR_Summary.csv':
+                #    psource_file = 'Stat_CDR_Summary_fixed.csv'
+                #    pTableName = 'ICE_Stat_CDR'
+                #elif psource_file == 'Agent.csv':
+                #    psource_file = 'Agent_fixed.csv'
+                #    pTableName = 'ICE_Agent'
+                #else:
+                xlen = len(psource_file) - 4    
+                pTableName = "ICE_" + psource_file[:xlen]
                 
                 logging.info(f"loading table: {pTableName}")
             
@@ -187,8 +187,10 @@ def daily_load_data():
                 query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{pTableName}]
                              FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{psource_file}'
                              WITH
-	                         ( FORMAT = 'CSV', MAXERRORS = 20, 
-                               ERRORFILE = '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{pTableName}_{dYmd}.log'
+	                         ( FORMAT = 'CSV', 
+                               MAXERRORS = 100, 
+                               ERRORFILE = '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{pTableName}_{dYmd}.log',
+                               TABLOCK
 	                         );
                          """
                 logging.info(f"query: {query}")
@@ -268,9 +270,9 @@ def daily_load_data():
         
         # Data fixes required for relevant daily table process 
         #Agent_Datafix
-        logging.info(f"Calling Stat_CDR_Datafix")
-        Stat_CDR_Datafix()
-        logging.info(f"Returning from Stat_CDR_Datafix")
+        #logging.info(f"Calling Stat_CDR_Datafix")
+        #Stat_CDR_Datafix()
+        #logging.info(f"Returning from Stat_CDR_Datafix")
         #Stat_CDR_Summary_Datafix
         
         for source_file in source_file_set:
