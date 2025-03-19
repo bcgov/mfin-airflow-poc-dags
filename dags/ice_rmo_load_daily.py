@@ -1,127 +1,89 @@
-from airflow.decorators import task, dag
-from airflow.hooks.base_hook import BaseHook
+import csv, sys, argparse
+import os
+import numpy as np
 import pandas as pd
-import datetime as dt
-from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
+from airflow.decorators import dag, task
+from airflow.providers.samba.hooks.samba import SambaHook
+from airflow.utils.dates import days_ago
+import zipfile
+import logging
+import io
 import time
+import datetime as dt
+from datetime import datetime
+from datetime import timedelta
+from airflow.operators.python import PythonOperator
+from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
+
+
+root = logging.getLogger()
+root.setLevel(logging.DEBUG)
+handler = logging.StreamHandler()
+handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s -%(message)s')
+handler.setFormatter(formatter)
+root.addHandler(handler) 
 
 @dag(
-    description="RMO CT daily table delete and bulk insert",
+    description="RMO CT Stat_CDR test",
     schedule=None,
     catchup=False,
 )
 
 def ice_rmo_load_daily():
     
-    def daily_table_delete(ptable_delete):
-        sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
+   def daily_load_source(psource_file):
+       sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
+       
+       conn = sql_hook.get_conn()
+       cursor = conn.cursor()
+       
+       source_path = r'/rmo_ct_prod/inprogress/'
+       file = 'Stat_CDR.csv'
 
-        try:
-            conn = sql_hook.get_conn()
-            cursor = conn.cursor()
-            
-            query = f""" DELETE FROM [RMO_ICE_HISTORY].[dbo].{ptable_delete};"""
-
-            start_time = time.time()
-            cursor.execute(query)
-            conn.commit()
-            
-            #print(f"bulk insert duration: --- {time.time() - start_time} seconds ---")
-            #print(f"bulk insert {rows} rows test, duration: --- {time.time() - start_time} seconds ---")
-        
-        
-        except Exception as e:
-            print(e)
- 
- 
-    def daily_load_source(psource_file):
-        sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
-
-        try:
-            conn = sql_hook.get_conn()
-            cursor = conn.cursor()
-            
-            query = f""" BULK INSERT [RMO_ICE_HISTORY].[dbo].{psource_file}
-                    FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{psource_file}.csv'
-                    WITH
-	                ( FORMAT = 'CSV'
-	                );
-                """
-
-            start_time = time.time()
-            cursor.execute(query)
-            conn.commit()
-            
-                      
-            print(f"bulk insert duration: --- {time.time() - start_time} seconds ---")
-            #print(f"bulk insert {rows} rows test, duration: --- {time.time() - start_time} seconds ---")
-        
-        
-        except Exception as e:
-            print(e)
- 
+       try:
+           with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+               with fs_hook.open_file(source_path + file,'r') as f:
+                   csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(22)])
+                   
+           sql = """
+           BEGIN TRY
+             INSERT INTO [FIN_SHARED_LANDING_DEV].[dbo].[Stat_CDR]
+                     (PrimaryKey,EventTime,DSTStatus,ContactID,EventID,
+                      SwitchID,ContactType,CurrentState,LastState,
+                      LastStateDuration,QueueID,
+                      IntData1,IntData2,IntData3,IntData4,
+                      StrData1,StrData2,StrData3,StrData4, 
+                      EventSequence,ServerId,RolledUp) 
+                      VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,
+                              %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
+           END TRY
+           
+           BEGIN CATCH
+             logging.info(f"skipping failed insert');
+           END CATCH;
+           """
+           
+           for record in csv_reader:
+               try:
+                   cursor.execute(sql,record)
+               except Expection as e:
+                   logging.error(f"Skipping record {record} due to error:{e}")
+                   
+           conn.commit()
+           cursor.close()
+           conn.close()
+           
 
     @task
     def daily_load_data():
-        # Tables not included in the daily delete statement
-        # "AgentAssignment","TeamAssignment", *** investigate further
         
-        
-        delete_tables_set = ["ACDQueue","Agent","AudioMessage", "AgentSkill",
-                             "ContactLink",
-                             "Email","EmailGroup","Eval_Contact","EvalScore","EvalCategory","EvalCategoryLangString",
-                             "EvalCriteria","EvalCriteriaLangString","EvalCriteriaValue","EvalCriteriaValueLangString",
-                             "EvalEvaluation","EvalForm","EvalFormLangString",
-                             "Holiday","IMRecording",
-                             "Languages","LOBCategory","LOBCategoryLangString","LOBCode","LOBCodeLangString",
-                             "Node","NotReadyReason","NotReadyReasonLangString",
-                             "OperatingDates",
-                             "Recordings","RecordingsFaultedFiles","RequiredSkill", 
-                             "SegmentAgent","SegmentQueue","Server","Site","Skill","Stat_CDR_LastSummarized","Switch",
-                             "Team",
-                             "UCAddress","UCGroup",
-                             "WfAttributeDetail","WfLinkDetail","WfLink","WfAction","WfPage","WfGraph",
-                             "WfSubAppMethod","WfSubApplication","WfVariables"]
-        
-        for delete_table in delete_table_set:
-            daily_table_delete(delete_table)                     
-                             
-        
-        source_file_set = ["ACDQueue","Agent","AudioMessage", "AgentSkill",
-                           "ContactLink","ContactSegment",
-                           "Email","EmailGroup","Eval_Contact","EvalScore","EvalCategory","EvalCategoryLangString",
-                           "EvalCriteria","EvalCriteriaLangString","EvalCriteriaValue","EvalCriteriaValueLangString",
-                           "EvalEvaluation","EvalForm","EvalFormLangString",
-                           "Holiday","IMRecording","icePay",
-                           "Languages","LOBCategory","LOBCategoryLangString","LOBCode","LOBCodeLangString",
-                           "Node","NotReadyReason","NotReadyReasonLangString",
-                           "OperatingDates",
-                           "Recordings","RecordingsFaultedFiles","RequiredSkill", 
-                           "SegmentAgent","SegmentQueue","Server","Site","Skill","Stat_CDR_LastSummarized","Switch",
-                           "Stat_AgentActivity_D", "Stat_AgentActivity_I", "Stat_AgentActivity_M", "Stat_AgentActivity_W", "Stat_AgentActivity_Y",
-                           "Stat_AgentActivityByQueue_D", "Stat_AgentActivityByQueue_I", "Stat_AgentActivityByQueue_M", "Stat_AgentActivityByQueue_W", "Stat_AgentActivityByQueue_Y",
-                           "Stat_AgentLineOfBusiness_D", "Stat_AgentLineOfBusiness_I", "Stat_AgentLineOfBusiness_M", "Stat_AgentLineOfBusiness_W", "Stat_AgentLineOfBusiness_Y",
-                          #"Stat_AgentNotReadyBreakdown_D" 2024 completed; 2025 missing Jan30-Feb03, 
-                          #"Stat_AgentNotReadyBreakdown_M" 2024 completed uncomment for 2025 data
-                           "Stat_AgentNotReadyBreakdown_I", "Stat_AgentNotReadyBreakdown_W", "Stat_AgentNotReadyBreakdown_Y",
-                           "Stat_DNISActivity_D", "Stat_DNISActivity_I", "Stat_DNISActivity_M", "Stat_DNISActivity_W", "Stat_DNISActivity_Y",
-                           "Stat_CDR","Stat_CDR_LastSummarize","Stat_CDR_Summary",
-                           "Stat_ADR",
-                           #"Stat_QueueActivity_D", missign Sep-2024 and Oct-2024
-                           #"Stat_QueueActivity_M" 2024 completed uncomment for 2025 data 
-                           "Stat_QueueActivity_I", "Stat_QueueActivity_W", "Stat_QueueActivity_Y",
-                           "Stat_SkillActivity_D", "Stat_SkillActivity_I", "Stat_SkillActivity_M", "Stat_SkillActivity_W", "Stat_SkillActivity_Y",
-                           "Stat_TrunckActivity_D", "Stat_TrunckActivity_I", "Stat_TrunckActivity_M", "Stat_TrunckActivity_W", "Stat_TrunckActivity_Y",    
-                           "Stat_WorkflowActionActivity_D", "Stat_WorkflowActionActivity_I", "Stat_WorkflowActionActivity_M", "Stat_WorkflowActionActivity_W", "Stat_WorkflowActionActivity_Y",
-                           "Team",
-                           "UCAddress","UCGroup",
-                           "WfAttributeDetail","WfLinkDetail","WfLink","WfAction","WfPage","WfGraph",
-                           "WfSubAppMethod","WfSubApplication","WfVariables"]
+        source_file_set = ["Stat_CDR"]
 
         
         for source_file in source_file_set:
             daily_load_source(source_file)
 
-    daily_load_data()
+    daily_load_data(), 
     
 ice_rmo_load_daily()
