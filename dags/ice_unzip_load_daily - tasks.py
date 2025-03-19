@@ -163,7 +163,7 @@ def daily_load_data():
         
         def load_db_source(psource_file):
             sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
-            dYmd = (dt.datetime.today() + timedelta(days=-1)).strftime('%Y%m%d')
+            dYmd = (dt.datetime.today() + timedelta(days = -1)).strftime('%Y%m%d')
 
             try:
                 #if psource_file == 'Stat_CDR_fixed.csv':
@@ -190,7 +190,7 @@ def daily_load_data():
 	                         ( FORMAT = 'CSV', 
                                MAXERRORS = 100, 
                                ERRORFILE = '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{pTableName}_{dYmd}.log',
-                               TABLOCK
+                               TABLOCK,
 	                         );
                          """
                 logging.info(f"query: {query}")
