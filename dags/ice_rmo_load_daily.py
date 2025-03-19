@@ -30,7 +30,7 @@ root.addHandler(handler)
     catchup=False,
 )
 
-def ice_rmo_load_daily():
+def daily_load_data():
    
    @task   
    def daily_load_source(psource_file):
@@ -81,15 +81,11 @@ def ice_rmo_load_daily():
        return
            
 
-    @task
-    def daily_load_data():
-        
-        source_file_set = ["Stat_CDR"]
+
+   source_file_set = ["Stat_CDR"]
+  
+   for source_file in source_file_set:
+       daily_load_source(source_file)
 
         
-        for source_file in source_file_set:
-            daily_load_source(source_file)
-
-    daily_load_data(), 
-    
-ice_rmo_load_daily()
+dag = daily_load_data()
