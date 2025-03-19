@@ -187,10 +187,10 @@ def daily_load_data():
                 query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{pTableName}]
                              FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{psource_file}'
                              WITH
-	                         ( FORMAT = 'CSV', 
-                               MAXERRORS = 100, 
-                               ERRORFILE = '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{pTableName}_{dYmd}.log',
-                               TABLOCK,
+	                         ( FORMAT='CSV', 
+                               MAXERRORS=100, 
+                               ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{pTableName}_{dYmd}.log',
+                               TABLOCK                               
 	                         );
                          """
                 logging.info(f"query: {query}")
