@@ -68,12 +68,12 @@ def daily_load_data():
                 END CATCH;
               """
            
-       for record in csv_reader:
-           try:
+       try:
+           for record in csv_reader:
                cursor.execute(sql, record)                   
                
-           except Expection as e:
-               logging.error(f"Skipping record {record} due to error:{e}")
+       except Exception as e:
+           logging.error(f"Skipping record {record} due to error:{e}")
            
        conn.commit()
                    
