@@ -1,11 +1,28 @@
-from airflow.decorators import task, dag
-#from airflow.providers.samba.hooks.samba import SambaHook
-from airflow.hooks.base_hook import BaseHook
+import csv, sys, argparse
+import os
+import numpy as np
 import pandas as pd
-import datetime as dt
-from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
-import time
+from airflow.decorators import dag, task
+from airflow.providers.samba.hooks.samba import SambaHook
+from airflow.utils.dates import days_ago
+import zipfile
 import logging
+import io
+import time
+import datetime as dt
+from datetime import datetime
+from datetime import timedelta
+from airflow.operators.python import PythonOperator
+from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
+
+
+root = logging.getLogger()
+root.setLevel(logging.DEBUG)
+handler = logging.StreamHandler()
+handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s -%(message)s')
+handler.setFormatter(formatter)
+root.addHandler(handler) 
 
 @dag(
     description="DAG - RMO CT specific dates bulk insert",
@@ -16,6 +33,34 @@ import logging
 
 def ice_rmo_load_ondemand():
     logging.basicConfig(level=logging.INFO)
+    
+    def Stat_CDR_Datafix():
+            source_path = r'/rmo_ct_prod/inprogress/'
+            file = 'Stat_CDR.csv'
+            output_file = 'Stat_CDR_fixed.csv'
+
+            logging.info("Stat_CDR fixing code")
+            try:
+                # Initialize SambaHook with your credentials and connection details
+                with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+                    
+                    usecols = ["PrimaryKey","EventTime","DSTStatus","ContactID","EventID","SwitchID","ContactType","CurrentState",
+                               "LastState","LastStateDuration","QueueID","IntData1","InData2","IntDate3","IntData4",
+                               "StrData1","StrData2","StrData3","StrData4","EventSequence","ServerId","RolledUp","Extra"]
+                    with fs_hook.open_file(source_path + file,'r') as f:
+                        csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(21)], quoting=1, on_bad_lines = 'skip')
+ 
+                        with fs_hook.open_file(source_path + output_file, 'w') as outfile:
+                            csv_reader.to_csv(outfile, header=False,index=False)
+                                
+  
+                                
+                outfile.close()
+                
+            except Exception as e:
+                logging.error(f"Error data fixing table Stat_CDR: {e}")
+                
+            return   
     
     def ondemand_load_source(psource_file):
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
@@ -31,7 +76,10 @@ def ice_rmo_load_ondemand():
             query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[ICE_Stat_CDR]
                     FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\Stat_CDR_fixed.csv'
                     WITH
-	                ( FORMAT = 'CSV'
+	                ( FORMAT = 'CSV',
+                      MAXERRORS = 10, 
+                      ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\ICE_Stat_fixed.log',
+
 	                );
                 """
             logging.info(f"query: {query}")
@@ -47,7 +95,7 @@ def ice_rmo_load_ondemand():
         
         
         except Exception as e:
-            logging.info(f"Error bulk loading table: ICE_Stat_CDR source file: Stat_CDR_fixed.csv {e}")
+            logging.error(f"Error bulk loading table: ICE_Stat_CDR source file: Stat_CDR_fixed.csv {e}")
  
 
     @task
@@ -82,6 +130,8 @@ def ice_rmo_load_ondemand():
         #                   "WfAttributeDetail.csv","WfLinkDetail.csv","WfLink.csv","WfAction.csv","WfPage.csv","WfGraph.csv",
         #                   "WfSubAppMethod.csv","WfSubApplication.csv","WfVariables.csv"]
         source_file_set = ["Stat_CDR.csv"]                   
+        
+        Stat_CDR_Datafix
         
         for source_file in source_file_set:
             ondemand_load_source(source_file)
