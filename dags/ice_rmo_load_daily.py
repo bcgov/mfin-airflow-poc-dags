@@ -45,7 +45,7 @@ def daily_load_data():
        try:
            with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
                with fs_hook.open_file(source_path + file,'r') as f:
-                   csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(22)])
+                   csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(21)])
         
        except Exception as e:
            logging.error(f"Error opening source folder {e}")         
