@@ -85,7 +85,7 @@ def daily_load_data():
        except Exception as e:
            logging.error(f"error Bulk Insert with error: {e}")
            
-                   
+                    
        #sql = f"""
        #         BEGIN TRY
        #           INSERT INTO [FIN_SHARED_LANDING_DEV].[dbo].[Stat_CDR]
