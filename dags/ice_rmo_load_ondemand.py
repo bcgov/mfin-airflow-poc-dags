@@ -78,9 +78,8 @@ def ice_rmo_load_ondemand():
                     FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\Stat_CDR_fixed.csv'
                     WITH
 	                ( FORMAT = 'CSV',
-                      MAXERRORS = '10', 
-                      ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\ICE_Stat_fixed.log',
-
+                      MAXERRORS = 10, 
+                      ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\ICE_Stat_fixed.log'
 	                );
                 """
             logging.info(f"query: {query}")
