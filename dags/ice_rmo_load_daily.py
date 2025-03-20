@@ -83,7 +83,7 @@ def daily_load_data():
            conn.commit()
 
        except Exception as e:
-           logging.error(f"error Bulk Insert with error" {e})
+           logging.error(f"error Bulk Insert with error" {e}")
            
                    
        #sql = f"""
