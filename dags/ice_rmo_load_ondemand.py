@@ -61,6 +61,7 @@ def ice_rmo_load_ondemand():
                 logging.error(f"Error data fixing table Stat_CDR: {e}")
                 
             return   
+            
     
     def ondemand_load_source(psource_file):
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
@@ -131,7 +132,7 @@ def ice_rmo_load_ondemand():
         #                   "WfSubAppMethod.csv","WfSubApplication.csv","WfVariables.csv"]
         source_file_set = ["Stat_CDR.csv"]                   
         
-        Stat_CDR_Datafix
+        Stat_CDR_Datafix()
         
         for source_file in source_file_set:
             ondemand_load_source(source_file)
