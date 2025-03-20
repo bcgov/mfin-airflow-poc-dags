@@ -34,6 +34,47 @@ root.addHandler(handler)
 def ice_rmo_load_ondemand():
     logging.basicConfig(level=logging.INFO)
     
+    def Agent_Datafix():
+            source_path = r'/rmo_ct_prod/inprogress/'
+            file = 'Agent.csv'
+            output_file = 'Agent_fixed.csv'
+
+            logging.info("Agent fixing code")
+            
+            try:
+                # Initialize SambaHook with your credentials and connection details
+                with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+                    
+                    names = ["SwitchID","AgentID","AgentName","AgentType","ClassOfService",
+                            ,"AutoLogonAddress","AutoLogonQueue","PAQOverflowThreshold","NoAnswerThreshold"
+                            ,"CfacDn","CfnaDn","CfpoDn","CfnlDn","CfState","EmailAddress"
+                            ,"RemoteDn","VoiceMailDN","NumVoiceMailCalls","CallerNumPBX"
+                            ,"CallerNumPSTN","AgentAlias","ImageURL","OutboundWorkflowDN"
+                            ,"OutboundWorkflowMode","HotlineDN","CallerName","PlacedCallAutoWrapTimer"
+                            ,"UpdateCount","LogonToNotReadyReason","IMAddress","PasswordCOS"
+                            ,"PasswordLastChanged","PasswordAbsoluteLockedOutDate"
+                            ,"PasswordLockedOutExpireDateTime","ClassOfService2","ADFQDN"
+                            ,"ADGUID","LanguageCode","AzureADGuid","MaxImConcurrency","MaxEmailConcurrency"]
+                              
+                    cols = [1,2,3,4,5,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,37,38,39,40,41,42,43,44,46,47,48]
+                              
+                    with fs_hook.open_file(source_path + file,'r') as f:
+                        csv_reader = pd.read_csv(f, header = None, usecols=cols, quoting=1)
+                        
+ 
+                        with fs_hook.open_file(source_path + output_file, 'w') as outfile:
+                            csv_reader.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
+                                
+  
+                                
+                outfile.close()
+                
+            except Exception as e:
+                logging.error(f"Error data fixing table Agent: {e}")
+                
+            return   
+          
+
     def Stat_CDR_Datafix():
             source_path = r'/rmo_ct_prod/inprogress/'
             file = 'Stat_CDR.csv'
@@ -67,23 +108,31 @@ def ice_rmo_load_ondemand():
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
 
         try:
-            xlen = len(psource_file)-4
-            pTableName = "ICE_" + psource_file[:xlen]
+            if psource_file == "Stat_CDR.csv":
+                pTableName = "ICE_Stat_CDR"
+                psource_file = "ICE_Stat_fixed.csv"
+            elif psource_file == "Agent.csv":
+                pTableName = "ICE_Agent"
+                psource_file = "ICE_Agent_fixed.csv"
+            else:
+                xlen = len(psource_file)-4
+                pTableName = "ICE_" + psource_file[:xlen]
+            
             logging.info(f"loading table: {pTableName}")
             
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
-            query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[ICE_Stat_CDR]
-                    FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\Stat_CDR_fixed.csv'
+            query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{pTableName}]
+                    FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{psource_file}'
                     WITH
 	                ( FORMAT = 'CSV',
                       MAXERRORS = 20, 
-                      ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\ICE_Stat_fixed.log'
+                      ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{psource_file}.log'
 	                );
                 """
             logging.info(f"query: {query}")
-            logging.info(f"inserting table:  ICE_Stat_CDR")
+            logging.info(f"inserting table:  {pTableName}")
             start_time = time.time()
             cursor.execute(query)
             conn.commit()
@@ -95,7 +144,7 @@ def ice_rmo_load_ondemand():
         
         
         except Exception as e:
-            logging.error(f"Error bulk loading table: ICE_Stat_CDR source file: Stat_CDR_fixed.csv {e}")
+            logging.error(f"Error bulk loading table: {pTableName} source file: {psource_file} {e}")
  
 
     @task
@@ -129,9 +178,10 @@ def ice_rmo_load_ondemand():
         #                   "UCAddress.csv","UCGroup.csv",
         #                   "WfAttributeDetail.csv","WfLinkDetail.csv","WfLink.csv","WfAction.csv","WfPage.csv","WfGraph.csv",
         #                   "WfSubAppMethod.csv","WfSubApplication.csv","WfVariables.csv"]
-        source_file_set = ["Stat_CDR.csv"]                   
+        source_file_set = ["Stat_CDR.csv","Agent.csv"]                   
         
         Stat_CDR_Datafix()
+        Agent_Datafix()
         
         for source_file in source_file_set:
             ondemand_load_source(source_file)
