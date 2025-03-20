@@ -51,7 +51,7 @@ def ice_rmo_load_ondemand():
                         csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(22)], quoting=1, on_bad_lines = 'skip')
  
                         with fs_hook.open_file(source_path + output_file, 'w') as outfile:
-                            csv_reader.to_csv(outfile, header=False,index=False)
+                            csv_reader.to_csv(outfile, header=False,index=False,line_terminator='\n')
                                 
   
                                 
