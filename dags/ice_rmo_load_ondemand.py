@@ -45,7 +45,7 @@ def ice_rmo_load_ondemand():
                 # Initialize SambaHook with your credentials and connection details
                 with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
                     
-                    names = ["SwitchID","AgentID","AgentName","AgentType","ClassOfService",
+                    names = ["SwitchID","AgentID","AgentName","AgentType","ClassOfService"
                             ,"AutoLogonAddress","AutoLogonQueue","PAQOverflowThreshold","NoAnswerThreshold"
                             ,"CfacDn","CfnaDn","CfpoDn","CfnlDn","CfState","EmailAddress"
                             ,"RemoteDn","VoiceMailDN","NumVoiceMailCalls","CallerNumPBX"
