@@ -104,55 +104,12 @@ def daily_load_data():
                                "LastState","LastStateDuration","QueueID","IntData1","InData2","IntDate3","IntData4",
                                "StrData1","StrData2","StrData3","StrData4","EventSequence","ServerId","RolledUp","Extra"]
                     with fs_hook.open_file(source_path + file,'r') as f:
-                        csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(22)], quoting=1, on_bad_lines = 'skip')
-                        #csv_reader = csv_reader.fillna(0)
-                        #if len(csv_reader[12]) != 0:
-                        #    csv_reader[12] = csv_reader[12].astype(int)
-                        #if len(csv_reader[13]) != 0:
-                        #    csv_reader[13] = csv_reader[13].astype(int)
-                        #if len(csv_reader[14]) != 0:
-                        #    csv_reader[14] = csv_reader[14].astype(int)
-                        #if len(csv_reader[15]) != 0:
-                        #    csv_reader[15] = csv_reader[15].astype(int)
-                        
-                        #csv_reader = csv.reader(f)
-                            
-                        #lst = ['']
-                        #for index, row in csv_reader.iterrows():
+                        csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(21)], quoting=1, on_bad_lines = 'skip')
+ 
                         with fs_hook.open_file(source_path + output_file, 'w') as outfile:
                             csv_reader.to_csv(outfile, header=False,index=False)
                                 
-                                #writer = csv.writer(outfile)
-                                #writer.writerows(row["PrimaryKey"])
-                                #if 'sip:' in row['EventSequence']:
-                                #    d = ','.join(str(e) for e in row)
-                                    
-                                    #writer.writerows(row["PrimaryKey"],row["EventTim"],row["DSStatus"],row["ContactID"],
-                                    #                row["EventID"],row["SwitchID"],row["ContactType"],row["CurrentState"],
-                                    #                row["LastState"],row["LastStateDuration"],row["QueueID"],row["IntData1"],
-                                    #                row["InData2"],row["IntDate3"],row["IntData4"],row["StrData1"],row["StrData2"],
-                                    #                row["StrData3"],row["StrData4"],row["ServiceId"],row["RolledUp"],row["ContactType"])
-                                #else:
-                                    
-                                #    writer.writerows(row["PrimaryKey"],row["EventTime"],row["DSTStatus"],row["ContactID"],
-                                #                    row["EventID"],row["SwitchID"],row["ContactType"],row["CurrentState"],
-                                #                    row["LastState"],row["LastStateDuration"],row["QueueID"],row["IntData1"],
-                                #                    row["InData2"],row["IntDate3"],row["IntData4"],row["StrData1"],row["StrData2"],
-                                #                    row["StrData3"],row["StrData4"],row["EventSequence"],row["ServerId"],row["RolledUp"])
-                                    
-                                     
-                                     
-                                
-                                #writer = csv.writer(outfile)            
-                                #writer.writerow(row['PrimaryKey'], row['EventTime'], row['DSStatus'])
-                                #if 'sip:' in row[19]:
-                                #    new_lst = [row[x] for x in range(19)]
-                                #    new_lst = new_lst + lst
-                                #    new_lst = new_lst + [row[x] for x in range(20,23)]
-                                #    writer.writerow(new_lst)
-                                #else:
-                                #    new_lst = [row[x] for x in range(21)]
-                                #    writer.writerow(new_lst)
+  
                                 
                                 
             except Exception as e:
@@ -166,16 +123,7 @@ def daily_load_data():
             dYmd = (dt.datetime.today() + timedelta(days = -1)).strftime('%Y%m%d')
 
             try:
-                #if psource_file == 'Stat_CDR_fixed.csv':
-                #    psource_file = 'Stat_CDR_fixed.csv'
-                #    pTableName = 'ICE_Stat_CDR'
-                #elif psource_file == 'Stat_CDR_Summary.csv':
-                #    psource_file = 'Stat_CDR_Summary_fixed.csv'
-                #    pTableName = 'ICE_Stat_CDR'
-                #elif psource_file == 'Agent.csv':
-                #    psource_file = 'Agent_fixed.csv'
-                #    pTableName = 'ICE_Agent'
-                #else:
+
                 xlen = len(psource_file) - 4    
                 pTableName = "ICE_" + psource_file[:xlen]
                 
