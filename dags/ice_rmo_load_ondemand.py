@@ -48,7 +48,7 @@ def ice_rmo_load_ondemand():
                                "LastState","LastStateDuration","QueueID","IntData1","InData2","IntDate3","IntData4",
                                "StrData1","StrData2","StrData3","StrData4","EventSequence","ServerId","RolledUp","Extra"]
                     with fs_hook.open_file(source_path + file,'r') as f:
-                        csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(21)], quoting=1, on_bad_lines = 'skip')
+                        csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(22)], quoting=1)
  
                         with fs_hook.open_file(source_path + output_file, 'w') as outfile:
                             csv_reader.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
