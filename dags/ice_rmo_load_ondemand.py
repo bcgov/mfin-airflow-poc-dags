@@ -28,14 +28,14 @@ def ice_rmo_load_ondemand():
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
-            query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{pTableName}]
-                    FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{psource_file}'
+            query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[ICE_Stat_CDR]
+                    FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\Stat_CDR_fixed.csv'
                     WITH
 	                ( FORMAT = 'CSV'
 	                );
                 """
             logging.info(f"query: {query}")
-            logging.info(f"inserting table:  {psource_file}")
+            logging.info(f"inserting table:  ICE_Stat_CDR")
             start_time = time.time()
             cursor.execute(query)
             conn.commit()
@@ -47,7 +47,7 @@ def ice_rmo_load_ondemand():
         
         
         except Exception as e:
-            logging.info(f"Error bulk loading table: {pTableName} source file: {psource_file} {e}")
+            logging.info(f"Error bulk loading table: ICE_Stat_CDR source file: Stat_CDR_fixed.csv {e}")
  
 
     @task
@@ -81,7 +81,7 @@ def ice_rmo_load_ondemand():
         #                   "UCAddress.csv","UCGroup.csv",
         #                   "WfAttributeDetail.csv","WfLinkDetail.csv","WfLink.csv","WfAction.csv","WfPage.csv","WfGraph.csv",
         #                   "WfSubAppMethod.csv","WfSubApplication.csv","WfVariables.csv"]
-        source_file_set = ["Holiday.csv"]                   
+        source_file_set = ["Stat_CDR.csv"]                   
         
         for source_file in source_file_set:
             ondemand_load_source(source_file)
