@@ -110,10 +110,10 @@ def ice_rmo_load_ondemand():
         try:
             if psource_file == "Stat_CDR.csv":
                 pTableName = "ICE_Stat_CDR"
-                psource_file = "ICE_Stat_fixed.csv"
+                psource_file = "Stat_CDR_fixed.csv"
             elif psource_file == "Agent.csv":
                 pTableName = "ICE_Agent"
-                psource_file = "ICE_Agent_fixed.csv"
+                psource_file = "Agent_fixed.csv"
             else:
                 xlen = len(psource_file)-4
                 pTableName = "ICE_" + psource_file[:xlen]
