@@ -56,7 +56,7 @@ def ice_rmo_load_ondemand():
                             ,"PasswordLockedOutExpireDateTime","ClassOfService2","ADFQDN"
                             ,"ADGUID","LanguageCode","AzureADGuid","MaxImConcurrency","MaxEmailConcurrency"]
                               
-                    cols = [1,2,3,4,5,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,37,38,39,40,41,42,43,44,46,47,48]
+                    cols = [0,1,2,3,4,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,36,37,38,39,40,41,42,43,45,46,47]
                               
                     with fs_hook.open_file(source_path + file,'r') as f:
                         csv_reader = pd.read_csv(f, header = None, usecols=cols, quoting=1)
