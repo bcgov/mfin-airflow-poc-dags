@@ -70,9 +70,8 @@ def ice_rmo_load_ondemand():
                         
                         for row in csv_reader:
                             special_flag = 0
-                            for col_index,value in enumerate(row):
-                                if col_index == 1 and value in ('1137','1888','1889','1890','2001','2003','9985'):
-                                    special_flag = 1
+                            if row[1] in ('1137','1888','1889','1890','2001','2003','9985'):
+                                special_flag = 1
                             
                             if special_flag == 0:
                                 r1 = row.iloc[:, 0:4,8:32,36:43,45:47] 
