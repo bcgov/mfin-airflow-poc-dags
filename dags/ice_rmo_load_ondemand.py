@@ -37,7 +37,9 @@ def ice_rmo_load_ondemand():
     def Agent_Datafix():
             source_path = r'/rmo_ct_prod/inprogress/'
             file = 'Agent.csv'
-            output_file = 'Agent_fixed.csv'
+            output_file1 = 'Agent1_fixed.csv'
+            output_file2 = 'Agent2_fixed.csv'
+            
 
             logging.info("Agent fixing code")
             
@@ -45,29 +47,50 @@ def ice_rmo_load_ondemand():
                 # Initialize SambaHook with your credentials and connection details
                 with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
                     
-                    names = ["SwitchID","AgentID","AgentName","AgentType","ClassOfService"
+                    names = ["SwitchID","AgentID","AgentName","AgentType","ClassOfService","pw1","pw2","pw3"
                             ,"AutoLogonAddress","AutoLogonQueue","PAQOverflowThreshold","NoAnswerThreshold"
                             ,"CfacDn","CfnaDn","CfpoDn","CfnlDn","CfState","EmailAddress"
                             ,"RemoteDn","VoiceMailDN","NumVoiceMailCalls","CallerNumPBX"
                             ,"CallerNumPSTN","AgentAlias","ImageURL","OutboundWorkflowDN"
                             ,"OutboundWorkflowMode","HotlineDN","CallerName","PlacedCallAutoWrapTimer"
-                            ,"UpdateCount","LogonToNotReadyReason","IMAddress","PasswordCOS"
-                            ,"PasswordLastChanged","PasswordAbsoluteLockedOutDate"
+                            ,"UpdateCount","LogonToNotReadyReason","IMAddress","pw4","pw5","pw6"
+                            ,"PasswordCOS","PasswordLastChanged","PasswordAbsoluteLockedOutDate"
                             ,"PasswordLockedOutExpireDateTime","ClassOfService2","ADFQDN"
-                            ,"ADGUID","LanguageCode","AzureADGuid","MaxImConcurrency","MaxEmailConcurrency"]
-                              
-                    cols = [0,1,2,3,4,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,36,37,38,39,40,41,42,43,45,46,47]
+                            ,"ADGUID","LanguageCode","version","AzureADGuid","MaxImConcurrency","MaxEmailConcurrency"]
+                               
+                    cols = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47]
+                    
+                    df1 = []
+                    r1 = []
+                    df2 = []
+                    r2 = []
                               
                     with fs_hook.open_file(source_path + file,'r') as f:
                         csv_reader = pd.read_csv(f, header = None, usecols=cols, quoting=1)
                         
- 
-                        with fs_hook.open_file(source_path + output_file, 'w') as outfile:
-                            csv_reader.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
+                        for row in csv_reader:
+                            special_flag = 0
+                            for col_index,value in enumerate(row):
+                                if col_index == 1 and value in ('1137','1888','1889','1890','2001','2003','9985'):
+                                    special_flag = 1
+                            
+                            if special_flag == 0:
+                                r1 = row.iloc[:, 0:4,8:32,36:43,45:47] 
+                                df1.loc[len(df)] = r1
+                            else:
+                                r2 = row.iloc[:, 0:4,6:30,32:39,41:43] 
+                                df2.loc[len(df1)] = r2
                                 
+ 
+                        with fs_hook.open_file(source_path + output_file1, 'w') as outfile1:
+                            df1.to_csv(outfile1, header=False,index=False,lineterminator='\r\n')
+                                
+                        with fs_hook.open_file(source_path + output_file2, 'w') as outfile2:
+                            df2.to_csv(outfile2, header=False,index=False,lineterminator='\r\n')
   
                                 
-                outfile.close()
+                outfile1.close()
+                outfile2.close()
                 
             except Exception as e:
                 logging.error(f"Error data fixing table Agent: {e}")
