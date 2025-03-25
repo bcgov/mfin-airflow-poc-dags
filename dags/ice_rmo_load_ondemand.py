@@ -75,8 +75,6 @@ def ice_rmo_load_ondemand():
                     df3 = csv_reader.loc[(csv_reader[1] ==  1148)]  
                     df3 = df3.iloc[:,[0,1,2,3,4,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,34,35,36,37,38,39,40,41,43,44,45]]
 
-
-                               
  
                     with fs_hook.open_file(source_path + output_file, 'w') as outfile:
                         df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
@@ -104,14 +102,31 @@ def ice_rmo_load_ondemand():
                 # Initialize SambaHook with your credentials and connection details
                 with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
                     
-                    usecols = ["PrimaryKey","EventTime","DSTStatus","ContactID","EventID","SwitchID","ContactType","CurrentState",
-                               "LastState","LastStateDuration","QueueID","IntData1","InData2","IntDate3","IntData4",
-                               "StrData1","StrData2","StrData3","StrData4","EventSequence","ServerId","RolledUp","Extra"]
+                    names = ["PrimaryKey","EventTime","DSTStatus","ContactID","EventID"
+                            ,"SwitchID","ContactType","CurrentState","LastState","LastStateDuration"
+                            ,"QueueID","IntData1","IntData2","IntData3","IntData4","StrData1"
+                            ,"StrData2","StrData3","StrData4","EventSequence","ServerId","RolledUp"]
+                               
+                    cols = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]                  
+                    
                     with fs_hook.open_file(source_path + file,'r') as f:
                         csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(22)], quoting=1)
  
                         with fs_hook.open_file(source_path + output_file, 'w') as outfile:
                             csv_reader.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
+                            
+                        df1 = csv_reader.loc[(csv_reader[22] ==  1) | (csv_reader[22] == 2)]    
+                        df1 = df1.iloc[:,[0,1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18,20,21,22]]
+                                        
+                        df2 = csv_reader.loc[(csv_reader[22] !=  1) | csv_reader[22] !=  2)]    
+                        df2 = df2.iloc[:,[0,1,2,3,4,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]]
+                        
+                        with fs_hook.open_file(source_path + output_file, 'w') as outfile:
+                            df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
+                                
+                        with fs_hook.open_file(source_path + output_file, 'a') as outfile:
+                            df2.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
+
                                 
   
                                 
