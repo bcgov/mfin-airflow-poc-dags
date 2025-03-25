@@ -118,7 +118,7 @@ def ice_rmo_load_ondemand():
                         df1 = csv_reader.loc[(csv_reader[22] ==  1) | (csv_reader[22] == 2)]    
                         df1 = df1.iloc[:,[0,1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18,20,21,22]]
                                         
-                        df2 = csv_reader.loc[(csv_reader[22] !=  1) | csv_reader[22] !=  2)]    
+                        df2 = csv_reader.loc[(csv_reader[22] !=  1) | (csv_reader[22] !=  2)]    
                         df2 = df2.iloc[:,[0,1,2,3,4,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]]
                         
                         with fs_hook.open_file(source_path + output_file, 'w') as outfile:
