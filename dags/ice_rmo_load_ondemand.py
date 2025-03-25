@@ -115,7 +115,7 @@ def ice_rmo_load_ondemand():
                         with fs_hook.open_file(source_path + output_file, 'w') as outfile:
                             csv_reader.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
                             
-                        df1 = csv_reader[csv_reader.loc[19].apply(lambda x: x in "sip:*")
+                        df1 = csv_reader[csv_reader.loc[19].apply(lambda x: x in "sip:*")]
                         #df1 = csv_reader.loc[csv_reader[19] in "sip:"]    
                         df1 = df1.iloc[:,[0,1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18,20,21,22]]
                                         
