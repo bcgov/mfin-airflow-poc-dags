@@ -193,7 +193,7 @@ def ice_rmo_load_ondemand():
             elif psource_file == "Agent.csv":
                 pTableName = "ICE_Agent"
                 psource_file = "Agent_fixed.csv"
-            elif psource_file == "Stat_CDR.csv":
+            elif psource_file == "Stat_CDR_Summary.csv":
                 pTableName = "ICE_Stat_CDR_Summary"
                 psource_file = "Stat_CDR_Summary_fixed.csv" 
             else:
