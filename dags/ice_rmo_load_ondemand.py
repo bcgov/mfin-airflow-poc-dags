@@ -107,10 +107,10 @@ def ice_rmo_load_ondemand():
                             ,"QueueID","IntData1","IntData2","IntData3","IntData4","StrData1"
                             ,"StrData2","StrData3","StrData4","EventSequence","ServerId","RolledUp"]
                                
-                    cols = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]                  
+                    cols = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]                  
                     
                     with fs_hook.open_file(source_path + file,'r') as f:
-                        csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(22)], quoting=1)
+                        csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(21)], quoting=1)
  
                     df1 = csv_reader.iloc[:, [0,1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]]
  
@@ -154,16 +154,18 @@ def ice_rmo_load_ondemand():
                              "LastLoggedActionWfID","LastLoggedActionPageID","LastLoggedActionActionID","LastLoggedActionDuration",
                              "LastLoggedActionName","LastLoggedActionData","LastLoggedActionResult","ServerId"]
                                
-                    cols = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,
-                            31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,
-                            59,60,61,62,63,64,65,66,67,68,69,70]                  
+                    cols = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19,
+                            20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,
+                            40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,
+                            60,61,62,63,64,65,66,67,68,69]                  
                     
                     with fs_hook.open_file(source_path + file,'r') as f:
-                        csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(70)], quoting=1)
+                        csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(69)], quoting=1)
  
-                    df1 = csv_reader.iloc[:, [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,
-                                              28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,
-                                              56,57,58,59,60,61,62,63,64,65,66,67,68,69,70]]                      
+                    df1 = csv_reader.iloc[:, [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19,
+                                              20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,
+                                              40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,
+                                              60,61,62,63,64,65,66,67,68,69]]                      
                             
 
                     with fs_hook.open_file(source_path + output_file, 'w') as outfile:
