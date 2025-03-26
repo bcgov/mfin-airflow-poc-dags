@@ -134,7 +134,7 @@ def ice_rmo_load_ondemand():
             file = 'Stat_CDR_Summary.csv'
             output_file = 'Stat_CDR_Summary_fixed.csv'
 
-            logging.info("Stat_CDR_Summary fixing code")
+            logging.info("Stat_CDR_Summary_fixing code")
             try:
                 # Initialize SambaHook with your credentials and connection details
                 with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
@@ -193,7 +193,7 @@ def ice_rmo_load_ondemand():
             elif psource_file == "Agent.csv":
                 pTableName = "ICE_Agent"
                 psource_file = "Agent_fixed.csv"
-            elif psource_file == "Stat_CDR_Summary.csv":
+            elif psource_file == "Stat_CDR.csv":
                 pTableName = "ICE_Stat_CDR_Summary"
                 psource_file = "Stat_CDR_Summary_fixed.csv" 
             else:
