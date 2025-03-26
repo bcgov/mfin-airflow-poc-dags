@@ -128,6 +128,60 @@ def ice_rmo_load_ondemand():
                 
             return   
             
+
+    def Stat_CDR_Summary_Datafix():
+            source_path = r'/rmo_ct_prod/inprogress/'
+            file = 'Stat_CDR_Summary.csv'
+            output_file = 'Stat_CDR_Summary_fixed.csv'
+
+            logging.info("Stat_CDR_Summary fixing code")
+            try:
+                # Initialize SambaHook with your credentials and connection details
+                with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+                    
+                    names = ["SwitchID","ContactID","ContactType","ContactTypeString ","CreatedDateTime",
+                             "CreatedReason","CreatedReasonString","CreatedContactGroupID","CreatedAddressID",
+                             "Duration","ReleasedReason","ReleasedReasonString","ReleasedDateTime",
+                             "OriginatorAddress","OriginatorName","ReceivingAddress","RedirectAddress","NumTimesInWorkflow",
+                             "TimeInWorkflow","NumTimesRouted","TimeInRouting","NumTimesInPAQ","TimeInPAQ",
+                             "NumTimesOnOutbound","TimeOnOutbound","NumTimesHandledByAgent","TimeHandledByAgent",
+                             "NumTimesQueued","NumTimesReturned","OriginalQueueID","OriginalQueueName","NumTimesHandledFromQueue",
+                             "TotalTimeQueuedHandled","NumTimesAbandonedFromQueue","TotalTimeQueuedAbandoned",
+                             "NumTimesRemovedFromQueue","TotalTimeQueuedRemoved","NumTimesSetUserData","NumTimesActionCompleted",
+                             "OriginalHandledQueueID","OriginalHandledQueueName","OriginalHandlingAgentID","OriginalHandlingAgentName",
+                             "OriginalHandlingAgentSkillScore","OriginalOutboundContactGroupID","OriginalOutboundAddressID", 
+                             "OriginalOutboundNumber", "OriginalRoutedAddressID","OriginalRoutedResult","OriginalRoutedResultString",
+                             "OriginalRoutedReason","OriginalRoutedReasonString", "OriginalRoutedDestination","OriginalSetUserData",
+                             "LastSetUserData","OriginalLoggedActionWfID","OriginalLoggedActionPageID", "OriginalLoggedActionActionID",
+                             "OriginalLoggedActionDuration","OriginalLoggedActionName","OriginalLoggedActionData","OriginalLoggedActionResult",
+                             "LastLoggedActionWfID","LastLoggedActionPageID","LastLoggedActionActionID","LastLoggedActionDuration",
+                             "LastLoggedActionName","LastLoggedActionData","LastLoggedActionResult","ServerId"]
+                               
+                    cols = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,
+                            31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,
+                            59,60,61,62,63,64,65,66,67,68,69,70]                  
+                    
+                    with fs_hook.open_file(source_path + file,'r') as f:
+                        csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(71)], quoting=1)
+ 
+                        with fs_hook.open_file(source_path + output_file, 'w') as outfile:
+                            csv_reader.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
+                            
+                        df1 = df1.iloc[:, [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,
+                                           28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,
+                                           56,57,58,59,60,61,62,63,64,65,66,67,68,69,70]]                      
+                            
+                        with fs_hook.open_file(source_path + output_file, 'w') as outfile:
+                            df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
+  
+                                
+                outfile.close()
+                
+            except Exception as e:
+                logging.error(f"Error data fixing table Stat_CDR: {e}")
+                
+            return   
+           
     
     def ondemand_load_source(psource_file):
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
@@ -139,6 +193,9 @@ def ice_rmo_load_ondemand():
             elif psource_file == "Agent.csv":
                 pTableName = "ICE_Agent"
                 psource_file = "Agent_fixed.csv"
+            elif psource_file == "Stat_CDR_Summary.csv":
+                pTableName = "ICE_Stat_CDR_Summary"
+                psource_file = "Stat_CDR_Summary_fixed.csv" 
             else:
                 xlen = len(psource_file)-4
                 pTableName = "ICE_" + psource_file[:xlen]
@@ -203,7 +260,7 @@ def ice_rmo_load_ondemand():
         #                   "UCAddress.csv","UCGroup.csv",
         #                   "WfAttributeDetail.csv","WfLinkDetail.csv","WfLink.csv","WfAction.csv","WfPage.csv","WfGraph.csv",
         #                   "WfSubAppMethod.csv","WfSubApplication.csv","WfVariables.csv"]
-        source_file_set = ["Stat_CDR.csv","Agent.csv"]                   
+        source_file_set = ["Stat_CDR.csv","Agent.csv","Stat_CDR_Summary"]                   
         
         Stat_CDR_Datafix()
         Agent_Datafix()
