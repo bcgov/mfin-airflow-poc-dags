@@ -115,7 +115,7 @@ def ice_rmo_load_ondemand():
                         with fs_hook.open_file(source_path + output_file, 'w') as outfile:
                             csv_reader.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
                             
-                        df1 = df1.iloc[:, [0,1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]]                      
+                        df1 = csv_reader.iloc[:, [0,1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]]                      
                             
                         with fs_hook.open_file(source_path + output_file, 'w') as outfile:
                             df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
@@ -167,9 +167,9 @@ def ice_rmo_load_ondemand():
                         with fs_hook.open_file(source_path + output_file, 'w') as outfile:
                             csv_reader.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
                             
-                        df1 = df1.iloc[:, [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,
-                                           28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,
-                                           56,57,58,59,60,61,62,63,64,65,66,67,68,69,70]]                      
+                        df1 = csv_reader.iloc[:, [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,
+                                                  28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,
+                                                  56,57,58,59,60,61,62,63,64,65,66,67,68,69,70]]                      
                             
                         with fs_hook.open_file(source_path + output_file, 'w') as outfile:
                             df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
@@ -260,7 +260,7 @@ def ice_rmo_load_ondemand():
         #                   "UCAddress.csv","UCGroup.csv",
         #                   "WfAttributeDetail.csv","WfLinkDetail.csv","WfLink.csv","WfAction.csv","WfPage.csv","WfGraph.csv",
         #                   "WfSubAppMethod.csv","WfSubApplication.csv","WfVariables.csv"]
-        source_file_set = ["Stat_CDR.csv","Agent.csv","Stat_CDR_Summary"]                   
+        source_file_set = ["Stat_CDR.csv","Agent.csv","Stat_CDR_Summary.csv"]                   
         
         Stat_CDR_Datafix()
         Stat_CDR_Summary_Datafix()
