@@ -178,7 +178,7 @@ def ice_rmo_load_ondemand():
                 outfile.close()
                 
             except Exception as e:
-                logging.error(f"Error data fixing table Stat_CDR: {e}")
+                logging.error(f"Error data fixing table Stat_CDR_Summary: {e}")
                 
             return   
            
@@ -263,7 +263,9 @@ def ice_rmo_load_ondemand():
         source_file_set = ["Stat_CDR.csv","Agent.csv","Stat_CDR_Summary"]                   
         
         Stat_CDR_Datafix()
+        Stat_CDR_Summary_Datafix()
         Agent_Datafix()
+        
         
         for source_file in source_file_set:
             ondemand_load_source(source_file)
