@@ -198,7 +198,7 @@ def ice_rmo_load_ondemand():
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
-            query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{pTableName}]
+            query = f""" BULK INSERT [FIN_SHARED_DATA_DEV].[dbo].[{pTableName}]
                     FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{psource_file}'
                     WITH
 	                ( FORMAT = 'CSV',
@@ -253,11 +253,11 @@ def ice_rmo_load_ondemand():
         #                   "UCAddress.csv","UCGroup.csv",
         #                   "WfAttributeDetail.csv","WfLinkDetail.csv","WfLink.csv","WfAction.csv","WfPage.csv","WfGraph.csv",
         #                   "WfSubAppMethod.csv","WfSubApplication.csv","WfVariables.csv"]
-        source_file_set = ["Stat_CDR.csv","Agent.csv","Stat_CDR_Summary.csv"]                   
+        source_file_set = ["EvalCriteriaValueLangString.csv","EvalCriteriaValue.csv","EvalScore.csv","EvalCriteria.csv"]                   
         
-        Stat_CDR_Datafix()
-        Stat_CDR_Summary_Datafix()
-        Agent_Datafix()
+        #Stat_CDR_Datafix()
+        #Stat_CDR_Summary_Datafix()
+        #Agent_Datafix()
         
         
         for source_file in source_file_set:
