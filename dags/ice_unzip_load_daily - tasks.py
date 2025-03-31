@@ -90,6 +90,65 @@ def daily_load_data():
     # Slowly changin dimension TBD on AgentAssignment, TeamAssignment
     def daily_load_source():
                 
+
+        def Agent_Datafix():
+            source_path = r'/rmo_ct_prod/inprogress/'
+            file = 'Agent.csv'
+            output_file = 'Agent_fixed.csv'
+            
+            logging.info("Agent fixing code")
+            
+            try:
+                # Initialize SambaHook with your credentials and connection details
+                with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+                    
+                    names = ["SwitchID","AgentID","AgentName","AgentType","ClassOfService","pw1","pw2","pw3"
+                            ,"AutoLogonAddress","AutoLogonQueue","PAQOverflowThreshold","NoAnswerThreshold"
+                            ,"CfacDn","CfnaDn","CfpoDn","CfnlDn","CfState","EmailAddress"
+                            ,"RemoteDn","VoiceMailDN","NumVoiceMailCalls","CallerNumPBX"
+                            ,"CallerNumPSTN","AgentAlias","ImageURL","OutboundWorkflowDN"
+                            ,"OutboundWorkflowMode","HotlineDN","CallerName","PlacedCallAutoWrapTimer"
+                            ,"UpdateCount","LogonToNotReadyReason","IMAddress","pw4","pw5","pw6"
+                            ,"PasswordCOS","PasswordLastChanged","PasswordAbsoluteLockedOutDate"
+                            ,"PasswordLockedOutExpireDateTime","ClassOfService2","ADFQDN"
+                            ,"ADGUID","LanguageCode","version","AzureADGuid","MaxImConcurrency","MaxEmailConcurrency"]
+                               
+                    cols = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47]
+                    
+                    with fs_hook.open_file(source_path + file,'r') as f:
+                        csv_reader = pd.read_csv(f, header = None, usecols=cols, quoting=1)
+                    
+                    # Agent: 1137 - Colin Klingspohn; 1148	Jasmyn Carnwell
+                    # Agent: 1888 - Revenu Service BC; 1889 - Health Insurance BC; 1890 - Enrolment Specialists; 2001 - Taxpayer Services
+                    # Agent: 2003 - eTax Team; 9985 - 9985
+ 
+                    df1 = csv_reader.loc[(csv_reader[1] ==  1137) | (csv_reader[1] == 1888) | (csv_reader[1] == 1889) | (csv_reader[1] == 1890) | (csv_reader[1] == 2001) | (csv_reader[1] == 2003) | (csv_reader[1] == 9985)]    
+                    df1 = df1.iloc[:,[0,1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,32,33,34,35,36,37,38,39,41,42,43]]
+                                        
+                    df2 = csv_reader.loc[(csv_reader[1] !=  1137) & (csv_reader[1] !=  1148) & (csv_reader[1] != 1888) & (csv_reader[1] != 1889) & (csv_reader[1] != 1890) & (csv_reader[1] != 2001) & (csv_reader[1] != 2003) & (csv_reader[1] != 9985)]    
+                    df2 = df2.iloc[:,[0,1,2,3,4,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,36,37,38,39,40,41,42,43,45,46,47]]
+
+                    df3 = csv_reader.loc[(csv_reader[1] ==  1148)]  
+                    df3 = df3.iloc[:,[0,1,2,3,4,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,34,35,36,37,38,39,40,41,43,44,45]]
+
+ 
+                    with fs_hook.open_file(source_path + output_file, 'w') as outfile:
+                        df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
+                                
+                    with fs_hook.open_file(source_path + output_file, 'a') as outfile:
+                        df2.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
+                    
+                    with fs_hook.open_file(source_path + output_file, 'a') as outfile:
+                        df3.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
+                                
+                
+            except Exception as e:
+                logging.error(f"Error data fixing table Agent: {e}")
+                
+            return   
+
+
+
         def Stat_CDR_Datafix():
             source_path = r'/rmo_ct_prod/inprogress/'
             file = 'Stat_CDR.csv'
@@ -100,32 +159,101 @@ def daily_load_data():
                 # Initialize SambaHook with your credentials and connection details
                 with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
                     
-                    usecols = ["PrimaryKey","EventTime","DSTStatus","ContactID","EventID","SwitchID","ContactType","CurrentState",
-                               "LastState","LastStateDuration","QueueID","IntData1","InData2","IntDate3","IntData4",
-                               "StrData1","StrData2","StrData3","StrData4","EventSequence","ServerId","RolledUp","Extra"]
+                    names = ["PrimaryKey","EventTime","DSTStatus","ContactID","EventID"
+                            ,"SwitchID","ContactType","CurrentState","LastState","LastStateDuration"
+                            ,"QueueID","IntData1","IntData2","IntData3","IntData4","StrData1"
+                            ,"StrData2","StrData3","StrData4","EventSequence","ServerId","RolledUp"]
+                               
+                    cols = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]                  
+                    
                     with fs_hook.open_file(source_path + file,'r') as f:
-                        csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(21)], quoting=1, on_bad_lines = 'skip')
+                        csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(22)], quoting=1)
  
-                        with fs_hook.open_file(source_path + output_file, 'w') as outfile:
-                            csv_reader.to_csv(outfile, header=False,index=False)
-                                
+                    df1 = csv_reader.loc[:, [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]]
+ 
+                    with fs_hook.open_file(source_path + output_file, 'w') as outfile:
+                            df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
   
                                 
-                                
+                outfile.close()
+                
             except Exception as e:
                 logging.error(f"Error data fixing table Stat_CDR: {e}")
                 
-            return                    
+            return                     
+
             
+        def Stat_CDR_Summary_Datafix():
+            source_path = r'/rmo_ct_prod/inprogress/'
+            file = 'Stat_CDR_Summary.csv'
+            output_file = 'Stat_CDR_Summary_fixed.csv'
+
+            logging.info("Stat_CDR_Summary_fixing code")
+            try:
+                # Initialize SambaHook with your credentials and connection details
+                with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+                    
+                    names = ["SwitchID","ContactID","ContactType","ContactTypeString ","CreatedDateTime",
+                             "CreatedReason","CreatedReasonString","CreatedContactGroupID","CreatedAddressID",
+                             "Duration","ReleasedReason","ReleasedReasonString","ReleasedDateTime",
+                             "OriginatorAddress","OriginatorName","ReceivingAddress","RedirectAddress","NumTimesInWorkflow",
+                             "TimeInWorkflow","NumTimesRouted","TimeInRouting","NumTimesInPAQ","TimeInPAQ",
+                             "NumTimesOnOutbound","TimeOnOutbound","NumTimesHandledByAgent","TimeHandledByAgent",
+                             "NumTimesQueued","NumTimesReturned","OriginalQueueID","OriginalQueueName","NumTimesHandledFromQueue",
+                             "TotalTimeQueuedHandled","NumTimesAbandonedFromQueue","TotalTimeQueuedAbandoned",
+                             "NumTimesRemovedFromQueue","TotalTimeQueuedRemoved","NumTimesSetUserData","NumTimesActionCompleted",
+                             "OriginalHandledQueueID","OriginalHandledQueueName","OriginalHandlingAgentID","OriginalHandlingAgentName",
+                             "OriginalHandlingAgentSkillScore","OriginalOutboundContactGroupID","OriginalOutboundAddressID", 
+                             "OriginalOutboundNumber", "OriginalRoutedAddressID","OriginalRoutedResult","OriginalRoutedResultString",
+                             "OriginalRoutedReason","OriginalRoutedReasonString", "OriginalRoutedDestination","OriginalSetUserData",
+                             "LastSetUserData","OriginalLoggedActionWfID","OriginalLoggedActionPageID", "OriginalLoggedActionActionID",
+                             "OriginalLoggedActionDuration","OriginalLoggedActionName","OriginalLoggedActionData","OriginalLoggedActionResult",
+                             "LastLoggedActionWfID","LastLoggedActionPageID","LastLoggedActionActionID","LastLoggedActionDuration",
+                             "LastLoggedActionName","LastLoggedActionData","LastLoggedActionResult","ServerId"]
+                               
+                    
+                    with fs_hook.open_file(source_path + file,'r') as f:
+                        csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(70)], quoting=1)
+ 
+                    df1 = csv_reader.loc[:,[0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19,
+                                            20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,
+                                            40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,
+                                            60,61,62,63,64,65,66,67,68,69]]                      
+                            
+
+                    with fs_hook.open_file(source_path + output_file, 'w') as outfile:
+                        df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
+  
+                                
+                outfile.close()
+                
+            except Exception as e:
+                logging.error(f"Error data fixing table Stat_CDR_Summary: {e}")
+                
+            return   
+        
+
         
         def load_db_source(psource_file):
             sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
             dYmd = (dt.datetime.today() + timedelta(days = -1)).strftime('%Y%m%d')
 
             try:
+                if psource_file == "Stat_CDR.csv":
+                    pTableName = "ICE_Stat_CDR"
+                    psource_file = "Stat_CDR_fixed.csv"
+                elif psource_file == "Agent.csv":
+                    pTableName = "ICE_Agent"
+                    psource_file = "Agent_fixed.csv"
+                elif psource_file == "Stat_CDR_Summary.csv":
+                    pTableName = "ICE_Stat_CDR_Summary"
+                    psource_file = "Stat_CDR_Summary_fixed.csv" 
+                else:
+                    xlen = len(psource_file)-4
+                    pTableName = "ICE_" + psource_file[:xlen]
 
-                xlen = len(psource_file) - 4    
-                pTableName = "ICE_" + psource_file[:xlen]
+                #xlen = len(psource_file) - 4    
+                #pTableName = "ICE_" + psource_file[:xlen]
                 
                 logging.info(f"loading table: {pTableName}")
             
@@ -172,6 +300,7 @@ def daily_load_data():
         #             - Agent.csv --> Agent_fixed.csv
         #             - Stat_CDR.csv --> Stat_CDR_fixed.csv
         #             - Stat_CDR-Summary.csv --> Stat_CDR-Summary_fixed.csv
+        #
         # RMO resource (Sofia Polar) implementing data fix code:
         #             - WfAction.csv
         #             - WfAttributeDetail.csv
@@ -179,11 +308,17 @@ def daily_load_data():
         #             - WfSubAppMethod.csv
         #             - WfSubApplication.csv
         #             - WfVariables.csv
-                 
+        #
+        # Tables not loaded and/not functional at this moment
+        #             - AudioMessage.csv not loaded
+        #             - AgentSkills.csv not used
+        #             - RequiredSkills.csv not used    
+        #             - Skill.csv not used        
             
         source_file_set = ["ACDQueue.csv","Agent.csv",
                            #"AudioMessage.csv", 
-                           "AgentAssignment.csv", "AgentSkill.csv",
+                           "AgentAssignment.csv", 
+                           #"AgentSkill.csv",
                            "ContactLink.csv","ContactSegment.csv",
                            "Email.csv","EmailGroup.csv","Eval_Contact.csv","EvalScore.csv","EvalCategory.csv","EvalCategoryLangString.csv",
                            "EvalCriteria.csv","EvalCriteriaValue.csv","EvalCriteriaValueLangString.csv",
@@ -195,14 +330,16 @@ def daily_load_data():
                            #"LOBCodeLangString.csv",
                            "Node.csv","NotReadyReason.csv","NotReadyReasonLangString.csv",
                            #"OperatingDates.csv",
-                           "Recordings.csv","RecordingsFaultedFiles.csv","RequiredSkill.csv", 
+                           "Recordings.csv","RecordingsFaultedFiles.csv",
+                           #"RequiredSkill.csv", 
                            "Stat_ADR.csv",
-                           "SegmentAgent.csv","SegmentQueue.csv","Skill.csv",
+                           "SegmentAgent.csv","SegmentQueue.csv",
+                           #"Skill.csv",
                            #"Server.csv","Site.csv","Switch.csv",
                            "Stat_AgentActivity_D.csv", "Stat_AgentActivity_I.csv", "Stat_AgentActivity_M.csv", "Stat_AgentActivity_W.csv", "Stat_AgentActivity_Y.csv",
                            "Stat_AgentActivityByQueue_D.csv", "Stat_AgentActivityByQueue_I.csv", "Stat_AgentActivityByQueue_M.csv", "Stat_AgentActivityByQueue_W.csv", "Stat_AgentActivityByQueue_Y.csv",
                            "Stat_AgentLineOfBusiness_D.csv", "Stat_AgentLineOfBusiness_I.csv", "Stat_AgentLineOfBusiness_M.csv", "Stat_AgentLineOfBusiness_W.csv", "Stat_AgentLineOfBusiness_Y.csv",
-                      #    "Stat_AgentNotReadyBreakdown_D" 2024 missing Jan30-Mar, 
+                           "Stat_AgentNotReadyBreakdown_D", #2024 missing Jan30-Mar, 
                            "Stat_AgentNotReadyBreakdown_M.csv","Stat_AgentNotReadyBreakdown_I.csv", "Stat_AgentNotReadyBreakdown_W.csv", "Stat_AgentNotReadyBreakdown_Y.csv",
                            "Stat_CDR.csv","Stat_CDR_LastSummarized.csv","Stat_CDR_Summary.csv",                           
                            "Stat_DNISActivity_D.csv", "Stat_DNISActivity_I.csv", "Stat_DNISActivity_M.csv", "Stat_DNISActivity_W.csv", "Stat_DNISActivity_Y.csv",
@@ -217,11 +354,9 @@ def daily_load_data():
 
         
         # Data fixes required for relevant daily table process 
-        #Agent_Datafix
-        #logging.info(f"Calling Stat_CDR_Datafix")
-        #Stat_CDR_Datafix()
-        #logging.info(f"Returning from Stat_CDR_Datafix")
-        #Stat_CDR_Summary_Datafix
+        Agent_Datafix()
+        Stat_CDR_Datafix()
+        Stat_CDR_Summary_Datafix()
         
         for source_file in source_file_set:
             load_db_source(source_file)
