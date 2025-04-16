@@ -253,7 +253,7 @@ def ice_rmo_load_ondemand():
         #                   "UCAddress.csv","UCGroup.csv",
         #                   "WfAttributeDetail.csv","WfLinkDetail.csv","WfLink.csv","WfAction.csv","WfPage.csv","WfGraph.csv",
         #                   "WfSubAppMethod.csv","WfSubApplication.csv","WfVariables.csv"]
-        source_file_set = ["AgentAssignment.csv"]                   
+        source_file_set = ["TeamAssignment.csv"]                   
         
         #Stat_CDR_Datafix()
         #Stat_CDR_Summary_Datafix()
