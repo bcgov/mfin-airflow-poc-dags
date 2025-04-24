@@ -217,7 +217,7 @@ def ice_rmo_load_ondemand():
             elif psource_file == "Stat_CDR_Summary.csv":
                 pTableName = "ICE_Stat_CDR_Summary"
                 psource_file = "Stat_CDR_Summary_fixed.csv" 
-            elif psource_file == "LOBCodeLangString.csv"   
+            elif psource_file == "LOBCodeLangString.csv":   
                 pTableName = "ICE_LOBCodeLangString"
                 psource_file = "LOBCodeLangString_fixed.csv"             
             else:
