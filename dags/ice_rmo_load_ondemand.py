@@ -35,7 +35,7 @@ def ice_rmo_load_ondemand():
     logging.basicConfig(level=logging.INFO)
     
     def Agent_Datafix():
-            source_path = r'/rmo_ct_prod/inprogress/'
+            source_path = r'/rmo_ct_prod/ondemand/'
             file = 'Agent.csv'
             output_file = 'Agent_fixed.csv'
             
@@ -93,7 +93,7 @@ def ice_rmo_load_ondemand():
           
 
     def Stat_CDR_Datafix():
-            source_path = r'/rmo_ct_prod/inprogress/'
+            source_path = r'/rmo_ct_prod/ondemand/'
             file = 'Stat_CDR.csv'
             output_file = 'Stat_CDR_fixed.csv'
 
@@ -127,7 +127,7 @@ def ice_rmo_load_ondemand():
             
 
     def Stat_CDR_Summary_Datafix():
-            source_path = r'/rmo_ct_prod/inprogress/'
+            source_path = r'/rmo_ct_prod/ondemand/'
             file = 'Stat_CDR_Summary.csv'
             output_file = 'Stat_CDR_Summary_fixed.csv'
 
@@ -176,7 +176,7 @@ def ice_rmo_load_ondemand():
             return   
             
     def LOBCodeLangString():
-            source_path = r'/rmo_ct_prod/inprogress/'
+            source_path = r'/rmo_ct_prod/ondemand/'
             file = 'LOBCodeLangString.csv'
             output_file = 'LOBCodeLangString_fixed.csv'
 
