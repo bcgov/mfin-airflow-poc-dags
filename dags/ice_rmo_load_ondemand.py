@@ -174,6 +174,34 @@ def ice_rmo_load_ondemand():
                 logging.error(f"Error data fixing table Stat_CDR_Summary: {e}")
                 
             return   
+            
+    def LOBCodeLangString():
+            source_path = r'/rmo_ct_prod/inprogress/'
+            file = 'LOBCodeLangString.csv'
+            output_file = 'LOBCodeLangString_fixed.csv'
+
+            logging.info("LOBCodeLangString_fixing code")
+            try:
+                # Initialize SambaHook with your credentials and connection details
+                with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+                    names = ["CodeID","Lang","Value"]
+                               
+                    
+                    with fs_hook.open_file(source_path + file,'r') as f:
+                        csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(2)], quoting=1)   
+
+                    df1 = csv_reader.loc[:,[0,1,2]]
+                    
+                    with fs_hook.open_file(source_path + output_file, 'w') as outfile:
+                        df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
+  
+                                
+                outfile.close()                    
+        
+            except Exception as e:
+                logging.error(f"Error data fixing table LOBCodeLangString {e}")
+                
+            return   
            
     
     def ondemand_load_source(psource_file):
@@ -189,6 +217,9 @@ def ice_rmo_load_ondemand():
             elif psource_file == "Stat_CDR_Summary.csv":
                 pTableName = "ICE_Stat_CDR_Summary"
                 psource_file = "Stat_CDR_Summary_fixed.csv" 
+            elif psource_file == "LOBCodeLangString.csv"   
+                pTableName = "ICE_LOBCodeLangString"
+                psource_file = "LOBCodeLangString_fixed.csv"             
             else:
                 xlen = len(psource_file)-4
                 pTableName = "ICE_" + psource_file[:xlen]
@@ -253,11 +284,12 @@ def ice_rmo_load_ondemand():
         #                   "UCAddress.csv","UCGroup.csv",
         #                   "WfAttributeDetail.csv","WfLinkDetail.csv","WfLink.csv","WfAction.csv","WfPage.csv","WfGraph.csv",
         #                   "WfSubAppMethod.csv","WfSubApplication.csv","WfVariables.csv"]
-        source_file_set = ["Agent.csv","Stat_CDR.csv","Stat_CDR_Summary.csv"]                   
+        source_file_set = ["LOBCodeLangString.csv"]                   
         
         #Stat_CDR_Datafix()
         #Stat_CDR_Summary_Datafix()
         #Agent_Datafix()
+        LOBCodeLangString()
         
         
         for source_file in source_file_set:
