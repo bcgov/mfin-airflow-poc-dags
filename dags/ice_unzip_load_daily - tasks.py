@@ -428,7 +428,7 @@ def daily_load_data():
  
  
    # Task 4: Removing 103 csv data files from \\fs1.fin.gov.bc.ca\rmo_ct_prod\inprogress\ subfolder
-    @task        
+            
     def remove_csv_inprogress():
         conn_id = 'fs1_rmo_ice'
       
