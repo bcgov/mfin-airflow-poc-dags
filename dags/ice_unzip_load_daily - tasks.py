@@ -233,6 +233,60 @@ def daily_load_data():
             return   
         
 
+        def LOBCodeLangString():
+            source_path = r'/rmo_ct_prod/inprogress/'
+            file = 'LOBCodeLangString.csv'
+            output_file = 'LOBCodeLangString_fixed.csv'
+
+            logging.info("LOBCodeLangString_fixing code")
+            try:
+                # Initialize SambaHook with your credentials and connection details
+                with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+                    names = ["CodeID","Lang","Value"]
+                               
+                    with fs_hook.open_file(source_path + file,'r') as f:
+                        csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(3)], quoting=1)   
+
+                    df1 = csv_reader.loc[:,[0,1,2]]
+                    
+                    with fs_hook.open_file(source_path + output_file, 'w') as outfile:
+                        df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
+                                
+                outfile.close()                    
+        
+            except Exception as e:
+                logging.error(f"Error data fixing table LOBCodeLangString {e}")
+                
+            return   
+            
+        def EvalCriteriaLangString():
+            source_path = r'/rmo_ct_prod/inprogress/'
+            file = 'EvalCriteriaLangString.csv'
+            output_file = 'EvalCriteriaLangString_fixed.csv'
+
+            logging.info("EvalCriteriaLangString_fixing code")
+            try:
+                # Initialize SambaHook with your credentials and connection details
+                with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+                    names = ["ID","Lang","Value"]
+                               
+                    
+                    with fs_hook.open_file(source_path + file,'r') as f:
+                        csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(3)], quoting=1)   
+
+                    df1 = csv_reader.loc[:,[0,1,2]]
+                    
+                    with fs_hook.open_file(source_path + output_file, 'w') as outfile:
+                        df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
+  
+                                
+                outfile.close()                    
+        
+            except Exception as e:
+                logging.error(f"Error data fixing table LOBCodeLangString {e}")
+                
+            return       
+
         
         def load_db_source(psource_file):
             sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
@@ -248,6 +302,12 @@ def daily_load_data():
                 elif psource_file == "Stat_CDR_Summary.csv":
                     pTableName = "ICE_Stat_CDR_Summary"
                     psource_file = "Stat_CDR_Summary_fixed.csv" 
+                elif psource_file == "LOBCodeLangString.csv":   
+                    pTableName = "ICE_LOBCodeLangString"
+                    psource_file = "LOBCodeLangString_fixed.csv"
+                elif psource_file == "EvalCriteriaLangString.csv":   
+                    pTableName = "ICE_EvalCriteriaLangString"
+                    psource_file = "EvalCriteriaLangString_fixed.csv"     
                 else:
                     xlen = len(psource_file)-4
                     pTableName = "ICE_" + psource_file[:xlen]
@@ -292,16 +352,15 @@ def daily_load_data():
         #     OperatingDates,
         #     QueueIDLookup
         
-        # Preloaded tables - need to be reviewed on a regular basis: 
-        #     ICE_CriteriaLangString
-        #     ICE_LOBCodeLangString   
         #
-        # Implemented data fix processes:
+        # Implemented tables data fix processes:
         #             - Agent.csv --> Agent_fixed.csv
         #             - Stat_CDR.csv --> Stat_CDR_fixed.csv
         #             - Stat_CDR-Summary.csv --> Stat_CDR-Summary_fixed.csv
+        #             - LOBCodeLangString.csv ---> LOBCodeLangString_fixed.csv 
+        #             - EvalCriteriaLangString ---> EvalCriteriaLangString_fixed.csv
         #
-        # RMO resource (Sofia Polar) implementing data fix code:
+        # RMO resource (Sofia Polar) implementing/testing data fix code:
         #             - WfAction.csv
         #             - WfAttributeDetail.csv
         #             - WfLink.csv
@@ -310,10 +369,12 @@ def daily_load_data():
         #             - WfVariables.csv
         #
         # Tables not loaded and/not functional at this moment
-        #             - AudioMessage.csv not loaded
-        #             - AgentSkills.csv not used
-        #             - RequiredSkills.csv not used    
-        #             - Skill.csv not used        
+        #             - AudioMessage.csv
+        #             - AgentSkills.csv
+        #             - RequiredSkills.csv   
+        #             - Recordings.csv
+        #             - RecodringFaultedFiles.csv        
+        #             - Skill.csv        
             
         source_file_set = ["ACDQueue.csv","Agent.csv",
                            #"AudioMessage.csv", 
@@ -322,15 +383,16 @@ def daily_load_data():
                            "ContactLink.csv","ContactSegment.csv",
                            "Email.csv","EmailGroup.csv","Eval_Contact.csv","EvalScore.csv","EvalCategory.csv","EvalCategoryLangString.csv",
                            "EvalCriteria.csv","EvalCriteriaValue.csv","EvalCriteriaValueLangString.csv",
-                           #"EvalCriteriaLangString.csv",
+                           "EvalCriteriaLangString.csv",
                            "EvalEvaluation.csv","EvalForm.csv","EvalFormLangString.csv",
                            #"Holiday.csv",
                            "IMRecording.csv","icePay.csv",
                            "Languages.csv","LOBCategory.csv","LOBCategoryLangString.csv","LOBCode.csv",
-                           #"LOBCodeLangString.csv",
+                           "LOBCodeLangString.csv",
                            "Node.csv","NotReadyReason.csv","NotReadyReasonLangString.csv",
                            #"OperatingDates.csv",
-                           "Recordings.csv","RecordingsFaultedFiles.csv",
+                           #"Recordings.csv",
+                           #"RecordingsFaultedFiles.csv",
                            #"RequiredSkill.csv", 
                            "Stat_ADR.csv",
                            "SegmentAgent.csv","SegmentQueue.csv",
@@ -357,6 +419,9 @@ def daily_load_data():
         Agent_Datafix()
         Stat_CDR_Datafix()
         Stat_CDR_Summary_Datafix()
+        LOBCodeLangString()
+        EvalCriteriaLangString()
+              
         
         for source_file in source_file_set:
             load_db_source(source_file)
@@ -380,6 +445,6 @@ def daily_load_data():
 
 
 #Set task dependencies
-    unzip_move_file() >> daily_load_source() #>> remove_csv_inprogress()
+    remove_csv_inprogress >> unzip_move_file() >> daily_load_source() #>> remove_csv_inprogress()
     
 dag = daily_load_data()
