@@ -84,7 +84,7 @@ def daily_load_data():
         except Exception as e:
             logging.error(f"Error backing up {dYmd} source file")
                 
-    
+    # Task 3: Removing 103 csv data files from \\fs1.fin.gov.bc.ca\rmo_ct_prod\inprogress\ subfolder    
     def remove_csv_inprogress():
         conn_id = 'fs1_rmo_ice'
       
@@ -100,7 +100,7 @@ def daily_load_data():
             logging.error(f"Error {e} removing file: {file_path}")
             
             
-    # Task 3: Loading 103 csv data files to [IAPETUS\FINDATA].[dbo].[FIN_SHARED_LANDING_DEV]      
+    # Task 4: Loading 103 csv data files to [IAPETUS\FINDATA].[dbo].[FIN_SHARED_LANDING_DEV]      
     #@task
     # Slowly changin dimension TBD on AgentAssignment, TeamAssignment
     def daily_load_source():
@@ -441,13 +441,7 @@ def daily_load_data():
             for source_file in source_file_set:
                 load_db_source(source_file)
  
- 
-        # Task 4: Removing 103 csv data files from \\fs1.fin.gov.bc.ca\rmo_ct_prod\inprogress\ subfolder
-            
-    
-
-
     #Set task dependencies
-    unzip_move_file() >> daily_load_source() #>> remove_csv_inprogress()
+    remove_csv_inprogress >> unzip_move_file() >> daily_load_source() #>> remove_csv_inprogress()
     
 dag = daily_load_data()
