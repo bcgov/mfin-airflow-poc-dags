@@ -37,7 +37,7 @@ def daily_load_data():
     logging.basicConfig(level=logging.INFO)
     
     #Task 1: Unzip and Move files from source to destination (using SambaHook)
-    #@task
+    @task
     def unzip_move_file():
         # Log all steps at INFO level
         #logging.basicConfig(level=logging.INFO)
@@ -62,10 +62,11 @@ def daily_load_data():
                 #logging.info(f"File moved from {source_path} to {dest_path}")
         except Exception as e:
             logging.error(f"Error unzipping files: {e}")        
+
     
 
     # Task 2: Backup iceDB_ICE_BCMOFRMO-YYYYMMDD.zip to the copleted folder 
-    #@task
+    @task
     def backup_file():
         source_path = 'r/rmo_ct_prod/'
         dest_path = r'/rmo_ct_prod/completed/'
@@ -83,8 +84,10 @@ def daily_load_data():
                     
         except Exception as e:
             logging.error(f"Error backing up {dYmd} source file")
-                
+ 
+ 
     # Task 3: Removing 103 csv data files from \\fs1.fin.gov.bc.ca\rmo_ct_prod\inprogress\ subfolder    
+    @task
     def remove_csv_inprogress():
         conn_id = 'fs1_rmo_ice'
       
@@ -101,7 +104,7 @@ def daily_load_data():
             
             
     # Task 4: Loading 103 csv data files to [IAPETUS\FINDATA].[dbo].[FIN_SHARED_LANDING_DEV]      
-    #@task
+    @task
     # Slowly changin dimension TBD on AgentAssignment, TeamAssignment
     def daily_load_source():
         logging.basicConfig(level=logging.INFO)                
@@ -357,7 +360,7 @@ def daily_load_data():
             
             
         @task
-        def ondemand_load_data():
+        #def ondemand_load_data():
             # Date: Mar 06, 2025
             # Annual table load 
             #     Holiday, 
@@ -391,7 +394,7 @@ def daily_load_data():
             #             - RecodringFaultedFiles.csv        
             #             - Skill.csv        
             
-            source_file_set = ["ACDQueue.csv","Agent.csv",
+        source_file_set = ["ACDQueue.csv","Agent.csv",
                                #"AudioMessage.csv", 
                                "AgentAssignment.csv", 
                                 #"AgentSkill.csv",
@@ -431,15 +434,15 @@ def daily_load_data():
 
         
             # Data fixes required for relevant daily table process 
-            Agent_Datafix()
-            Stat_CDR_Datafix()
-            Stat_CDR_Summary_Datafix()
-            LOBCodeLangString()
-            EvalCriteriaLangString()
+        Agent_Datafix()
+        Stat_CDR_Datafix()
+        Stat_CDR_Summary_Datafix()
+        LOBCodeLangString()
+        EvalCriteriaLangString()
               
         
-            for source_file in source_file_set:
-                load_db_source(source_file)
+        for source_file in source_file_set:
+            load_db_source(source_file)
  
     #Set task dependencies
     remove_csv_inprogress() >> unzip_move_file() >> daily_load_source() #>> remove_csv_inprogress()
