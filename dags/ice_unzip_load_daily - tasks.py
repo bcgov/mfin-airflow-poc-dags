@@ -394,7 +394,7 @@ def daily_load_data():
             #             - RecodringFaultedFiles.csv        
             #             - Skill.csv        
             
-        source_file_set = ["ACDQueue.csv","Agent.csv",
+            source_file_set = ["ACDQueue.csv","Agent.csv",
                                #"AudioMessage.csv", 
                                "AgentAssignment.csv", 
                                 #"AgentSkill.csv",
@@ -434,15 +434,14 @@ def daily_load_data():
 
         
             # Data fixes required for relevant daily table process 
-        Agent_Datafix()
-        Stat_CDR_Datafix()
-        Stat_CDR_Summary_Datafix()
-        LOBCodeLangString()
-        EvalCriteriaLangString()
+            Agent_Datafix()
+            Stat_CDR_Datafix()
+            Stat_CDR_Summary_Datafix()
+            LOBCodeLangString()
+            EvalCriteriaLangString()
               
-        
-        for source_file in source_file_set:
-            load_db_source(source_file)
+            for source_file in source_file_set:
+                load_db_source(source_file)
  
     #Set task dependencies
     remove_csv_inprogress() >> unzip_move_file() >> daily_load_source() #>> remove_csv_inprogress()
