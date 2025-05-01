@@ -34,7 +34,7 @@ root.addHandler(handler)
 
 
 def daily_load_data():
-    logging.basicConfig(level=logging.INFO)
+    #logging.basicConfig(level=logging.INFO)
     
     #Task 1: Unzip and Move files from source to destination (using SambaHook)
     @task
@@ -101,6 +101,8 @@ def daily_load_data():
                 hook.remove(file_path)
         except:
             logging.error(f"Error {e} removing file: {file_path}")
+            
+        return
             
             
     # Task 4: Loading 103 csv data files to [IAPETUS\FINDATA].[dbo].[FIN_SHARED_LANDING_DEV]      
@@ -276,6 +278,7 @@ def daily_load_data():
                 logging.error(f"Error data fixing table LOBCodeLangString {e}")
                 
             return   
+
             
         def EvalCriteriaLangString():
             source_path = r'/rmo_ct_prod/inprogress/'
@@ -359,40 +362,38 @@ def daily_load_data():
             return
             
             
-        #@task
-        #def ondemand_load_data():
-            # Date: Mar 06, 2025
-            # Annual table load 
-            #     Holiday, 
-            #     Server,
-            #     Site,
-            #     Switch,
-            #     OperatingDates,
-            #     QueueIDLookup
+        # Date: Mar 06, 2025
+        # Annual table load 
+        #     Holiday, 
+        #     Server,
+        #     Site,
+        #     Switch,
+        #     OperatingDates,
+        #     QueueIDLookup
         
-            #
-            # Implemented tables data fix processes:
-            #             - Agent.csv --> Agent_fixed.csv
-            #             - Stat_CDR.csv --> Stat_CDR_fixed.csv
-            #             - Stat_CDR-Summary.csv --> Stat_CDR-Summary_fixed.csv
-            #             - LOBCodeLangString.csv ---> LOBCodeLangString_fixed.csv 
-            #             - EvalCriteriaLangString ---> EvalCriteriaLangString_fixed.csv
-            #
-            # RMO resource (Sofia Polar) implementing/testing data fix code:
-            #             - WfAction.csv
-            #             - WfAttributeDetail.csv
-            #             - WfLink.csv
-            #             - WfSubAppMethod.csv
-            #             - WfSubApplication.csv
-            #             - WfVariables.csv
-            #
-            # Tables not loaded and/not functional at this moment
-            #             - AudioMessage.csv
-            #             - AgentSkills.csv
-            #             - RequiredSkills.csv   
-            #             - Recordings.csv
-            #             - RecodringFaultedFiles.csv        
-            #             - Skill.csv        
+        #
+        # Implemented tables data fix processes:
+        #             - Agent.csv --> Agent_fixed.csv
+        #             - Stat_CDR.csv --> Stat_CDR_fixed.csv
+        #             - Stat_CDR-Summary.csv --> Stat_CDR-Summary_fixed.csv
+        #             - LOBCodeLangString.csv ---> LOBCodeLangString_fixed.csv 
+        #             - EvalCriteriaLangString ---> EvalCriteriaLangString_fixed.csv
+        #
+        # RMO resource (Sofia Polar) implementing/testing data fix code:
+        #             - WfAction.csv
+        #             - WfAttributeDetail.csv
+        #             - WfLink.csv
+        #             - WfSubAppMethod.csv
+        #             - WfSubApplication.csv
+        #             - WfVariables.csv
+        #
+        # Tables not loaded and/not functional at this moment
+        #             - AudioMessage.csv
+        #             - AgentSkills.csv
+        #             - RequiredSkills.csv   
+        #             - Recordings.csv
+        #             - RecodringFaultedFiles.csv        
+        #             - Skill.csv        
             
         source_file_set = ["ACDQueue.csv","Agent.csv",
                            #"AudioMessage.csv", 
@@ -443,7 +444,8 @@ def daily_load_data():
         for source_file in source_file_set:
             load_db_source(source_file)
  
-    #Set task dependencies
+ 
+ #Set task dependencies
     remove_csv_inprogress() >> unzip_move_file() >> daily_load_source() #>> remove_csv_inprogress()
     
 dag = daily_load_data()
