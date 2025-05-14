@@ -70,7 +70,7 @@ def daily_load_data():
     def backup_file():
         source_path = 'r/rmo_ct_prod/'
         dest_path = r'/rmo_ct_prod/completed/'
-        conn_id = 'fs1_rmo_ice'
+        conn_id = 'fs1_prod_conn'
         file = 'iceDB_ICE_BCMOFRMO.zip'
         hook = SambaHook(conn_id)
     #   Set dYmd to yesterdays date
@@ -89,7 +89,7 @@ def daily_load_data():
     # Task 3: Removing 103 csv data files from \\fs1.fin.gov.bc.ca\rmo_ct_prod\inprogress\ subfolder    
     @task
     def remove_csv_inprogress():
-        conn_id = 'fs1_rmo_ice'
+        conn_id = 'fs1_prod_conn'
       
         delete_path = r'/rmo_ct_prod/inprogress/'
         hook = SambaHook(conn_id)
@@ -120,7 +120,7 @@ def daily_load_data():
             
             try:
                 # Initialize SambaHook with your credentials and connection details
-                with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+                with SambaHook(samba_conn_id="fs1_prod_conn") as fs_hook:
                     
                     names = ["SwitchID","AgentID","AgentName","AgentType","ClassOfService","pw1","pw2","pw3"
                             ,"AutoLogonAddress","AutoLogonQueue","PAQOverflowThreshold","NoAnswerThreshold"
@@ -177,7 +177,7 @@ def daily_load_data():
             logging.info("Stat_CDR fixing code")
             try:
                 # Initialize SambaHook with your credentials and connection details
-                with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+                with SambaHook(samba_conn_id="fs1_prod_conn") as fs_hook:
                     
                     names = ["PrimaryKey","EventTime","DSTStatus","ContactID","EventID"
                             ,"SwitchID","ContactType","CurrentState","LastState","LastStateDuration"
@@ -211,7 +211,7 @@ def daily_load_data():
             logging.info("Stat_CDR_Summary_fixing code")
             try:
                 # Initialize SambaHook with your credentials and connection details
-                with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+                with SambaHook(samba_conn_id="fs1_prod_conn") as fs_hook:
                     
                     names = ["SwitchID","ContactID","ContactType","ContactTypeString ","CreatedDateTime",
                              "CreatedReason","CreatedReasonString","CreatedContactGroupID","CreatedAddressID",
@@ -261,7 +261,7 @@ def daily_load_data():
             logging.info("LOBCodeLangString_fixing code")
             try:
                 # Initialize SambaHook with your credentials and connection details
-                with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+                with SambaHook(samba_conn_id="fs1_prod_conn") as fs_hook:
                     names = ["CodeID","Lang","Value"]
                                
                     with fs_hook.open_file(source_path + file,'r') as f:
@@ -288,7 +288,7 @@ def daily_load_data():
             logging.info("EvalCriteriaLangString_fixing code")
             try:
                 # Initialize SambaHook with your credentials and connection details
-                with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+                with SambaHook(samba_conn_id="fs1_prod_conn") as fs_hook:
                     names = ["ID","Lang","Value"]
                                
                     
