@@ -432,7 +432,7 @@ def daily_load_data():
                            "UCAddress.csv","UCGroup.csv",
                            "WfAttributeDetail.csv","WfLinkDetail.csv","WfLink.csv","WfAction.csv","WfPage.csv","WfGraph.csv",
                            "WfSubAppMethod.csv","WfSubApplication.csv","WfVariables.csv"]
-
+ 
         
         # Data fixes required for relevant daily table process 
         Agent_Datafix()
