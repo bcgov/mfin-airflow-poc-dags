@@ -104,8 +104,33 @@ def daily_load_data():
             
         return
             
+
+    # Task 4: Truncate landing tables prior loading next daily source files    
+    @task
+    def truncate_landing_tables():
+        sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
+      
+        try:
+            logging.info(f"truncating landing tables")
             
-    # Task 4: Loading 103 csv data files to [IAPETUS\FINDATA].[dbo].[FIN_SHARED_LANDING_DEV]      
+            conn = sql_hook.get_conn()
+            cursor = conn.cursor()
+            
+            query = f"""EXEC [FIN_SHARED_STAGING_DEV].[dbo].[PROC_TELEPHONY_ICE_TRUNCATE];"""
+            
+            start_time = time.time()
+            cursor.execute(query)
+            conn.commit()
+                                  
+            logging.info(f"truncate landing tables {time.time() - start_time} seconds")
+        
+        except Exception as e:
+                logging.error(f"Error truncati landing tables {e}")
+        
+        return
+
+            
+    # Task 5: Loading 103 csv data files to [IAPETUS\FINDATA].[dbo].[FIN_SHARED_LANDING_DEV]      
     @task
     # Slowly changin dimension TBD on AgentAssignment, TeamAssignment
     def daily_load_source():
@@ -446,6 +471,6 @@ def daily_load_data():
  
  
  #Set task dependencies
-    remove_csv_inprogress() >> unzip_move_file() >> daily_load_source() #>> remove_csv_inprogress()
+    remove_csv_inprogress() >> unzip_move_file() >> truncate_landing_tables >> daily_load_source() #>> remove_csv_inprogress()
     
 dag = daily_load_data()
