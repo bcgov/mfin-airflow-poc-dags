@@ -124,8 +124,8 @@ def daily_load_data():
                                   
             logging.info(f"truncate landing tables {time.time() - start_time} seconds")
         
-        except:
-            logging.error(f"Error truncati landing tables {e}")
+        except Exception as e:
+            logging.error(f"Error truncating landing tables {e}")
         
         return
 
