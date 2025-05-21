@@ -112,7 +112,7 @@ def daily_load_data():
     # Task 4: Truncate landing tables prior loading next daily source files    
     @task
     def truncate_landing_tables():
-        sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_finafdbp')
+        sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
       
         try:
             logging.info(f"truncating landing tables")
