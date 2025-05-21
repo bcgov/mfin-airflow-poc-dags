@@ -61,7 +61,9 @@ def daily_load_data():
                     
                 #logging.info(f"File moved from {source_path} to {dest_path}")
         except Exception as e:
-            logging.error(f"Error unzipping files: {e}")        
+            logging.error(f"Error unzipping files: {e}")  
+
+        return            
 
     
 
@@ -84,6 +86,8 @@ def daily_load_data():
                     
         except Exception as e:
             logging.error(f"Error backing up {dYmd} source file")
+        
+        return
  
  
     # Task 3: Removing 103 csv data files from \\fs1.fin.gov.bc.ca\rmo_ct_prod\inprogress\ subfolder    
@@ -108,7 +112,7 @@ def daily_load_data():
     # Task 4: Truncate landing tables prior loading next daily source files    
     @task
     def truncate_landing_tables():
-        sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
+        sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_finafdbp')
       
         try:
             logging.info(f"truncating landing tables")
