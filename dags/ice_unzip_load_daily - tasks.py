@@ -120,12 +120,12 @@ def daily_load_data():
             
             start_time = time.time()
             cursor.execute(query)
-            conn.commit()
+            #conn.commit()
                                   
             logging.info(f"truncate landing tables {time.time() - start_time} seconds")
         
-        except Exception as e:
-                logging.error(f"Error truncati landing tables {e}")
+        except:
+            logging.error(f"Error truncati landing tables {e}")
         
         return
 
