@@ -65,9 +65,9 @@ def daily_load_data():
 
     
 
-    # Task 2: Backup iceDB_ICE_BCMOFRMO-YYYYMMDD.zip to the copleted folder 
+    # Task 2: Backup iceDB_ICE_BCMOFRMO-YYYYMMDD.zip to the completed folder 
     @task
-    def backup_file():
+    def backup_daily_source_file():
         source_path = 'r/rmo_ct_prod/'
         dest_path = r'/rmo_ct_prod/completed/'
         conn_id = 'fs1_rmo_ice'
@@ -471,6 +471,6 @@ def daily_load_data():
  
  
  #Set task dependencies
-    remove_csv_inprogress() >> unzip_move_file() >> truncate_landing_tables() >> daily_load_source() 
+    remove_csv_inprogress() >> unzip_move_file() >> backup_daily_source_file() >> truncate_landing_tables() >> daily_load_source() 
     
 dag = daily_load_data()
