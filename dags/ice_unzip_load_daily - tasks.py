@@ -120,7 +120,7 @@ def daily_load_data():
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
-            query = f"""EXEC [FIN_SHARED_LANDING_DEV].[dbo].[PROC_TELEPHONY_ICE_TRUNCATE];"""
+            query = f"""EXEC [FIN_SHARED_STAGING_DEV].[dbo].[PROC_TELEPHONY_ICE_TRUNCATE];"""
             
             start_time = time.time()
             cursor.execute(query)
