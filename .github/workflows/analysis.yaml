@@ -1,12 +1,16 @@
 name: Analysis
 
+permissions:
+  contents: read
+  pull-requests: write
+
 on:
   push:
     branches: [main]
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review, converted_to_draft]
   schedule:
-    - cron: "0 11 * * 0" # 3 AM PST = 12 PM UDT, runs sundays
+    - cron: "0 12 * * *" 
   workflow_dispatch:
 
 concurrency:
@@ -14,35 +18,76 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # https://github.com/marketplace/actions/aqua-security-trivy
-  trivy:
-    name: Trivy Security Scan
+  tests:
+    name: Tests
     if: ${{ ! github.event.pull_request.draft }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+      strategy:
+        matrix:
+          dir: [dags]
+          include:
+            - dir: dags
+              token: SONAR_TOKEN
+      steps:
+        - uses: bcgov-nr/action-test-and-analyse@v1.1.1
+            dir: ${{ matrix.dir }}
+            node_version: "20"
+            sonar_args: >
+              -Dsonar.exclusions=**/coverage/**,**/node_modules/**,**/*spec.ts
+              -Dsonar.organization=bcgov-sonarcloud
+              -Dsonar.projectKey=quickstart-openshift_${{ matrix.dir }}
+              -Dsonar.sources=src
+              -Dsonar.python.lcov.reportPaths=./coverage/lcov.info
+            sonar_token: ${{ secrets[matrix.token] }}
+            triggers: ('${{ matrix.dir }}/')
+
+  codeql:
+    name: CodeQL Security Scan
+    if: ${{ ! github.event.pull_request.draft }}
+    runs-on: ubuntu-22.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Run Trivy vulnerability scanner in repo mode
-        uses: aquasecurity/trivy-action@0.30.0
+      - uses: github/codeql-action/init@v3
         with:
-          format: "sarif"
-          output: "trivy-results.sarif"
-          ignore-unfixed: true
-          scan-type: "fs"
-          scanners: "vuln,secret,config"
-          severity: "CRITICAL,HIGH"
+          languages: python
 
-      - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
         with:
-          sarif_file: "trivy-results.sarif"
+          category: "/language:python"  
+  
+    # https://github.com/marketplace/actions/aqua-security-trivy
+    trivy:
+      name: Trivy Security Scan
+      if: ${{ ! github.event.pull_request.draft }}
+      runs-on: ubuntu-24.04
+      timeout-minutes: 5
+      steps:
+        - uses: actions/checkout@v4
+        - name: Run Trivy vulnerability scanner in repo mode
+          uses: aquasecurity/trivy-action@0.30.0
+          with:
+            format: "sarif"
+            output: "trivy-results.sarif"
+            ignore-unfixed: true
+            scan-type: "fs"
+            languages: "python"
+            scanners: "vuln,secret,config"
+            severity: "CRITICAL,HIGH"
 
-  results:
-    name: Analysis Results
-    needs: [trivy]
-    if: always()
-    runs-on: ubuntu-24.04
-    steps:
-      - if: contains(needs.*.result, 'failure')
-        run: echo "At least one job has failed." && exit 1
-      - run: echo "Success!"
+        - name: Upload Trivy scan results to GitHub Security tab
+          uses: github/codeql-action/upload-sarif@v3
+          with:
+            sarif_file: "trivy-results.sarif"
+
+    results:
+      name: Analysis Results
+      needs: [trivy]
+      if: always()
+      runs-on: ubuntu-24.04
+      steps:
+        - if: contains(needs.*.result, 'failure')
+          run: echo "At least one job has failed." && exit 1
+        - run: echo "Success!"
