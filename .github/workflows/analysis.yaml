@@ -1,9 +1,5 @@
 name: Analysis
 
-permissions:
-  contents: read
-  pull-requests: write
-
 on:
   push:
     branches: [main]
