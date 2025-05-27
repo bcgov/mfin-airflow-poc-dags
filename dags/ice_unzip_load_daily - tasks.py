@@ -117,6 +117,7 @@ def daily_load_data():
         #sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
         conn_id = 'mssql_default'
         conn = BaseHook.get_connection(conn_id)
+        dbname = 'FIN_SHARED_LANDING_DEV'
         
         host = conn.host
         user = conn.login
@@ -134,12 +135,12 @@ def daily_load_data():
             #conn.commit()
 
             
-            connection = pymssql.connect(host=host, database='FIN_SHARED_LANDING_DEV', user=user, password=password)
+            connection = pymssql.connect(host = host, database = dbname, user = user, password = password)
             cursor = connection.cursor()
-            cursor.execute("EXECUTE [FIN_SHARED_LANDING_DEV].[dbo].[PROC_TELEPHONY_ICE_TRUNCATE]")
+            cursor.execute("EXECUTE [dbo].[PROC_TELEPHONY_ICE_TRUNCATE]")
              
             row = cursor.fetchone()
-            logging.info(f"Database: {database} - Number of tables: ",row[0])
+            logging.info(f"Database: {dbname} - Number of tables: ",row[0])
             
             start_time = time.time()
                                   
@@ -151,7 +152,7 @@ def daily_load_data():
         finally:
             if connection:
                 connection.close()
-                logging.info(f"Database {database} - Connection closed")
+                logging.info(f"Database {dbname} - Connection closed")
         
         return
 
