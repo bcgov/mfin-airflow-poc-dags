@@ -14,6 +14,8 @@ from datetime import datetime
 from datetime import timedelta
 from airflow.operators.python import PythonOperator
 from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
+from airflow.hooks.base_hook import BaseHook
+import pymssql
 
 
 root = logging.getLogger()
@@ -112,24 +114,44 @@ def daily_load_data():
     # Task 4: Truncate landing tables prior loading next daily source files    
     @task
     def truncate_landing_tables():
-        sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
+        #sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
+        conn_id = 'mssql_conn'
+        conn = BaseHook.get_connection(conn_id)
+        
+        host = conn.host
+        user = conn.login
+        password = conn.password
+        
+        connection = None
       
         try:
             logging.info(f"truncating landing tables")
             
-            conn = sql_hook.get_conn()
-            cursor = conn.cursor()
+            #conn = sql_hook.get_conn()
+            #cursor = conn.cursor()
+            #query = f"""EXEC [FIN_SHARED_LANDING_DEV].[dbo].[PROC_TELEPHONY_ICE_TRUNCATE];"""
+            #cursor.execute(query)
+            #conn.commit()
+
             
-            query = f"""EXEC [FIN_SHARED_LANDING_DEV].[dbo].[PROC_TELEPHONY_ICE_TRUNCATE];"""
+            connection = pymssql.connect(host=host, database=database, user=user, password=password)
+            cursor = connection.cursor()
+            cursor.execute("EXECUTE [FIN_SHARED_LANDING_DEV].[dbo].[PROC_TELEPHONY_ICE_TRUNCATE]")
+             
+            row = cursor.fetchone()
+            logging.info(f"Database: {database} - Number of tables: ',row[0])
             
             start_time = time.time()
-            cursor.execute(query)
-            #conn.commit()
                                   
             logging.info(f"truncate landing tables {time.time() - start_time} seconds")
         
         except Exception as e:
             logging.error(f"Error truncating landing tables {e}")
+        
+        finally:
+            if connection:
+                connection.close()
+                logging.info(f'Database {database} - Connection closed')
         
         return
 
