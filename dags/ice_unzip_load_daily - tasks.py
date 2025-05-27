@@ -134,7 +134,7 @@ def daily_load_data():
             #conn.commit()
 
             
-            connection = pymssql.connect(host=host, database=database, user=user, password=password)
+            connection = pymssql.connect(host=host, database='FIN_SHARED_LANDING_DEV', user=user, password=password)
             cursor = connection.cursor()
             cursor.execute("EXECUTE [FIN_SHARED_LANDING_DEV].[dbo].[PROC_TELEPHONY_ICE_TRUNCATE]")
              
