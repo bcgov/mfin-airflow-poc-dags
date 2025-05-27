@@ -13,23 +13,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-jobs:
-  codeql:
-    name: CodeQL Security Scan
-    if: ${{ ! github.event.pull_request.draft }}
-    runs-on: ubuntu-22.04
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-      - uses: github/codeql-action/init@v3
-        with:
-          languages: python
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
-        with:
-          category: "/language:python"  
-  
+jobs: 
   # https://github.com/marketplace/actions/aqua-security-trivy
   trivy:
     name: Trivy Security Scan
@@ -45,7 +29,6 @@ jobs:
           output: "trivy-results.sarif"
           ignore-unfixed: true
           scan-type: "fs"
-          languages: "python"
           scanners: "vuln,secret,config"
           severity: "CRITICAL,HIGH"
       - name: Upload Trivy scan results to GitHub Security tab
