@@ -115,7 +115,7 @@ def daily_load_data():
     @task
     def truncate_landing_tables():
         #sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
-        conn_id = 'mssql_conn'
+        conn_id = 'mssql_default'
         conn = BaseHook.get_connection(conn_id)
         
         host = conn.host
