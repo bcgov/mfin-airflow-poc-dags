@@ -36,7 +36,7 @@ root.addHandler(handler)
 
 
 def daily_load_data():
-    #logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.INFO)
     
     #Task 1: Unzip and Move files from source to destination (using SambaHook)
     @task
@@ -116,11 +116,13 @@ def daily_load_data():
     def truncate_landing_tables():
         logging.basicConfig(level=logging.INFO) 
         logging.info(f"entering truncate_landing_tables procedure")
+        print(f'starting truncate procedure execution')
         #sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
         conn_id = 'mssql_default'
         conn = BaseHook.get_connection(conn_id)
         dbname = 'FIN_SHARED_LANDING_DEV'
         logging.info(f"setting up host, user, password variables")
+        print(f'setting up host, user, password variable')
         host = conn.host
         user = conn.login
         password = conn.password
@@ -129,6 +131,7 @@ def daily_load_data():
       
         try:
             logging.info(f"truncating landing tables")
+            print(f'entering try')
             
             #conn = sql_hook.get_conn()
             #cursor = conn.cursor()
@@ -141,13 +144,17 @@ def daily_load_data():
             #logging.info(f"Database: {dbname} - Number of tables: ",row[0])
 
             logging.info(f"setting connection with pmyssql statement")
+            print(f'setting connection with pmyssql statement')
             connection =  pymssql.connect(host = host, database = dbname, user = user, password = password)
             logging.info(f"creating cursor")
+            print(f'creating cursor')
             cursor = connection.cursor()
             logging.info("executing cursor")
+            print(f'executing cursor')
             cursor.execute("SELECT COUNT(1) FROM ICE_Stat_QueueActivity_D")
             row = cursor.fetchone()
             logging.info(f"Number of records: {row[0]}")
+            print(f'Number of records: {row[0]}')
             
             start_time = time.time()
                                   
