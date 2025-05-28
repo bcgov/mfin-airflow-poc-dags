@@ -143,7 +143,7 @@ def daily_load_data():
             cursor = connection.cursor()
             cursor.execute("SELECT COUNT(1) FROM ICE_Stat_QueueActivity_D")
             row = cursor.fetchone()
-            logging.info(f"Number of records:"{row0})
+            logging.info(f"Number of records: {row[0]}")
             
             start_time = time.time()
                                   
