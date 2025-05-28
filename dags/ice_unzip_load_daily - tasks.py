@@ -164,7 +164,9 @@ def daily_load_data():
                     logging.info("executing cursor")
                     print(f'executing cursor')
                     outfile.write("executing cursor\n")
-                    cursor.execute("SELECT COUNT(1) FROM ICE_Stat_QueueActivity_D")
+                    #cursor.execute("SELECT COUNT(1) FROM ICE_Stat_QueueActivity_D")
+                    cursor.execute("TRUNCATE TABLE dbo.ICE_Stat_QueueActivity_D")
+                    connection.commit()
             
                     row = cursor.fetchone()
                     logging.info(f"Number of records: {row[0]}")
