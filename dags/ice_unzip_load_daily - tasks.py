@@ -505,6 +505,6 @@ def daily_load_data():
  
  
  #Set task dependencies
-    remove_csv_inprogress() >> unzip_move_file() >> backup_daily_source_file() >> truncate_landing_tables() >> daily_load_source() 
+    remove_csv_inprogress() >> unzip_move_file() >> truncate_landing_tables() >> daily_load_source() 
     
 dag = daily_load_data()
