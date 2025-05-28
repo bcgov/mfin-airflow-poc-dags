@@ -169,7 +169,7 @@ def daily_load_data():
                     row = cursor.fetchone()
                     logging.info(f"Number of records: {row[0]}")
                     print(f'Number of records: {row[0]}')
-                    #outfile.write("Number of records", row[0])
+                    outfile.write(f'Number of records, {row[0]}\n')
                     
             
                     start_time = time.time()
