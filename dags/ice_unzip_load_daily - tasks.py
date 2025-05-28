@@ -114,11 +114,13 @@ def daily_load_data():
     # Task 4: Truncate landing tables prior loading next daily source files    
     @task
     def truncate_landing_tables():
+        logging.basicConfig(level=logging.INFO) 
+        logging.info(f"entering truncate_landing_tables procedure")
         #sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
         conn_id = 'mssql_default'
         conn = BaseHook.get_connection(conn_id)
         dbname = 'FIN_SHARED_LANDING_DEV'
-        
+        logging.info(f"setting up host, user, password variables")
         host = conn.host
         user = conn.login
         password = conn.password
@@ -138,9 +140,11 @@ def daily_load_data():
             #row = cursor.fetchone()
             #logging.info(f"Database: {dbname} - Number of tables: ",row[0])
 
-            
+            logging.info(f"setting connection with pmyssql statement")
             connection =  pymssql.connect(host = host, database = dbname, user = user, password = password)
+            logging.info(f"creating cursor")
             cursor = connection.cursor()
+            logging.info("executing cursor")
             cursor.execute("SELECT COUNT(1) FROM ICE_Stat_QueueActivity_D")
             row = cursor.fetchone()
             logging.info(f"Number of records: {row[0]}")
