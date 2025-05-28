@@ -114,26 +114,34 @@ def daily_load_data():
     # Task 4: Truncate landing tables prior loading next daily source files    
     @task
     def truncate_landing_tables():
+        file_path = r'/rmo_ct_prod/log/'
+        output_file = 'truncate_landing_tables.txt'
+        
         logging.basicConfig(level=logging.INFO) 
         logging.info(f"entering truncate_landing_tables procedure")
-        print(f'starting truncate procedure execution')
-        #sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
-        conn_id = 'mssql_default'
-        conn = BaseHook.get_connection(conn_id)
-        dbname = 'FIN_SHARED_LANDING_DEV'
-        logging.info(f"setting up host, user, password variables")
-        print(f'setting up host, user, password variable')
-        host = conn.host
-        user = conn.login
-        password = conn.password
+        with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+            with fs_hook.open_file(file_path + output_file, 'w') as outfile:
+                outfile.write("starting truncate procedure execution\n")
+
+                #sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
+                conn_id = 'mssql_default'
+                conn = BaseHook.get_connection(conn_id)
+                dbname = 'FIN_SHARED_LANDING_DEV'
+                logging.info(f"setting up host, user, password variables")
+                print(f'setting up host, user, password variable')
+                outfile.write("setting up host, user, password variable\n")
+                host = conn.host
+                user = conn.login
+                password = conn.password
         
-        connection = None
-      
-        try:
-            logging.info(f"truncating landing tables")
-            print(f'entering try')
+                connection = None
+                
+                try:
+                    logging.info(f"truncating landing tables")
+                    print(f'entering try')
+                    outfile.write("entering try\n")
             
-            #conn = sql_hook.get_conn()
+                    #conn = sql_hook.get_conn()
             #cursor = conn.cursor()
             #query = f"""EXEC [FIN_SHARED_LANDING_DEV].[dbo].[PROC_TELEPHONY_ICE_TRUNCATE];"""
             #cursor.execute(query)
@@ -143,31 +151,39 @@ def daily_load_data():
             #row = cursor.fetchone()
             #logging.info(f"Database: {dbname} - Number of tables: ",row[0])
 
-            logging.info(f"setting connection with pmyssql statement")
-            print(f'setting connection with pmyssql statement')
-            connection =  pymssql.connect(host = host, database = dbname, user = user, password = password)
-            logging.info(f"creating cursor")
-            print(f'creating cursor')
-            cursor = connection.cursor()
-            logging.info("executing cursor")
-            print(f'executing cursor')
-            cursor.execute("SELECT COUNT(1) FROM ICE_Stat_QueueActivity_D")
-            row = cursor.fetchone()
-            logging.info(f"Number of records: {row[0]}")
-            print(f'Number of records: {row[0]}')
+                    logging.info(f"setting connection with pmyssql statement")
+                    print(f'setting connection with pmyssql statement')
+                    outfile.write("setting connection with pmyssql statement\n")
+                    connection =  pymssql.connect(host = host, database = dbname, user = user, password = password)
+
+                    logging.info(f"creating cursor")
+                    print(f'connecting cursor')
+                    outfile.write("connecting cursor\n")                    
+                    cursor = connection.cursor()
+                    
+                    logging.info("executing cursor")
+                    print(f'executing cursor')
+                    outfile.write("executing cursor\n")
+                    cursor.execute("SELECT COUNT(1) FROM ICE_Stat_QueueActivity_D")
             
-            start_time = time.time()
+                    row = cursor.fetchone()
+                    logging.info(f"Number of records: {row[0]}")
+                    print(f'Number of records: {row[0]}')
+                    outfile.write("Number of records", row[0])
+                    
+            
+                    start_time = time.time()
                                   
-            logging.info(f"truncate landing tables {time.time() - start_time} seconds")
+                    logging.info(f"truncate landing tables {time.time() - start_time} seconds")
         
-        except Exception as e:
-            logging.error(f"Error truncating landing tables {e}")
+                except Exception as e:
+                    logging.error(f"Error truncating landing tables {e}")
         
-        finally:
-            if connection:
-                connection.close()
-                logging.info(f"Database {dbname} - Connection closed")
-        
+                finally:
+                    if connection:
+                        connection.close()
+                        logging.info(f"Database {dbname} - Connection closed")
+                        outfile.write("Connecting closed\n")
         return
 
             
