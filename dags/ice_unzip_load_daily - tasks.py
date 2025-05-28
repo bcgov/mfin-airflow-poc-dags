@@ -133,15 +133,17 @@ def daily_load_data():
             #query = f"""EXEC [FIN_SHARED_LANDING_DEV].[dbo].[PROC_TELEPHONY_ICE_TRUNCATE];"""
             #cursor.execute(query)
             #conn.commit()
-
-            
-            connection = pymssql.connect(host = host, database = dbname, user = user, password = password)
-            cursor = connection.cursor()
-            cursor.execute("DELETE FROM ICE_Stat_QueueActivity_D")
             #cursor.execute("EXECUTE PROC_TELEPHONY_ICE_TRUNCATE")
             #cursor.execute("TRUNCATE TABLE FIN_SHARED_LANDING_DEV.dbo.ICE_Stat_QueueActivity_D")
             #row = cursor.fetchone()
             #logging.info(f"Database: {dbname} - Number of tables: ",row[0])
+
+            
+            connection =  pymssql.connect(host = host, database = dbname, user = user, password = password)
+            cursor = connection.cursor()
+            cursor.execute("SELECT COUNT(1) FROM ICE_Stat_QueueActivity_D")
+            row = cursor.fetchone()
+            logging.info(f"Number of records:"{row0})
             
             start_time = time.time()
                                   
