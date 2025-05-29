@@ -114,83 +114,53 @@ def daily_load_data():
     # Task 4: Truncate landing tables prior loading next daily source files    
     @task
     def truncate_landing_tables():
-        file_path = r'/rmo_ct_prod/log/'
-        output_file = 'truncate_landing_tables.txt'
-        
         logging.basicConfig(level=logging.INFO) 
-        logging.info(f"entering truncate_landing_tables procedure")
-        with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
-            with fs_hook.open_file(file_path + output_file, 'w') as outfile:
-                outfile.write("starting truncate procedure execution\n")
+        logging.info(f"truncate_landing_tables procedure")
 
-                #sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
-                conn_id = 'mssql_default'
-                conn = BaseHook.get_connection(conn_id)
-                dbname = 'FIN_SHARED_LANDING_DEV'
-                logging.info(f"setting up host, user, password variables")
-                print(f'setting up host, user, password variable')
-                outfile.write("setting up host, user, password variable\n")
-                host = conn.host
-                user = conn.login
-                password = conn.password
+        #sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
+        conn_id = 'mssql_default'
+        conn = BaseHook.get_connection(conn_id)
+        dbname = 'FIN_SHARED_LANDING_DEV'
+        host = conn.host
+        user = conn.login
+        password = conn.password
         
-                connection = None
+        connection = None
                 
-                try:
-                    logging.info(f"truncating landing tables")
-                    print(f'entering try')
-                    outfile.write("entering try\n")
-            
-                    #conn = sql_hook.get_conn()
+        try:
+ 
+            #conn = sql_hook.get_conn()
             #cursor = conn.cursor()
             #query = f"""EXEC [FIN_SHARED_LANDING_DEV].[dbo].[PROC_TELEPHONY_ICE_TRUNCATE];"""
             #cursor.execute(query)
             #conn.commit()
             #cursor.execute("EXECUTE PROC_TELEPHONY_ICE_TRUNCATE")
             #cursor.execute("TRUNCATE TABLE FIN_SHARED_LANDING_DEV.dbo.ICE_Stat_QueueActivity_D")
-            #row = cursor.fetchone()
-            #logging.info(f"Database: {dbname} - Number of tables: ",row[0])
-
-                    logging.info(f"setting connection with pmyssql statement")
-                    print(f'setting connection with pmyssql statement')
-                    outfile.write("setting connection with pmyssql statement\n")
-                    connection =  pymssql.connect(host = host, database = dbname, user = user, password = password)
-
-                    logging.info(f"creating cursor")
-                    print(f'connecting cursor')
-                    outfile.write("connecting cursor\n")                    
-                    cursor = connection.cursor()
+ 
+            connection =  pymssql.connect(host = host, database = dbname, user = user, password = password)
+            cursor = connection.cursor()
                     
-                    logging.info("executing cursor")
-                    print(f'executing cursor')
-                    outfile.write("executing cursor\n")
-                    #cursor.execute("SELECT COUNT(1) FROM ICE_Stat_QueueActivity_D")
-                    cursor.execute("EXEC [dbo].[PROC_TELEPHONY_ICE_TRUNCATE]")
-                    #cursor.execute("TRUNCATE TABLE dbo.ICE_Stat_QueueActivity_D")
-                    connection.commit()
+            start_time = time.time()
+
+            cursor.execute("EXEC [dbo].[PROC_TELEPHONY_ICE_TRUNCATE]")
             
-                    row = cursor.fetchone()
-                    logging.info(f"Number of records: {row[0]}")
-                    print(f'Number of records: {row[0]}')
-                    outfile.write(f'Number of records, {row[0]}\n')
-                    
+            connection.commit()
             
-                    start_time = time.time()
                                   
-                    logging.info(f"truncate landing tables {time.time() - start_time} seconds")
+            logging.info(f"truncate landing tables {time.time() - start_time} seconds")
         
-                except Exception as e:
-                    logging.error(f"Error truncating landing tables {e}")
+        except Exception as e:
+            logging.error(f"Error truncating landing tables {e}")
         
-                finally:
-                    if connection:
-                        connection.close()
-                        logging.info(f"Database {dbname} - Connection closed")
-                        outfile.write("Connecting closed\n")
+        finally:
+            if connection:
+                connection.close()
+                logging.info(f"Database {dbname} - Connection closed")
+ 
         return
 
             
-    # Task 5: Loading 103 csv data files to [IAPETUS\FINDATA].[dbo].[FIN_SHARED_LANDING_DEV]      
+    # Task 5: Loading 103 csv data files to SQL Server database       
     @task
     # Slowly changin dimension TBD on AgentAssignment, TeamAssignment
     def daily_load_source():
@@ -222,11 +192,7 @@ def daily_load_data():
                     
                     with fs_hook.open_file(source_path + file,'r') as f:
                         csv_reader = pd.read_csv(f, header = None, usecols=cols, quoting=1)
-                    
-                    # Agent: 1137 - Colin Klingspohn; 1148	Jasmyn Carnwell
-                    # Agent: 1888 - Revenu Service BC; 1889 - Health Insurance BC; 1890 - Enrolment Specialists; 2001 - Taxpayer Services
-                    # Agent: 2003 - eTax Team; 9985 - 9985
- 
+
                     df1 = csv_reader.loc[(csv_reader[1] ==  1137) | (csv_reader[1] == 1888) | (csv_reader[1] == 1889) | (csv_reader[1] == 1890) | (csv_reader[1] == 2001) | (csv_reader[1] == 2003) | (csv_reader[1] == 9985)]    
                     df1 = df1.iloc[:,[0,1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,32,33,34,35,36,37,38,39,41,42,43]]
                                         
@@ -394,37 +360,37 @@ def daily_load_data():
             return       
 
         
-        def load_db_source(psource_file):
+        def load_db_source(pSource_File, pDBname):
             sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
             dYmd = (dt.datetime.today() + timedelta(days = -1)).strftime('%Y%m%d')
 
             try:
-                if psource_file == "Stat_CDR.csv":
+                if pSource_File == "Stat_CDR.csv":
                     pTableName = "ICE_Stat_CDR"
-                    psource_file = "Stat_CDR_fixed.csv"
-                elif psource_file == "Agent.csv":
+                    pSource_File = "Stat_CDR_fixed.csv"
+                elif pSource_File == "Agent.csv":
                     pTableName = "ICE_Agent"
-                    psource_file = "Agent_fixed.csv"
-                elif psource_file == "Stat_CDR_Summary.csv":
+                    pSource_File = "Agent_fixed.csv"
+                elif pSource_File == "Stat_CDR_Summary.csv":
                     pTableName = "ICE_Stat_CDR_Summary"
-                    psource_file = "Stat_CDR_Summary_fixed.csv" 
-                elif psource_file == "LOBCodeLangString.csv":   
+                    pSource_File = "Stat_CDR_Summary_fixed.csv" 
+                elif pSource_File == "LOBCodeLangString.csv":   
                     pTableName = "ICE_LOBCodeLangString"
-                    psource_file = "LOBCodeLangString_fixed.csv"
-                elif psource_file == "EvalCriteriaLangString.csv":   
+                    pSource_File = "LOBCodeLangString_fixed.csv"
+                elif pSource_File == "EvalCriteriaLangString.csv":   
                     pTableName = "ICE_EvalCriteriaLangString"
-                    psource_file = "EvalCriteriaLangString_fixed.csv"     
+                    pSource_File = "EvalCriteriaLangString_fixed.csv"     
                 else:
-                    xlen = len(psource_file)-4
-                    pTableName = "ICE_" + psource_file[:xlen]
+                    xlen = len(pSource_File)-4
+                    pTableName = "ICE_" + pSource_File[:xlen]
 
                 logging.info(f"loading table: {pTableName}")
             
                 conn = sql_hook.get_conn()
                 cursor = conn.cursor()
             
-                query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{pTableName}]
-                             FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{psource_file}'
+                query = f""" BULK INSERT [{pDBname}].[dbo].[{pTableName}]
+                             FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{pSource_File}'
                              WITH
 	                         ( FORMAT='CSV', 
                                MAXERRORS=100, 
@@ -433,7 +399,7 @@ def daily_load_data():
 	                         );
                          """
                 logging.info(f"query: {query}")
-                logging.info(f"inserting table:  {psource_file}")
+                logging.info(f"inserting table:  {pSource_File}")
                 start_time = time.time()
                 cursor.execute(query)
                 conn.commit()
@@ -441,84 +407,28 @@ def daily_load_data():
                 logging.info(f"bulk insert {time.time() - start_time} seconds")
         
             except Exception as e:
-                logging.error(f"Error bulk loading table: {pTableName} source file: {psource_file} {e}")
+                logging.error(f"Error bulk loading table: {pTableName} source file: {pSource_File} {e}")
                
                 
             return
             
+        config_path = r'/rmo_ct_prod/Configuration/'
+        file = 'source_file_names.csv'
+        source_file_set=[] 
+
+        file_dbname = 'Database_name.txt'
+        dbname = ''        
+      
+        with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
             
-        # Date: Mar 06, 2025
-        # Annual table load 
-        #     Holiday, 
-        #     Server,
-        #     Site,
-        #     Switch,
-        #     OperatingDates,
-        #     QueueIDLookup
-        
-        #
-        # Implemented tables data fix processes:
-        #             - Agent.csv --> Agent_fixed.csv
-        #             - Stat_CDR.csv --> Stat_CDR_fixed.csv
-        #             - Stat_CDR-Summary.csv --> Stat_CDR-Summary_fixed.csv
-        #             - LOBCodeLangString.csv ---> LOBCodeLangString_fixed.csv 
-        #             - EvalCriteriaLangString ---> EvalCriteriaLangString_fixed.csv
-        #
-        # RMO resource (Sofia Polar) implementing/testing data fix code:
-        #             - WfAction.csv
-        #             - WfAttributeDetail.csv
-        #             - WfLink.csv
-        #             - WfSubAppMethod.csv
-        #             - WfSubApplication.csv
-        #             - WfVariables.csv
-        #
-        # Tables not loaded and/not functional at this moment
-        #             - AudioMessage.csv
-        #             - AgentSkills.csv
-        #             - RequiredSkills.csv   
-        #             - Recordings.csv
-        #             - RecodringFaultedFiles.csv        
-        #             - Skill.csv        
+            with fs_hook.open_file(config_path + file,'r') as f:
+                source_file_set = pd.read_csv(f, header = None, quoting=1)     
             
-        source_file_set = ["ACDQueue.csv","Agent.csv",
-                           #"AudioMessage.csv", 
-                           "AgentAssignment.csv", 
-                           #"AgentSkill.csv",
-                           "ContactLink.csv","ContactSegment.csv",
-                           "Email.csv","EmailGroup.csv","Eval_Contact.csv","EvalScore.csv","EvalCategory.csv","EvalCategoryLangString.csv",
-                           "EvalCriteria.csv","EvalCriteriaValue.csv","EvalCriteriaValueLangString.csv",
-                           "EvalCriteriaLangString.csv",
-                           "EvalEvaluation.csv","EvalForm.csv","EvalFormLangString.csv",
-                           #"Holiday.csv",
-                           "IMRecording.csv","icePay.csv",
-                           "Languages.csv","LOBCategory.csv","LOBCategoryLangString.csv","LOBCode.csv",
-                           "LOBCodeLangString.csv",
-                           "Node.csv","NotReadyReason.csv","NotReadyReasonLangString.csv",
-                           #"OperatingDates.csv",
-                           #"Recordings.csv",
-                           #"RecordingsFaultedFiles.csv",
-                           #"RequiredSkill.csv", 
-                           "Stat_ADR.csv",
-                           "SegmentAgent.csv","SegmentQueue.csv",
-                           #"Skill.csv",
-                           #"Server.csv","Site.csv","Switch.csv",
-                           "Stat_AgentActivity_D.csv", "Stat_AgentActivity_I.csv", "Stat_AgentActivity_M.csv", "Stat_AgentActivity_W.csv", "Stat_AgentActivity_Y.csv",
-                           "Stat_AgentActivityByQueue_D.csv", "Stat_AgentActivityByQueue_I.csv", "Stat_AgentActivityByQueue_M.csv", "Stat_AgentActivityByQueue_W.csv", "Stat_AgentActivityByQueue_Y.csv",
-                           "Stat_AgentLineOfBusiness_D.csv", "Stat_AgentLineOfBusiness_I.csv", "Stat_AgentLineOfBusiness_M.csv", "Stat_AgentLineOfBusiness_W.csv", "Stat_AgentLineOfBusiness_Y.csv",
-                           "Stat_AgentNotReadyBreakdown_D.csv", #2024 missing Jan30-Mar, 
-                           "Stat_AgentNotReadyBreakdown_M.csv","Stat_AgentNotReadyBreakdown_I.csv", "Stat_AgentNotReadyBreakdown_W.csv", "Stat_AgentNotReadyBreakdown_Y.csv",
-                           "Stat_CDR.csv","Stat_CDR_LastSummarized.csv","Stat_CDR_Summary.csv",                           
-                           "Stat_DNISActivity_D.csv", "Stat_DNISActivity_I.csv", "Stat_DNISActivity_M.csv", "Stat_DNISActivity_W.csv", "Stat_DNISActivity_Y.csv",
-                           "Stat_QueueActivity_D.csv","Stat_QueueActivity_M.csv","Stat_QueueActivity_I.csv", "Stat_QueueActivity_W.csv", "Stat_QueueActivity_Y.csv",
-                           "Stat_SkillActivity_D.csv", "Stat_SkillActivity_I.csv", "Stat_SkillActivity_M.csv", "Stat_SkillActivity_W.csv", "Stat_SkillActivity_Y.csv",
-                           "Stat_TrunkActivity_D.csv", "Stat_TrunkActivity_I.csv", "Stat_TrunkActivity_M.csv", "Stat_TrunkActivity_W.csv", "Stat_TrunkActivity_Y.csv",    
-                           "Stat_WorkflowActionActivity_D.csv", "Stat_WorkflowActionActivity_I.csv", "Stat_WorkflowActionActivity_M.csv", "Stat_WorkflowActionActivity_W.csv", "Stat_WorkflowActionActivity_Y.csv",
-                           "Team.csv","TeamAssignment.csv",
-                           "UCAddress.csv","UCGroup.csv",
-                           "WfAttributeDetail.csv","WfLinkDetail.csv","WfLink.csv","WfAction.csv","WfPage.csv","WfGraph.csv",
-                           "WfSubAppMethod.csv","WfSubApplication.csv","WfVariables.csv"]
- 
-        
+            with fs_hook.open_file(config_path + file_dbname, 'r') as t:
+                dbname = pd.read_csv(t, header = None, quoting=1)
+            
+     
+       
         # Data fixes required for relevant daily table process 
         Agent_Datafix()
         Stat_CDR_Datafix()
@@ -527,7 +437,7 @@ def daily_load_data():
         EvalCriteriaLangString()
               
         for source_file in source_file_set:
-            load_db_source(source_file)
+            load_db_source(source_file, dbname)
  
  
  #Set task dependencies
