@@ -413,15 +413,15 @@ def daily_load_data():
             return
             
         config_path = r'/rmo_ct_prod/Configuration/'
-        file = 'source_file_names.csv'
+        file_names = 'source_file_names.csv'
         source_file_set=[] 
 
         file_dbname = 'Database_name.txt'
-        dbname = ''        
+        dbname = []        
       
         with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
             
-            with fs_hook.open_file(config_path + file,'r') as f:
+            with fs_hook.open_file(config_path + file_names,'r') as f:
                 source_file_set = pd.read_csv(f, header = None, quoting=1)     
             
             with fs_hook.open_file(config_path + file_dbname, 'r') as t:
