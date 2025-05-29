@@ -426,15 +426,17 @@ def daily_load_data():
             
             with fs_hook.open_file(config_path + file_names,'r') as f:
                 source_file_set = pd.read_csv(f, header = None, quoting=1)
-                for row in source_file_set.iterrows():
-                    source_file_set.append(row)         
+                
+                with fs_hook.open_file(log_path + log_name,'w') as outfile:
+                    for row in source_file_set.iterrows():
+                        outfile.write(f'{row}\n')         
             
             with fs_hook.open_file(config_path + file_dbname, 'r') as t:
                 dbname = pd.read_csv(t, header = None, quoting=1)
             
-            with fs_hook.open_file(log_path + log_name,'w') as outfile:
-                for sc in source_file_set:
-                    outfile.write(f'csv file name = ,{sc[0], sc[1]}\n')
+            #with fs_hook.open_file(log_path + log_name,'w') as outfile:
+            #    for sc in source_file_set:
+            #        outfile.write(f'csv file name = ,{sc[0], sc[1]}\n')
        
         # Data fixes required for relevant daily table process 
         Agent_Datafix()
