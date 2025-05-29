@@ -413,7 +413,7 @@ def daily_load_data():
             return
             
         log_path = r'/rmo_ct_prod/log/'
-        log_name = r'daily_set.txt'
+        log_name = 'daily_set.txt'
         
         config_path = r'/rmo_ct_prod/Configuration/'
         file_names = 'source_file_names.csv'
@@ -430,9 +430,9 @@ def daily_load_data():
             with fs_hook.open_file(config_path + file_dbname, 'r') as t:
                 dbname = pd.read_csv(t, header = None, quoting=1)
             
-        with open(log_path + log_name,'w') as f:
-            for sc in source_file_name:
-                f.write(sc)
+            with fs_hook.open_file(log_path + log_name,'w') as outfile:
+                for sc in source_file_name:
+                    outfile.write(f'csv file name = ,{sc}\n')
        
         # Data fixes required for relevant daily table process 
         Agent_Datafix()
