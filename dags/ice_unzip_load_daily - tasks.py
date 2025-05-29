@@ -431,7 +431,7 @@ def daily_load_data():
                 dbname = pd.read_csv(t, header = None, quoting=1)
             
             with fs_hook.open_file(log_path + log_name,'w') as outfile:
-                for sc in source_file_name:
+                for sc in source_file_set:
                     outfile.write(f'csv file name = ,{sc}\n')
        
         # Data fixes required for relevant daily table process 
