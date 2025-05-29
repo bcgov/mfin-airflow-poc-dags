@@ -416,7 +416,7 @@ def daily_load_data():
         file_names = 'source_file_names.csv'
         source_file_set=[] 
 
-        file_dbname = 'Database_name.txt'
+        file_dbname = 'Database_name.csv'
         dbname = []        
       
         with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
