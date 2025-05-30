@@ -420,13 +420,16 @@ def daily_load_data():
         source_file_set=[] 
 
         file_dbname = 'Database_name.csv'
-        dbname = []        
+        dbname = [] 
+        data = []        
       
         with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
             
             with fs_hook.open_file(config_path + file_names,'r') as f:
                 source_file_set = pd.read_csv(f, header = None, quoting=1)
-                data = list(source_file_set)
+                data = source_file_set.values.flatten().tolist()
+   
+                #data = list(source_file_set)
                 
                 with fs_hook.open_file(log_path + log_name,'w') as outfile:
                     for item in data:
