@@ -36,6 +36,7 @@ root.addHandler(handler)
 
 
 def daily_load_data():
+    
     logging.basicConfig(level=logging.INFO)
     
     #Task 1: Unzip and Move files from source to destination (using SambaHook)
@@ -92,7 +93,7 @@ def daily_load_data():
         return
  
  
-    # Task 3: Removing 103 csv data files from \\fs1.fin.gov.bc.ca\rmo_ct_prod\inprogress\ subfolder    
+    # Task 3: Inprogress subfolder - Removing csv data files    
     @task
     def remove_csv_inprogress():
         conn_id = 'fs1_rmo_ice'
@@ -426,7 +427,7 @@ def daily_load_data():
         with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
             
             with fs_hook.open_file(config_path + file_names,'r') as f:
-                source_file_set = pd.read_csv(f, header = None, usecols=1, quoting=1)
+                source_file_set = pd.read_csv(f, header = None, quoting=1)
                 data = source_file_set.values.flatten().tolist()
    
                 
