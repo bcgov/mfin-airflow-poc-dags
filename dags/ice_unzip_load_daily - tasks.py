@@ -15,7 +15,7 @@ from datetime import timedelta
 from airflow.operators.python import PythonOperator
 from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
 from airflow.hooks.base_hook import BaseHook
-from airflow.models import Variables
+from airflow.models import Variable
 import pymssql
 
 
