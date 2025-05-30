@@ -429,7 +429,9 @@ def daily_load_data():
                 data = list(source_file_set)
                 
                 with fs_hook.open_file(log_path + log_name,'w') as outfile:
-                    outfile.write(data)         
+                    for item in data:
+                        outfile.write("%s\n" % item)
+                        
             
             with fs_hook.open_file(config_path + file_dbname, 'r') as t:
                 dbname = pd.read_csv(t, header = None, quoting=1)
