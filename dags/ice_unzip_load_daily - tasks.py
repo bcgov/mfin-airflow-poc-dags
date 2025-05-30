@@ -366,24 +366,24 @@ def daily_load_data():
             dYmd = (dt.datetime.today() + timedelta(days = -1)).strftime('%Y%m%d')
 
             try:
-                if pSource_File == "Stat_CDR.csv":
-                    pTableName = "ICE_Stat_CDR"
-                    pSource_File = "Stat_CDR_fixed.csv"
-                elif pSource_File == "Agent.csv":
-                    pTableName = "ICE_Agent"
-                    pSource_File = "Agent_fixed.csv"
-                elif pSource_File == "Stat_CDR_Summary.csv":
-                    pTableName = "ICE_Stat_CDR_Summary"
-                    pSource_File = "Stat_CDR_Summary_fixed.csv" 
-                elif pSource_File == "LOBCodeLangString.csv":   
-                    pTableName = "ICE_LOBCodeLangString"
-                    pSource_File = "LOBCodeLangString_fixed.csv"
-                elif pSource_File == "EvalCriteriaLangString.csv":   
-                    pTableName = "ICE_EvalCriteriaLangString"
-                    pSource_File = "EvalCriteriaLangString_fixed.csv"     
+                if pSource_File == 'Stat_CDR.csv':
+                    pTableName = 'ICE_Stat_CDR'
+                    pSource_File = 'Stat_CDR_fixed.csv'
+                elif pSource_File == 'Agent.csv':
+                    pTableName = 'ICE_Agent'
+                    pSource_File = 'Agent_fixed.csv'
+                elif pSource_File == 'Stat_CDR_Summary.csv':
+                    pTableName = 'ICE_Stat_CDR_Summary'
+                    pSource_File = 'Stat_CDR_Summary_fixed.csv' 
+                elif pSource_File == 'LOBCodeLangString.csv':   
+                    pTableName = 'ICE_LOBCodeLangString'
+                    pSource_File = 'LOBCodeLangString_fixed.csv'
+                elif pSource_File == 'EvalCriteriaLangString.csv':   
+                    pTableName = 'ICE_EvalCriteriaLangString'
+                    pSource_File = 'EvalCriteriaLangString_fixed.csv'     
                 else:
                     xlen = len(pSource_File)-4
-                    pTableName = "ICE_" + pSource_File[:xlen]
+                    pTableName = 'ICE_' + pSource_File[:xlen]
 
                 logging.info(f"loading table: {pTableName}")
             
@@ -422,28 +422,20 @@ def daily_load_data():
 
         file_dbname = 'Database_name.csv'
         dbname = [] 
-        data = []        
+        data = []
       
         with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
             
             with fs_hook.open_file(config_path + file_names,'r') as f:
                 source_file_set = pd.read_csv(f, header = None, quoting=1)
-                data = source_file_set.values.flatten().tolist()
-   
+                data = source_file_set.values.flatten().tolist()   
                 
-                data = [x for x in data if str(x) != 'nan']
+                data_set = [x for x in data if str(x) != 'nan']
                 
                 with fs_hook.open_file(log_path + log_name,'w') as outfile:
-                    for item in data:
+                    for item in data_set:
                         outfile.write("%s\n" % item)
                         
-            
-            with fs_hook.open_file(config_path + file_dbname, 'r') as t:
-                dbname = pd.read_csv(t, header = None, quoting=1)
-            
-            #with fs_hook.open_file(log_path + log_name,'w') as outfile:
-            #    for sc in source_file_set:
-            #        outfile.write(f'csv file name = ,{sc[0], sc[1]}\n')
        
         # Data fixes required for relevant daily table process 
         Agent_Datafix()
@@ -452,7 +444,7 @@ def daily_load_data():
         LOBCodeLangString()
         EvalCriteriaLangString()
               
-        for source_file in source_file_set:
+        for source_file in data_set:
             load_db_source(source_file, dbname)
  
  
