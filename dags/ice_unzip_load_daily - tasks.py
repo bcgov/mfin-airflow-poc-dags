@@ -15,6 +15,7 @@ from datetime import timedelta
 from airflow.operators.python import PythonOperator
 from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
 from airflow.hooks.base_hook import BaseHook
+from airflow.models import Variables
 import pymssql
 
 
@@ -419,11 +420,11 @@ def daily_load_data():
         config_path = r'/rmo_ct_prod/Configuration/'
         file_names = 'source_file_names.csv'
         source_file_set=[] 
-
-        file_dbname = 'Database_name.csv'
-        dbname = [] 
         data = []
       
+        dbname = 'FIN_SHARED_LANDING_DEV' 
+        #dbname = Variable.get("VDatabaseName")
+
         with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
             
             with fs_hook.open_file(config_path + file_names,'r') as f:
