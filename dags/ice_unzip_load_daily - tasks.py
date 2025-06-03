@@ -4,6 +4,9 @@ import numpy as np
 import pandas as pd
 from airflow.decorators import dag, task
 from airflow.providers.samba.hooks.samba import SambaHook
+from airflow.providers.ssh.operators.shh import SHHOperator
+from airflow.providers.ssh.hook.ssh import SSHHook
+from airflow.operators.email import EmailOperator
 from airflow.utils.dates import days_ago
 import zipfile
 import logging
@@ -37,13 +40,12 @@ root.addHandler(handler)
 
 
 def daily_load_data():
-    
+    # Log all steps at INFO level
     logging.basicConfig(level=logging.INFO)
     
     #Task 1: Unzip and Move files from source to destination (using SambaHook)
     @task
-    def unzip_move_file():
-        # Log all steps at INFO level
+    def unzip_move_file():        
         #logging.basicConfig(level=logging.INFO)
 
         source_path = r'/rmo_ct_prod/'
@@ -67,18 +69,19 @@ def daily_load_data():
         except Exception as e:
             logging.error(f"Error unzipping files: {e}")  
 
-        return            
-
+        return          
     
 
-    # Task 2: Backup iceDB_ICE_BCMOFRMO-YYYYMMDD.zip to the completed folder 
+    # Task 2: Backup iceDB_ICE_BCMOFRMO-YYYYMMDD.zip to the completed subfolder 
     @task
     def backup_daily_source_file():
+        foundflag = 0
         source_path = 'r/rmo_ct_prod/'
         dest_path = r'/rmo_ct_prod/completed/'
         conn_id = 'fs1_rmo_ice'
         file = 'iceDB_ICE_BCMOFRMO.zip'
         hook = SambaHook(conn_id)
+        ssh_hook = SSHHook(ssh_conn_id='ssh_prod')
     #   Set dYmd to yesterdays date
         dYmd = (dt.datetime.today() + timedelta(days=-1)).strftime('%Y%m%d')
         
@@ -86,13 +89,28 @@ def daily_load_data():
             files = hook.listdir(source_path)
             for f in files:
                 if f == 'iceDB_ICE_BCMOFRMO.zip':
-                    hook.replace(source_path + f, dest_path + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip') 
-                    
+                    copy_remote_file = SSHOperator(
+                        task_id = 'copy_file_remote',
+                        ssh_hook = ssh_hook,
+                        command = r'cp /rmo_ct_prod/iceDB_ICE_BCMOFRMO.zip /rmo_ct_prod/completed/iceDB_ICE_BCMOFRMO.zip'
+                     )
+                     foundflag = 1
+                        
+                    #hook.replace(source_path + f, dest_path + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip') 
+            
+            
+            #if foundflag == 0:
+            #    send_email = EmailOperator(
+            #        task_id='send_email_task',
+            #        to='eloy.mendez@gov.bc.ca',
+            #        subject='iceDB_ICE_BCMOFRMO.zip file not available to process',
+            #        html_content = '<p>Computer Talk daily file not received for processing!<p>',
+            #    )
+                
         except Exception as e:
             logging.error(f"Error backing up {dYmd} source file")
         
         return
- 
  
     # Task 3: Inprogress subfolder - Removing csv data files    
     @task
@@ -111,7 +129,6 @@ def daily_load_data():
             logging.error(f"Error {e} removing file: {file_path}")
             
         return
-            
 
     # Task 4: Truncate landing tables prior loading next daily source files    
     @task
@@ -122,7 +139,7 @@ def daily_load_data():
         #sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
         conn_id = 'mssql_default'
         conn = BaseHook.get_connection(conn_id)
-        dbname = 'FIN_SHARED_LANDING_DEV'
+        dbname = Variable.get("VDatabaseName")
         host = conn.host
         user = conn.login
         password = conn.password
@@ -146,8 +163,7 @@ def daily_load_data():
 
             cursor.execute("EXEC [dbo].[PROC_TELEPHONY_ICE_TRUNCATE]")
             
-            connection.commit()
-            
+            connection.commit()            
                                   
             logging.info(f"truncate landing tables {time.time() - start_time} seconds")
         
@@ -160,16 +176,14 @@ def daily_load_data():
                 logging.info(f"Database {dbname} - Connection closed")
  
         return
-
             
-    # Task 5: Loading 103 csv data files to SQL Server database       
+    # Task 5: Loading csv data files to SQL Server database       
     @task
-    # Slowly changin dimension TBD on AgentAssignment, TeamAssignment
     def daily_load_source():
         logging.basicConfig(level=logging.INFO)                
 
-        def Agent_Datafix():
-            source_path = r'/rmo_ct_prod/inprogress/'
+        def Agent_Datafix(psource_path):
+#            source_path = r'/rmo_ct_prod/inprogress/'
             file = 'Agent.csv'
             output_file = 'Agent_fixed.csv'
             
@@ -179,20 +193,9 @@ def daily_load_data():
                 # Initialize SambaHook with your credentials and connection details
                 with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
                     
-                    names = ["SwitchID","AgentID","AgentName","AgentType","ClassOfService","pw1","pw2","pw3"
-                            ,"AutoLogonAddress","AutoLogonQueue","PAQOverflowThreshold","NoAnswerThreshold"
-                            ,"CfacDn","CfnaDn","CfpoDn","CfnlDn","CfState","EmailAddress"
-                            ,"RemoteDn","VoiceMailDN","NumVoiceMailCalls","CallerNumPBX"
-                            ,"CallerNumPSTN","AgentAlias","ImageURL","OutboundWorkflowDN"
-                            ,"OutboundWorkflowMode","HotlineDN","CallerName","PlacedCallAutoWrapTimer"
-                            ,"UpdateCount","LogonToNotReadyReason","IMAddress","pw4","pw5","pw6"
-                            ,"PasswordCOS","PasswordLastChanged","PasswordAbsoluteLockedOutDate"
-                            ,"PasswordLockedOutExpireDateTime","ClassOfService2","ADFQDN"
-                            ,"ADGUID","LanguageCode","version","AzureADGuid","MaxImConcurrency","MaxEmailConcurrency"]
-                               
                     cols = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47]
                     
-                    with fs_hook.open_file(source_path + file,'r') as f:
+                    with fs_hook.open_file(psource_path + file,'r') as f:
                         csv_reader = pd.read_csv(f, header = None, usecols=cols, quoting=1)
 
                     df1 = csv_reader.loc[(csv_reader[1] ==  1137) | (csv_reader[1] == 1888) | (csv_reader[1] == 1889) | (csv_reader[1] == 1890) | (csv_reader[1] == 2001) | (csv_reader[1] == 2003) | (csv_reader[1] == 9985)]    
@@ -205,13 +208,13 @@ def daily_load_data():
                     df3 = df3.iloc[:,[0,1,2,3,4,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,34,35,36,37,38,39,40,41,43,44,45]]
 
  
-                    with fs_hook.open_file(source_path + output_file, 'w') as outfile:
+                    with fs_hook.open_file(psource_path + output_file, 'w') as outfile:
                         df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
                                 
-                    with fs_hook.open_file(source_path + output_file, 'a') as outfile:
+                    with fs_hook.open_file(psource_path + output_file, 'a') as outfile:
                         df2.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
                     
-                    with fs_hook.open_file(source_path + output_file, 'a') as outfile:
+                    with fs_hook.open_file(psource_path + output_file, 'a') as outfile:
                         df3.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
                                 
                 
@@ -222,8 +225,8 @@ def daily_load_data():
 
 
 
-        def Stat_CDR_Datafix():
-            source_path = r'/rmo_ct_prod/inprogress/'
+        def Stat_CDR_Datafix(psource_path):
+#            source_path = r'/rmo_ct_prod/inprogress/'
             file = 'Stat_CDR.csv'
             output_file = 'Stat_CDR_fixed.csv'
 
@@ -232,21 +235,15 @@ def daily_load_data():
                 # Initialize SambaHook with your credentials and connection details
                 with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
                     
-                    names = ["PrimaryKey","EventTime","DSTStatus","ContactID","EventID"
-                            ,"SwitchID","ContactType","CurrentState","LastState","LastStateDuration"
-                            ,"QueueID","IntData1","IntData2","IntData3","IntData4","StrData1"
-                            ,"StrData2","StrData3","StrData4","EventSequence","ServerId","RolledUp"]
-                               
                     cols = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]                  
                     
-                    with fs_hook.open_file(source_path + file,'r') as f:
+                    with fs_hook.open_file(psource_path + file,'r') as f:
                         csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(22)], quoting=1)
  
                     df1 = csv_reader.loc[:, [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]]
  
-                    with fs_hook.open_file(source_path + output_file, 'w') as outfile:
+                    with fs_hook.open_file(psource_path + output_file, 'w') as outfile:
                             df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
-  
                                 
                 outfile.close()
                 
@@ -256,8 +253,8 @@ def daily_load_data():
             return                     
 
             
-        def Stat_CDR_Summary_Datafix():
-            source_path = r'/rmo_ct_prod/inprogress/'
+        def Stat_CDR_Summary_Datafix(psource_path):
+#            source_path = r'/rmo_ct_prod/inprogress/'
             file = 'Stat_CDR_Summary.csv'
             output_file = 'Stat_CDR_Summary_fixed.csv'
 
@@ -266,26 +263,7 @@ def daily_load_data():
                 # Initialize SambaHook with your credentials and connection details
                 with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
                     
-                    names = ["SwitchID","ContactID","ContactType","ContactTypeString ","CreatedDateTime",
-                             "CreatedReason","CreatedReasonString","CreatedContactGroupID","CreatedAddressID",
-                             "Duration","ReleasedReason","ReleasedReasonString","ReleasedDateTime",
-                             "OriginatorAddress","OriginatorName","ReceivingAddress","RedirectAddress","NumTimesInWorkflow",
-                             "TimeInWorkflow","NumTimesRouted","TimeInRouting","NumTimesInPAQ","TimeInPAQ",
-                             "NumTimesOnOutbound","TimeOnOutbound","NumTimesHandledByAgent","TimeHandledByAgent",
-                             "NumTimesQueued","NumTimesReturned","OriginalQueueID","OriginalQueueName","NumTimesHandledFromQueue",
-                             "TotalTimeQueuedHandled","NumTimesAbandonedFromQueue","TotalTimeQueuedAbandoned",
-                             "NumTimesRemovedFromQueue","TotalTimeQueuedRemoved","NumTimesSetUserData","NumTimesActionCompleted",
-                             "OriginalHandledQueueID","OriginalHandledQueueName","OriginalHandlingAgentID","OriginalHandlingAgentName",
-                             "OriginalHandlingAgentSkillScore","OriginalOutboundContactGroupID","OriginalOutboundAddressID", 
-                             "OriginalOutboundNumber", "OriginalRoutedAddressID","OriginalRoutedResult","OriginalRoutedResultString",
-                             "OriginalRoutedReason","OriginalRoutedReasonString", "OriginalRoutedDestination","OriginalSetUserData",
-                             "LastSetUserData","OriginalLoggedActionWfID","OriginalLoggedActionPageID", "OriginalLoggedActionActionID",
-                             "OriginalLoggedActionDuration","OriginalLoggedActionName","OriginalLoggedActionData","OriginalLoggedActionResult",
-                             "LastLoggedActionWfID","LastLoggedActionPageID","LastLoggedActionActionID","LastLoggedActionDuration",
-                             "LastLoggedActionName","LastLoggedActionData","LastLoggedActionResult","ServerId"]
-                               
-                    
-                    with fs_hook.open_file(source_path + file,'r') as f:
+                    with fs_hook.open_file(psource_path + file,'r') as f:
                         csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(70)], quoting=1)
  
                     df1 = csv_reader.loc[:,[0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19,
@@ -294,9 +272,8 @@ def daily_load_data():
                                             60,61,62,63,64,65,66,67,68,69]]                      
                             
 
-                    with fs_hook.open_file(source_path + output_file, 'w') as outfile:
+                    with fs_hook.open_file(psource_path + output_file, 'w') as outfile:
                         df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
-  
                                 
                 outfile.close()
                 
@@ -306,8 +283,8 @@ def daily_load_data():
             return   
         
 
-        def LOBCodeLangString():
-            source_path = r'/rmo_ct_prod/inprogress/'
+        def LOBCodeLangString(psource_path):
+#            source_path = r'/rmo_ct_prod/inprogress/'
             file = 'LOBCodeLangString.csv'
             output_file = 'LOBCodeLangString_fixed.csv'
 
@@ -315,14 +292,13 @@ def daily_load_data():
             try:
                 # Initialize SambaHook with your credentials and connection details
                 with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
-                    names = ["CodeID","Lang","Value"]
                                
-                    with fs_hook.open_file(source_path + file,'r') as f:
+                    with fs_hook.open_file(psource_path + file,'r') as f:
                         csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(3)], quoting=1)   
 
                     df1 = csv_reader.loc[:,[0,1,2]]
                     
-                    with fs_hook.open_file(source_path + output_file, 'w') as outfile:
+                    with fs_hook.open_file(psource_path + output_file, 'w') as outfile:
                         df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
                                 
                 outfile.close()                    
@@ -333,8 +309,8 @@ def daily_load_data():
             return   
 
             
-        def EvalCriteriaLangString():
-            source_path = r'/rmo_ct_prod/inprogress/'
+        def EvalCriteriaLangString(psource_path):
+#            source_path = r'/rmo_ct_prod/inprogress/'
             file = 'EvalCriteriaLangString.csv'
             output_file = 'EvalCriteriaLangString_fixed.csv'
 
@@ -342,18 +318,15 @@ def daily_load_data():
             try:
                 # Initialize SambaHook with your credentials and connection details
                 with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
-                    names = ["ID","Lang","Value"]
-                               
-                    
-                    with fs_hook.open_file(source_path + file,'r') as f:
+                     
+                    with fs_hook.open_file(psource_path + file,'r') as f:
                         csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(3)], quoting=1)   
 
                     df1 = csv_reader.loc[:,[0,1,2]]
                     
-                    with fs_hook.open_file(source_path + output_file, 'w') as outfile:
+                    with fs_hook.open_file(psource_path + output_file, 'w') as outfile:
                         df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
-  
-                                
+                                 
                 outfile.close()                    
         
             except Exception as e:
@@ -414,16 +387,14 @@ def daily_load_data():
                 
             return
             
-        log_path = r'/rmo_ct_prod/log/'
-        log_name = 'daily_set.txt'
-        
-        config_path = r'/rmo_ct_prod/Configuration/'
-        file_names = 'source_file_names.csv'
+
         source_file_set=[] 
         data = []
       
-        dbname = 'FIN_SHARED_LANDING_DEV' 
-        #dbname = Variable.get("VDatabaseName")
+        dbname = Variable.get("VDatabaseName")
+        Config_Path = Variable.get("VConfig_path")
+        file_names = Variable.get("VConfig_Name")
+        source_path = Variable.get("VSource_path")
 
         with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
             
@@ -433,17 +404,13 @@ def daily_load_data():
                 
                 data_set = [x for x in data if str(x) != 'nan']
                 
-                with fs_hook.open_file(log_path + log_name,'w') as outfile:
-                    for item in data_set:
-                        outfile.write("%s\n" % item)
-                        
        
         # Data fixes required for relevant daily table process 
-        Agent_Datafix()
-        Stat_CDR_Datafix()
-        Stat_CDR_Summary_Datafix()
-        LOBCodeLangString()
-        EvalCriteriaLangString()
+        Agent_Datafix(source_path)
+        Stat_CDR_Datafix(source_path)
+        Stat_CDR_Summary_Datafix(source_path)
+        LOBCodeLangString(source_path)
+        EvalCriteriaLangString(source_path)
               
         for source_file in data_set:
             load_db_source(source_file, dbname)
