@@ -82,8 +82,8 @@ def daily_load_data():
         file = 'iceDB_ICE_BCMOFRMO.zip'
         hook = SambaHook(conn_id)
     #   Set dYmd to yesterdays date
-        dYmd = (dt.datetime.today() + timedelta(days=-1)).strftime('%Y%m%d')
-        
+        #dYmd = (dt.datetime.today() + timedelta(days=-1)).strftime('%Y%m%d')
+        dYmd = (dt.datetime.today() + timedelta(days=+1)).strftime('%Y%m%d')
         try:
             files = hook.listdir(source_path)
             for f in files:
