@@ -138,7 +138,7 @@ def daily_load_data():
         #sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
         conn_id = 'mssql_default'
         conn = BaseHook.get_connection(conn_id)
-        dbname = Variable.get("VDatabaseName")
+        dbname = Variable.get("vDatabaseName")
         host = conn.host
         user = conn.login
         password = conn.password
@@ -335,6 +335,8 @@ def daily_load_data():
 
         
         def load_db_source(pSource_File, pDBname):
+            pRMOInProgressFolder = Variable.get("vRMOInProgressFolder")
+            pRMOLogFolder = Variable.get("vRMOLogFolder")
             sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
             dYmd = (dt.datetime.today() + timedelta(days = -1)).strftime('%Y%m%d')
 
@@ -364,11 +366,11 @@ def daily_load_data():
                 cursor = conn.cursor()
             
                 query = f""" BULK INSERT [{pDBname}].[dbo].[{pTableName}]
-                             FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{pSource_File}'
+                             FROM '{pRMOInProgressFolder}{pSource_File}'
                              WITH
 	                         ( FORMAT='CSV', 
                                MAXERRORS=100, 
-                               ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{pTableName}_{dYmd}.log',
+                               ERRORFILE='{pRMOLogFolder}{pTableName}_{dYmd}.log',
                                TABLOCK                               
 	                         );
                          """
@@ -390,14 +392,14 @@ def daily_load_data():
         source_file_set=[] 
         data = []
       
-        dbname = Variable.get("VDatabaseName")
-        Config_Path = Variable.get("VConfig_path")
-        file_names = Variable.get("VConfig_Name")
-        source_path = Variable.get("VSource_path")
+        dbname = Variable.get("vDatabaseName")
+        ConfigPath = Variable.get("vRMOConfigPath")
+        FileNames = Variable.get("vConfigName")
+        SourcePath = Variable.get("vRMOSourcePath")
 
         with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
             
-            with fs_hook.open_file(config_path + file_names,'r') as f:
+            with fs_hook.open_file(ConfigPath + FileNames,'r') as f:
                 source_file_set = pd.read_csv(f, header = None, quoting=1)
                 data = source_file_set.values.flatten().tolist()   
                 
@@ -405,17 +407,17 @@ def daily_load_data():
                 
        
         # Data fixes required for relevant daily table process 
-        Agent_Datafix(source_path)
-        Stat_CDR_Datafix(source_path)
-        Stat_CDR_Summary_Datafix(source_path)
-        LOBCodeLangString(source_path)
-        EvalCriteriaLangString(source_path)
+        Agent_Datafix(SourcePath)
+        Stat_CDR_Datafix(SourcePath)
+        Stat_CDR_Summary_Datafix(SourcePath)
+        LOBCodeLangString(SourcePath)
+        EvalCriteriaLangString(SourcePath)
               
         for source_file in data_set:
             load_db_source(source_file, dbname)
  
  
  #Set task dependencies
-    remove_csv_inprogress() >> unzip_move_file() >> truncate_landing_tables() >> daily_load_source() 
+    remove_csv_inprogress() >> backup_daily_source_file() >> unzip_move_file() >> truncate_landing_tables() >> daily_load_source() 
     
 dag = daily_load_data()
