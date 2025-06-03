@@ -75,7 +75,7 @@ def daily_load_data():
     # Task 2: Backup iceDB_ICE_BCMOFRMO-YYYYMMDD.zip to the completed subfolder 
     @task
     def backup_daily_source_file():
-        foundflag = 0
+          
         source_path = 'r/rmo_ct_prod/'
         dest_path = r'/rmo_ct_prod/completed/'
         conn_id = 'fs1_rmo_ice'
@@ -94,8 +94,7 @@ def daily_load_data():
                         ssh_hook = ssh_hook,
                         command = r'cp /rmo_ct_prod/iceDB_ICE_BCMOFRMO.zip /rmo_ct_prod/completed/iceDB_ICE_BCMOFRMO.zip'
                      )
-                     foundflag = 1
-                        
+                                             
                     #hook.replace(source_path + f, dest_path + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip') 
             
             
