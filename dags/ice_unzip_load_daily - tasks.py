@@ -5,7 +5,7 @@ import pandas as pd
 from airflow.decorators import dag, task
 from airflow.providers.samba.hooks.samba import SambaHook
 from airflow.providers.ssh.operators.ssh import SSHOperator
-from airflow.providers.ssh.hook.ssh import SSHHook
+from airflow.providers.ssh.hooks.ssh import SSHHook
 #from airflow.operators.email import EmailOperator
 from airflow.utils.dates import days_ago
 import zipfile
