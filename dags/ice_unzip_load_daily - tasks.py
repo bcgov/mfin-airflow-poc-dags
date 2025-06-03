@@ -81,7 +81,6 @@ def daily_load_data():
         conn_id = 'fs1_rmo_ice'
         file = 'iceDB_ICE_BCMOFRMO.zip'
         hook = SambaHook(conn_id)
-        ssh_hook = SSHHook(ssh_conn_id='ssh_prod')
     #   Set dYmd to yesterdays date
         dYmd = (dt.datetime.today() + timedelta(days=-1)).strftime('%Y%m%d')
         
@@ -89,13 +88,7 @@ def daily_load_data():
             files = hook.listdir(source_path)
             for f in files:
                 if f == 'iceDB_ICE_BCMOFRMO.zip':
-                    copy_remote_file = SSHOperator(
-                        task_id = 'copy_file_remote',
-                        ssh_hook = ssh_hook,
-                        command = r'cp /rmo_ct_prod/iceDB_ICE_BCMOFRMO.zip /rmo_ct_prod/completed/iceDB_ICE_BCMOFRMO.zip'
-                     )
-                                             
-                    #hook.replace(source_path + f, dest_path + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip') 
+                    hook.replace(source_path + f, dest_path + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip') 
             
             
             #if foundflag == 0:
@@ -393,13 +386,15 @@ def daily_load_data():
         data = []
       
         dbname = Variable.get("vDatabaseName")
-        ConfigPath = Variable.get("vRMOConfigPath")
-        FileNames = Variable.get("vConfigName")
+        config_path = r'/rmo_ct_prod/Configuration/'
+        file_names = 'source_file_names.csv'
+        #ConfigPath = Variable.get("vRMOConfigPath")
+        #FileNames = Variable.get("vConfigName")
         SourcePath = Variable.get("vRMOSourcePath")
 
         with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
             
-            with fs_hook.open_file(ConfigPath + FileNames,'r') as f:
+            with fs_hook.open_file(config_path + file_names,'r') as f:
                 source_file_set = pd.read_csv(f, header = None, quoting=1)
                 data = source_file_set.values.flatten().tolist()   
                 
