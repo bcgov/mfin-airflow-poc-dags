@@ -382,7 +382,8 @@ def daily_load_data():
         log_path = r'/rmo_ct_prod/log/'
         log_name = 'daily_set.txt'
         
-        config_path = r'/rmo_ct_prod/Configuration/'
+        #config_path = r'/rmo_ct_prod/Configuration/'
+        ConfigPath = Variable.get("vRMOConfigPath")
         file_names = 'source_file_names.csv'
         SourcePath = r'/rmo_ct_prod/inprogress/'
         source_file_set=[] 
@@ -392,7 +393,7 @@ def daily_load_data():
 
         with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
             
-            with fs_hook.open_file(config_path + file_names,'r') as f:
+            with fs_hook.open_file(ConfigPath + file_names,'r') as f:
                 source_file_set = pd.read_csv(f, header = None, quoting=1)
                 data = source_file_set.values.flatten().tolist()   
                 
