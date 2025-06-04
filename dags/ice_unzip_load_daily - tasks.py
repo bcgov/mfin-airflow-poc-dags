@@ -75,18 +75,24 @@ def daily_load_data():
         dest_path = r'/rmo_ct_prod/completed/'
         conn_id = 'fs1_rmo_ice'
         file = 'iceDB_ICE_BCMOFRMO.zip'
+        log_path = r'/rmo_ct_prod/log/'
+        log_name = 'daily_backup.txt'
         hook = SambaHook(conn_id)
     #   Set dYmd to yesterdays date
-        dYmd = (dt.datetime.today() + timedelta(days=1)).strftime('%Y%m%d')
+        dYmd = (dt.datetime.today() + timedelta(days=2)).strftime('%Y%m%d')
         
-        try:
-            files = hook.listdir(source_path)
-            for f in files:
-                if f == 'iceDB_ICE_BCMOFRMO.zip':
-                    hook.replace(source_path + f, dest_path + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip') 
+        with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+            with fs_hook.open_file(log_path + log_name,'w') as outfile:
+                try:
+                    files = hook.listdir(source_path)
+                    for f in files:
+                        outfile.write("looking for daily RMO file %s\n" % f)
+                        if f == 'iceDB_ICE_BCMOFRMO.zip':
+                            hook.replace(source_path + f, dest_path + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip') 
+                            outfile.write("copying file %s to completed folder\n" %f)
                     
-        except Exception as e:
-            logging.error(f"Error backing up {dYmd} source file")
+                except Exception as e:
+                    logging.error(f"Error backing up {dYmd} source file")
         
         return
  
@@ -220,7 +226,7 @@ def daily_load_data():
  
                     df1 = csv_reader.loc[:, [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]]
  
-                    with fs_hook.open_file(PSourcePath + output_file, 'w') as outfile:
+                    with fs_hook.open_file(pSourcePath + output_file, 'w') as outfile:
                             df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
   
                                 
@@ -345,7 +351,7 @@ def daily_load_data():
                 conn = sql_hook.get_conn()
                 cursor = conn.cursor()
             
-                query = f""" BULK INSERT [{pDBname}].[dbo].[{pTableName}]
+                query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{pTableName}]
                              FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{pSourceFile}'
                              WITH
 	                         ( FORMAT='CSV', 
