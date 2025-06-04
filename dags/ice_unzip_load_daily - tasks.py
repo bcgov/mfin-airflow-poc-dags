@@ -71,28 +71,33 @@ def daily_load_data():
     # Task 2: Backup iceDB_ICE_BCMOFRMO-YYYYMMDD.zip to the completed folder 
     @task
     def backup_daily_source_file():
-        source_path = 'r/rmo_ct_prod/'
-        dest_path = r'/rmo_ct_prod/completed/'
-        conn_id = 'fs1_rmo_ice'
-        file = 'iceDB_ICE_BCMOFRMO.zip'
         log_path = r'/rmo_ct_prod/log/'
         log_name = 'daily_backup.txt'
-        hook = SambaHook(conn_id)
-    #   Set dYmd to yesterdays date
-        dYmd = (dt.datetime.today() + timedelta(days=2)).strftime('%Y%m%d')
         
         with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
             with fs_hook.open_file(log_path + log_name,'w') as outfile:
-                try:
-                    files = hook.listdir(source_path)
-                    for f in files:
-                        outfile.write("looking for daily RMO file %s\n" % f)
-                        if f == 'iceDB_ICE_BCMOFRMO.zip':
-                            hook.replace(source_path + f, dest_path + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip') 
-                            outfile.write("copying file %s to completed folder\n" %f)
+        
+            source_path = 'r/rmo_ct_prod/'
+            dest_path = r'/rmo_ct_prod/completed/'
+            conn_id = 'fs1_rmo_ice'
+            file = 'iceDB_ICE_BCMOFRMO.zip'
+            hook = SambaHook(conn_id)
+            outfile.write("creating SambaHook\n")
+            #   Set dYmd to yesterdays date
+            dYmd = (dt.datetime.today() + timedelta(days=2)).strftime('%Y%m%d')
+            outfile.write("Setting date extension\n")        
+            try:
+                files = hook.listdir(source_path)
+                outfile.write("getting hook.listdir\n")
+
+                for f in files:
+                    outfile.write("looking for daily RMO file %s\n" % f)
+                    if f == 'iceDB_ICE_BCMOFRMO.zip':
+                        hook.replace(source_path + f, dest_path + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip') 
+                        outfile.write("copying file %s to completed folder\n" % f)
                     
-                except Exception as e:
-                    logging.error(f"Error backing up {dYmd} source file")
+            except Exception as e:
+                logging.error(f"Error backing up {dYmd} source file")
         
         return
  
