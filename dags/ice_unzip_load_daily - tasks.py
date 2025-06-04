@@ -172,7 +172,6 @@ def daily_load_data():
         logging.basicConfig(level=logging.INFO)                
 
         def Agent_Datafix(pSourcePath):
-            #source_path = r'/rmo_ct_prod/inprogress/'
             file = 'Agent.csv'
             output_file = 'Agent_fixed.csv'
             
@@ -215,7 +214,6 @@ def daily_load_data():
 
 
         def Stat_CDR_Datafix(pSourcePath):
-            #source_path = r'/rmo_ct_prod/inprogress/'
             file = 'Stat_CDR.csv'
             output_file = 'Stat_CDR_fixed.csv'
 
@@ -244,7 +242,6 @@ def daily_load_data():
 
             
         def Stat_CDR_Summary_Datafix(pSourcePath):
-            #source_path = r'/rmo_ct_prod/inprogress/'
             file = 'Stat_CDR_Summary.csv'
             output_file = 'Stat_CDR_Summary_fixed.csv'
 
@@ -275,7 +272,6 @@ def daily_load_data():
         
 
         def LOBCodeLangString(pSourcePath):
-            #source_path = r'/rmo_ct_prod/inprogress/'
             file = 'LOBCodeLangString.csv'
             output_file = 'LOBCodeLangString_fixed.csv'
 
@@ -301,7 +297,6 @@ def daily_load_data():
 
             
         def EvalCriteriaLangString(pSourcePath):
-            #source_path = r'/rmo_ct_prod/inprogress/'
             file = 'EvalCriteriaLangString.csv'
             output_file = 'EvalCriteriaLangString_fixed.csv'
 
@@ -383,8 +378,8 @@ def daily_load_data():
                 
             return
             
-        log_path = r'/rmo_ct_prod/log/'
-        log_name = 'daily_set.txt'
+        #log_path = r'/rmo_ct_prod/log/'
+        #log_name = 'daily_set.txt'
         
         ConfigPath = Variable.get("vRMOConfigPath")
         FileName = Variable.get("vConfigName")
