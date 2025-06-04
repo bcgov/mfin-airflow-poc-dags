@@ -77,8 +77,8 @@ def daily_load_data():
         with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
             with fs_hook.open_file(log_path + log_name,'w') as outfile:
                       
-                source_path = 'r/rmo_ct_prod/'
-                dest_path = r'/rmo_ct_prod/completed/'
+                SourcePath = '/rmo_ct_prod/'
+                DestPath = '/rmo_ct_prod/completed/'
                 conn_id = 'fs1_rmo_ice'
                 file = 'iceDB_ICE_BCMOFRMO.zip'
                 hook = SambaHook(conn_id)
@@ -87,13 +87,13 @@ def daily_load_data():
                 dYmd = (dt.datetime.today() + timedelta(days=2)).strftime('%Y%m%d')
                 outfile.write("Setting date extension\n")        
                 try:
-                    files = hook.listdir(source_path)
+                    files = hook.listdir(SourcePath)
                     outfile.write("getting hook.listdir\n")
 
                     for f in files:
                         outfile.write("looking for daily RMO file %s\n" % f)
                         if f == 'iceDB_ICE_BCMOFRMO.zip':
-                            hook.replace(source_path + f, dest_path + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip') 
+                            hook.replace(SourcePath + f, DestPath + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip') 
                             outfile.write("copying file %s to completed folder\n" % f)
                     
                 except Exception as e:
