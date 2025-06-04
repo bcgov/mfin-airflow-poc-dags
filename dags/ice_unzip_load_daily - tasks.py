@@ -4,9 +4,6 @@ import numpy as np
 import pandas as pd
 from airflow.decorators import dag, task
 from airflow.providers.samba.hooks.samba import SambaHook
-from airflow.providers.ssh.operators.ssh import SSHOperator
-from airflow.providers.ssh.hooks.ssh import SSHHook
-#from airflow.operators.email import EmailOperator
 from airflow.utils.dates import days_ago
 import zipfile
 import logging
@@ -65,40 +62,29 @@ def daily_load_data():
 
                         fs_hook.push_from_local(dest_path+iceTable.filename, os.path.join(zip_loc,iceTable.filename))
                     
-                #logging.info(f"File moved from {source_path} to {dest_path}")
-        except Exception as e:
+          except Exception as e:
             logging.error(f"Error unzipping files: {e}")  
 
         return          
     
 
-    # Task 2: Backup iceDB_ICE_BCMOFRMO-YYYYMMDD.zip to the completed subfolder 
+    # Task 2: Backup iceDB_ICE_BCMOFRMO-YYYYMMDD.zip to the completed folder 
     @task
     def backup_daily_source_file():
-          
         source_path = 'r/rmo_ct_prod/'
         dest_path = r'/rmo_ct_prod/completed/'
         conn_id = 'fs1_rmo_ice'
         file = 'iceDB_ICE_BCMOFRMO.zip'
         hook = SambaHook(conn_id)
     #   Set dYmd to yesterdays date
-        #dYmd = (dt.datetime.today() + timedelta(days=-1)).strftime('%Y%m%d')
-        dYmd = (dt.datetime.today() + timedelta(days=+1)).strftime('%Y%m%d')
+        dYmd = (dt.datetime.today() + timedelta(days=1)).strftime('%Y%m%d')
+        
         try:
             files = hook.listdir(source_path)
             for f in files:
                 if f == 'iceDB_ICE_BCMOFRMO.zip':
                     hook.replace(source_path + f, dest_path + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip') 
-            
-            
-            #if foundflag == 0:
-            #    send_email = EmailOperator(
-            #        task_id='send_email_task',
-            #        to='eloy.mendez@gov.bc.ca',
-            #        subject='iceDB_ICE_BCMOFRMO.zip file not available to process',
-            #        html_content = '<p>Computer Talk daily file not received for processing!<p>',
-            #    )
-                
+                    
         except Exception as e:
             logging.error(f"Error backing up {dYmd} source file")
         
@@ -106,16 +92,16 @@ def daily_load_data():
  
     # Task 3: Inprogress subfolder - Removing csv data files    
     @task
-    def remove_csv_inprogress():
+    def remove_csv_inprogress(pDeletePath):
         conn_id = 'fs1_rmo_ice'
       
-        delete_path = r'/rmo_ct_prod/inprogress/'
+        #delete_path = r'/rmo_ct_prod/inprogress/'
         hook = SambaHook(conn_id)
-        files = hook.listdir(delete_path)
+        files = hook.listdir(pDeletePath)
 
         try:
             for file in files:
-                file_path = f"{delete_path}/{file}"
+                file_path = f"{pDeletePath}/{file}"
                 hook.remove(file_path)
         except:
             logging.error(f"Error {e} removing file: {file_path}")
@@ -131,7 +117,7 @@ def daily_load_data():
         #sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
         conn_id = 'mssql_default'
         conn = BaseHook.get_connection(conn_id)
-        dbname = Variable.get("vDatabaseName")
+        dbname = 'FIN_SHARED_LANDING_DEV'
         host = conn.host
         user = conn.login
         password = conn.password
@@ -174,8 +160,8 @@ def daily_load_data():
     def daily_load_source():
         logging.basicConfig(level=logging.INFO)                
 
-        def Agent_Datafix(psource_path):
-#            source_path = r'/rmo_ct_prod/inprogress/'
+        def Agent_Datafix(pSourcePath):
+            #source_path = r'/rmo_ct_prod/inprogress/'
             file = 'Agent.csv'
             output_file = 'Agent_fixed.csv'
             
@@ -187,7 +173,7 @@ def daily_load_data():
                     
                     cols = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47]
                     
-                    with fs_hook.open_file(psource_path + file,'r') as f:
+                    with fs_hook.open_file(pSourcePath + file,'r') as f:
                         csv_reader = pd.read_csv(f, header = None, usecols=cols, quoting=1)
 
                     df1 = csv_reader.loc[(csv_reader[1] ==  1137) | (csv_reader[1] == 1888) | (csv_reader[1] == 1889) | (csv_reader[1] == 1890) | (csv_reader[1] == 2001) | (csv_reader[1] == 2003) | (csv_reader[1] == 9985)]    
@@ -200,13 +186,13 @@ def daily_load_data():
                     df3 = df3.iloc[:,[0,1,2,3,4,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,34,35,36,37,38,39,40,41,43,44,45]]
 
  
-                    with fs_hook.open_file(psource_path + output_file, 'w') as outfile:
+                    with fs_hook.open_file(pSourcePath + output_file, 'w') as outfile:
                         df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
                                 
-                    with fs_hook.open_file(psource_path + output_file, 'a') as outfile:
+                    with fs_hook.open_file(pSourcePath + output_file, 'a') as outfile:
                         df2.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
                     
-                    with fs_hook.open_file(psource_path + output_file, 'a') as outfile:
+                    with fs_hook.open_file(pSourcePath + output_file, 'a') as outfile:
                         df3.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
                                 
                 
@@ -217,8 +203,8 @@ def daily_load_data():
 
 
 
-        def Stat_CDR_Datafix(psource_path):
-#            source_path = r'/rmo_ct_prod/inprogress/'
+        def Stat_CDR_Datafix(pSourcePath):
+            #source_path = r'/rmo_ct_prod/inprogress/'
             file = 'Stat_CDR.csv'
             output_file = 'Stat_CDR_fixed.csv'
 
@@ -229,13 +215,14 @@ def daily_load_data():
                     
                     cols = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]                  
                     
-                    with fs_hook.open_file(psource_path + file,'r') as f:
+                    with fs_hook.open_file(pSourcePath + file,'r') as f:
                         csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(22)], quoting=1)
  
                     df1 = csv_reader.loc[:, [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]]
  
-                    with fs_hook.open_file(psource_path + output_file, 'w') as outfile:
+                    with fs_hook.open_file(PSourcePath + output_file, 'w') as outfile:
                             df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
+  
                                 
                 outfile.close()
                 
@@ -245,8 +232,8 @@ def daily_load_data():
             return                     
 
             
-        def Stat_CDR_Summary_Datafix(psource_path):
-#            source_path = r'/rmo_ct_prod/inprogress/'
+        def Stat_CDR_Summary_Datafix(pSourcePath):
+            #source_path = r'/rmo_ct_prod/inprogress/'
             file = 'Stat_CDR_Summary.csv'
             output_file = 'Stat_CDR_Summary_fixed.csv'
 
@@ -255,7 +242,7 @@ def daily_load_data():
                 # Initialize SambaHook with your credentials and connection details
                 with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
                     
-                    with fs_hook.open_file(psource_path + file,'r') as f:
+                    with fs_hook.open_file(pSourcePath + file,'r') as f:
                         csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(70)], quoting=1)
  
                     df1 = csv_reader.loc[:,[0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19,
@@ -264,8 +251,9 @@ def daily_load_data():
                                             60,61,62,63,64,65,66,67,68,69]]                      
                             
 
-                    with fs_hook.open_file(psource_path + output_file, 'w') as outfile:
+                    with fs_hook.open_file(pSourcePath + output_file, 'w') as outfile:
                         df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
+  
                                 
                 outfile.close()
                 
@@ -275,8 +263,8 @@ def daily_load_data():
             return   
         
 
-        def LOBCodeLangString(psource_path):
-#            source_path = r'/rmo_ct_prod/inprogress/'
+        def LOBCodeLangString(pSourcePath):
+            #source_path = r'/rmo_ct_prod/inprogress/'
             file = 'LOBCodeLangString.csv'
             output_file = 'LOBCodeLangString_fixed.csv'
 
@@ -285,12 +273,12 @@ def daily_load_data():
                 # Initialize SambaHook with your credentials and connection details
                 with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
                                
-                    with fs_hook.open_file(psource_path + file,'r') as f:
+                    with fs_hook.open_file(pSourcePath + file,'r') as f:
                         csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(3)], quoting=1)   
 
                     df1 = csv_reader.loc[:,[0,1,2]]
                     
-                    with fs_hook.open_file(psource_path + output_file, 'w') as outfile:
+                    with fs_hook.open_file(pSourcePath + output_file, 'w') as outfile:
                         df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
                                 
                 outfile.close()                    
@@ -301,8 +289,8 @@ def daily_load_data():
             return   
 
             
-        def EvalCriteriaLangString(psource_path):
-#            source_path = r'/rmo_ct_prod/inprogress/'
+        def EvalCriteriaLangString(pSourcePath):
+            #source_path = r'/rmo_ct_prod/inprogress/'
             file = 'EvalCriteriaLangString.csv'
             output_file = 'EvalCriteriaLangString_fixed.csv'
 
@@ -310,15 +298,16 @@ def daily_load_data():
             try:
                 # Initialize SambaHook with your credentials and connection details
                 with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
-                     
-                    with fs_hook.open_file(psource_path + file,'r') as f:
+                    
+                    with fs_hook.open_file(pSourcePath + file,'r') as f:
                         csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(3)], quoting=1)   
 
                     df1 = csv_reader.loc[:,[0,1,2]]
                     
-                    with fs_hook.open_file(psource_path + output_file, 'w') as outfile:
+                    with fs_hook.open_file(pSourcePath + output_file, 'w') as outfile:
                         df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
-                                 
+  
+                                
                 outfile.close()                    
         
             except Exception as e:
@@ -327,31 +316,29 @@ def daily_load_data():
             return       
 
         
-        def load_db_source(pSource_File, pDBname):
-            pRMOInProgressFolder = Variable.get("vRMOInProgressFolder")
-            pRMOLogFolder = Variable.get("vRMOLogFolder")
+        def load_db_source(pSourceFile, pDBname):
             sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
             dYmd = (dt.datetime.today() + timedelta(days = -1)).strftime('%Y%m%d')
 
             try:
-                if pSource_File == 'Stat_CDR.csv':
+                if pSourceFile == 'Stat_CDR.csv':
                     pTableName = 'ICE_Stat_CDR'
-                    pSource_File = 'Stat_CDR_fixed.csv'
-                elif pSource_File == 'Agent.csv':
+                    pSourceFile = 'Stat_CDR_fixed.csv'
+                elif pSourceFile == 'Agent.csv':
                     pTableName = 'ICE_Agent'
-                    pSource_File = 'Agent_fixed.csv'
-                elif pSource_File == 'Stat_CDR_Summary.csv':
+                    pSourceFile = 'Agent_fixed.csv'
+                elif pSourceFile == 'Stat_CDR_Summary.csv':
                     pTableName = 'ICE_Stat_CDR_Summary'
-                    pSource_File = 'Stat_CDR_Summary_fixed.csv' 
-                elif pSource_File == 'LOBCodeLangString.csv':   
+                    pSourceFile = 'Stat_CDR_Summary_fixed.csv' 
+                elif pSourceFile == 'LOBCodeLangString.csv':   
                     pTableName = 'ICE_LOBCodeLangString'
-                    pSource_File = 'LOBCodeLangString_fixed.csv'
-                elif pSource_File == 'EvalCriteriaLangString.csv':   
+                    pSourceFile = 'LOBCodeLangString_fixed.csv'
+                elif pSourceFile == 'EvalCriteriaLangString.csv':   
                     pTableName = 'ICE_EvalCriteriaLangString'
-                    pSource_File = 'EvalCriteriaLangString_fixed.csv'     
+                    pSourceFile = 'EvalCriteriaLangString_fixed.csv'     
                 else:
-                    xlen = len(pSource_File)-4
-                    pTableName = 'ICE_' + pSource_File[:xlen]
+                    xlen = len(pSourceFile)-4
+                    pTableName = 'ICE_' + pSourceFile[:xlen]
 
                 logging.info(f"loading table: {pTableName}")
             
@@ -359,16 +346,16 @@ def daily_load_data():
                 cursor = conn.cursor()
             
                 query = f""" BULK INSERT [{pDBname}].[dbo].[{pTableName}]
-                             FROM '{pRMOInProgressFolder}{pSource_File}'
+                             FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{pSourceFile}'
                              WITH
 	                         ( FORMAT='CSV', 
                                MAXERRORS=100, 
-                               ERRORFILE='{pRMOLogFolder}{pTableName}_{dYmd}.log',
+                               ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{pTableName}_{dYmd}.log',
                                TABLOCK                               
 	                         );
                          """
                 logging.info(f"query: {query}")
-                logging.info(f"inserting table:  {pSource_File}")
+                logging.info(f"inserting table:  {pSourceFile}")
                 start_time = time.time()
                 cursor.execute(query)
                 conn.commit()
@@ -376,21 +363,21 @@ def daily_load_data():
                 logging.info(f"bulk insert {time.time() - start_time} seconds")
         
             except Exception as e:
-                logging.error(f"Error bulk loading table: {pTableName} source file: {pSource_File} {e}")
+                logging.error(f"Error bulk loading table: {pTableName} source file: {pSourceFile} {e}")
                
                 
             return
             
-
+        log_path = r'/rmo_ct_prod/log/'
+        log_name = 'daily_set.txt'
+        
+        config_path = r'/rmo_ct_prod/Configuration/'
+        file_names = 'source_file_names.csv'
+        SourcePath = r'/rmo_ct_prod/inprogress/'
         source_file_set=[] 
         data = []
       
         dbname = Variable.get("vDatabaseName")
-        config_path = r'/rmo_ct_prod/Configuration/'
-        file_names = 'source_file_names.csv'
-        #ConfigPath = Variable.get("vRMOConfigPath")
-        #FileNames = Variable.get("vConfigName")
-        SourcePath = Variable.get("vRMOSourcePath")
 
         with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
             
@@ -400,6 +387,10 @@ def daily_load_data():
                 
                 data_set = [x for x in data if str(x) != 'nan']
                 
+                #with fs_hook.open_file(log_path + log_name,'w') as outfile:
+                #    for item in data_set:
+                #        outfile.write("%s\n" % item)
+                        
        
         # Data fixes required for relevant daily table process 
         Agent_Datafix(SourcePath)
@@ -413,6 +404,6 @@ def daily_load_data():
  
  
  #Set task dependencies
-    remove_csv_inprogress() >> unzip_move_file() >> backup_daily_source_file() >> unzip_move_file() >> truncate_landing_tables() >> daily_load_source() 
+    remove_csv_inprogress(SourcePath) >> unzip_move_file() >> backup_daily_source_file() >> truncate_landing_tables() >> daily_load_source() 
     
 dag = daily_load_data()
