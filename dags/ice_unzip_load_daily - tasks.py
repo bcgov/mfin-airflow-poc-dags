@@ -62,7 +62,7 @@ def daily_load_data():
 
                         fs_hook.push_from_local(dest_path+iceTable.filename, os.path.join(zip_loc,iceTable.filename))
                     
-          except Exception as e:
+        except Exception as e:
             logging.error(f"Error unzipping files: {e}")  
 
         return          
