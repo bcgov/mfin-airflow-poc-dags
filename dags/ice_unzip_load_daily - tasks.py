@@ -327,46 +327,50 @@ def daily_load_data():
             return       
 
         
-        def load_db_source(pSourceFile, pDBname):
+        def load_db_source(pSourceFile, pDBName):
             sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
             dYmd = (dt.datetime.today() + timedelta(days = -1)).strftime('%Y%m%d')
 
             try:
                 if pSourceFile == 'Stat_CDR.csv':
-                    pTableName = 'ICE_Stat_CDR'
-                    pSourceFile = 'Stat_CDR_fixed.csv'
+                    vTableName = 'ICE_Stat_CDR'
+                    vSourceFile = 'Stat_CDR_fixed.csv'
                 elif pSourceFile == 'Agent.csv':
-                    pTableName = 'ICE_Agent'
-                    pSourceFile = 'Agent_fixed.csv'
+                    vTableName = 'ICE_Agent'
+                    vSourceFile = 'Agent_fixed.csv'
                 elif pSourceFile == 'Stat_CDR_Summary.csv':
-                    pTableName = 'ICE_Stat_CDR_Summary'
-                    pSourceFile = 'Stat_CDR_Summary_fixed.csv' 
+                    vTableName = 'ICE_Stat_CDR_Summary'
+                    vSourceFile = 'Stat_CDR_Summary_fixed.csv' 
                 elif pSourceFile == 'LOBCodeLangString.csv':   
-                    pTableName = 'ICE_LOBCodeLangString'
-                    pSourceFile = 'LOBCodeLangString_fixed.csv'
+                    vTableName = 'ICE_LOBCodeLangString'
+                    vSourceFile = 'LOBCodeLangString_fixed.csv'
                 elif pSourceFile == 'EvalCriteriaLangString.csv':   
-                    pTableName = 'ICE_EvalCriteriaLangString'
-                    pSourceFile = 'EvalCriteriaLangString_fixed.csv'     
+                    vTableName = 'ICE_EvalCriteriaLangString'
+                    vSourceFile = 'EvalCriteriaLangString_fixed.csv'     
                 else:
                     xlen = len(pSourceFile)-4
-                    pTableName = 'ICE_' + pSourceFile[:xlen]
+                    vTableName = 'ICE_' + pSourceFile[:xlen]
+                    vSourceFile = pSourceFile
 
-                logging.info(f"loading table: {pTableName}")
+                logging.info(f"loading table: {vTableName}")
             
                 conn = sql_hook.get_conn()
                 cursor = conn.cursor()
+                
+                vRMOInprogress = Variable.get("vRMOInProgressFolder")
+                vRMOLog = Variable.get("vRMOLogFolder")
             
-                query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{pTableName}]
-                             FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{pSourceFile}'
+                query = f""" BULK INSERT [{pDBName}].[dbo].[{vTableName}]
+                             FROM '{vRMOInProgress}{vSourceFile}'
                              WITH
 	                         ( FORMAT='CSV', 
                                MAXERRORS=100, 
-                               ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{pTableName}_{dYmd}.log',
+                               ERRORFILE='{vRMOLog}{vTableName}_{dYmd}.log',
                                TABLOCK                               
 	                         );
                          """
                 logging.info(f"query: {query}")
-                logging.info(f"inserting table:  {pSourceFile}")
+                logging.info(f"inserting table:  {vSourceFile}")
                 start_time = time.time()
                 cursor.execute(query)
                 conn.commit()
@@ -374,7 +378,7 @@ def daily_load_data():
                 logging.info(f"bulk insert {time.time() - start_time} seconds")
         
             except Exception as e:
-                logging.error(f"Error bulk loading table: {pTableName} source file: {pSourceFile} {e}")
+                logging.error(f"Error bulk loading table: {vTableName} source file: {vSourceFile} {e}")
                
                 
             return
@@ -382,18 +386,18 @@ def daily_load_data():
         log_path = r'/rmo_ct_prod/log/'
         log_name = 'daily_set.txt'
         
-        #config_path = r'/rmo_ct_prod/Configuration/'
         ConfigPath = Variable.get("vRMOConfigPath")
-        file_names = 'source_file_names.csv'
-        SourcePath = r'/rmo_ct_prod/inprogress/'
+        FileName = Variable.get("vConfigName")
+        SourcePath = Variable.get("vRMOSourcePath")
+                
         source_file_set=[] 
         data = []
       
-        dbname = Variable.get("vDatabaseName")
+        DBName = Variable.get("vDatabaseName")
 
         with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
             
-            with fs_hook.open_file(ConfigPath + file_names,'r') as f:
+            with fs_hook.open_file(ConfigPath + FileName,'r') as f:
                 source_file_set = pd.read_csv(f, header = None, quoting=1)
                 data = source_file_set.values.flatten().tolist()   
                 
@@ -412,7 +416,7 @@ def daily_load_data():
         EvalCriteriaLangString(SourcePath)
               
         for source_file in data_set:
-            load_db_source(source_file, dbname)
+            load_db_source(source_file, DBName)
  
  
  #Set task dependencies
