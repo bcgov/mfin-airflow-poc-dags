@@ -97,7 +97,7 @@ def daily_load_data():
                         outfile.write("copying file %s to completed folder\n" % f)
                     
             except Exception as e:
-                logging.error(f"Error backing up {dYmd} source file")
+                logging.error(f"Error backing up {file}-{dYmd}.zip source file")
         
         return
  
