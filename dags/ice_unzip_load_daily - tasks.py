@@ -357,7 +357,7 @@ def daily_load_data():
                 conn = sql_hook.get_conn()
                 cursor = conn.cursor()
                 
-                vRMOInprogress = Variable.get("vRMOInProgressFolder")
+                vRMOInProgress = Variable.get("vRMOInProgressFolder")
                 vRMOLog = Variable.get("vRMOLogFolder")
             
                 query = f""" BULK INSERT [{pDBName}].[dbo].[{vTableName}]
