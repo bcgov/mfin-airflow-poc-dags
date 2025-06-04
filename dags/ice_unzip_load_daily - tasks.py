@@ -92,19 +92,19 @@ def daily_load_data():
  
     # Task 3: Inprogress subfolder - Removing csv data files    
     @task
-    def remove_csv_inprogress(pDeletePath):
+    def remove_csv_inprogress():
         conn_id = 'fs1_rmo_ice'
       
-        #delete_path = r'/rmo_ct_prod/inprogress/'
+        DeletePath = r'/rmo_ct_prod/inprogress/'
         hook = SambaHook(conn_id)
-        files = hook.listdir(pDeletePath)
+        files = hook.listdir(DeletePath)
 
         try:
             for file in files:
-                file_path = f"{pDeletePath}/{file}"
+                file_path = f"{DeletePath}/{file}"
                 hook.remove(file_path)
         except:
-            logging.error(f"Error {e} removing file: {file_path}")
+            logging.error(f"Error {e} removing file: {DeletePath}")
             
         return
 
@@ -404,6 +404,6 @@ def daily_load_data():
  
  
  #Set task dependencies
-    remove_csv_inprogress(SourcePath) >> unzip_move_file() >> backup_daily_source_file() >> truncate_landing_tables() >> daily_load_source() 
+    remove_csv_inprogress() >> unzip_move_file() >> backup_daily_source_file() >> truncate_landing_tables() >> daily_load_source() 
     
 dag = daily_load_data()
