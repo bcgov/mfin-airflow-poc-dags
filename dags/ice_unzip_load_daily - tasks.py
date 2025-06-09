@@ -13,7 +13,8 @@ import datetime as dt
 from datetime import datetime
 from datetime import timedelta
 from airflow.operators.python import PythonOperator
-from airflow.utils.email import send_email
+from airflow.operators.email import EmailOperator
+from airflow.utils.context import Context
 from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
 from airflow.hooks.base_hook import BaseHook
 from airflow.models import Variable
@@ -100,10 +101,20 @@ def daily_load_data():
                             foundflag = 1
                     
                     if foundflag == 0:
-                        send_email(to = 'eloy.mendez@gov.bc.ca',
-                                   subject = 'Missing daily Computer Talk source file',
-                                   html_content = '<p>iceDB_ICE_BCMOFRM.zip missing in target folder!,/p>'
+                        email_operator = EmailOperator(
+                                   task_id = 'Source file not available',
+                                   to = 'eloy.mendez@gov.bc.ca',
+                                   subject = 'Missing daily iceDB_ICE_BCMOFRMO.zip file',
+                                   html_content = '<p>iceDB_ICE_BCMOFRM.zip missing in target folder!/p>',
+                                   dag = None
                                    )
+                        
+                        context = {'ds' : str(datetime.today()),
+                                   'ts' : str(datetime.now()),
+                                   'task_instance' = None,
+                                  }
+                        
+                        email_operator.execute(context = context)
                     
                 except Exception as e:
                     logging.error(f"Error backing up {file}-{dYmd}.zip source file")
