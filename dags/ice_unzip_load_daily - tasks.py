@@ -13,6 +13,7 @@ import datetime as dt
 from datetime import datetime
 from datetime import timedelta
 from airflow.operators.python import PythonOperator
+from airflow.utils.email import send_email
 from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
 from airflow.hooks.base_hook import BaseHook
 from airflow.models import Variable
@@ -85,7 +86,8 @@ def daily_load_data():
                 outfile.write("creating SambaHook\n")
                 #   Set dYmd to yesterdays date
                 dYmd = (dt.datetime.today() + timedelta(days=2)).strftime('%Y%m%d')
-                outfile.write("Setting date extension\n")        
+                outfile.write("Setting date extension\n")   
+                foundflag = 0                
                 try:
                     files = hook.listdir(SourcePath)
                     outfile.write("getting hook.listdir\n")
@@ -95,6 +97,13 @@ def daily_load_data():
                         if f == 'iceDB_ICE_BCMOFRMO.zip':
                             hook.replace(SourcePath + f, DestPath + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip') 
                             outfile.write("copying file %s to completed folder\n" % f)
+                            foundflag = 1
+                    
+                    if foundflag == 0:
+                        send_email(to = 'eloy.mendez@gov.bc.ca',
+                                   subject = 'Missing daily Computer Talk source file',
+                                   html_content = '<p>iceDB_ICE_BCMOFRM.zip missing in target folder!,/p>'
+                                   )
                     
                 except Exception as e:
                     logging.error(f"Error backing up {file}-{dYmd}.zip source file")
@@ -106,7 +115,8 @@ def daily_load_data():
     def remove_csv_inprogress():
         conn_id = 'fs1_rmo_ice'
       
-        DeletePath = r'/rmo_ct_prod/inprogress/'
+        #DeletePath = r'/rmo_ct_prod/inprogress/'
+        DeletePath = Variable.get("vRMOSourcePath")
         hook = SambaHook(conn_id)
         files = hook.listdir(DeletePath)
 
