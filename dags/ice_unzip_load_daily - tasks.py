@@ -111,7 +111,7 @@ def daily_load_data():
                         
                         context = {'ds' : str(datetime.today()),
                                    'ts' : str(datetime.now()),
-                                   'task_instance' = None,
+                                   'task_instance' : None,
                                   }
                         
                         email_operator.execute(context = context)
