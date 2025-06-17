@@ -1,6 +1,6 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-from airflow.providers.smtp.hooks.smtp import SMTPHook
+from airflow.providers.smtp.hooks.smtp import SmtpHook
 from email.mime.text import MIMEText
 from airflow.providers.smtp.notifications.smtp import send_smtp_notification
 from datetime import datetime
