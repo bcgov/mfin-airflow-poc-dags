@@ -15,9 +15,8 @@ root.addHandler(handler)
 
 
 def send_email_smtp():
-    smtp_hook=SmtpHook(smtp_conn_id = 'Email_Notification')
-	
-	msg = MIMEText('<h3>Daily iceDB_ICE_BCMOFRMO.zip missing for ETL process</h3>', 'html')
+    smtp_hook = SmtpHook(smtp_conn_id = 'Email_Notification')	
+    msg = MIMEText('<h3>Daily iceDB_ICE_BCMOFRMO.zip missing for ETL process</h3>', 'html')
     msg['Subject'] = 'Airflow SMTP Email'
     msg['From'] = 'FINDAMSG@gov.bc.ca'
 	msg['To'] = 'eloy.mendez@gov.bc.ca'
@@ -40,4 +39,5 @@ with DAG(
 	email_task = PythonOperator(
 	    task_id = 'send_email',
 		python_callable = send_email_smtp
+    )
 
