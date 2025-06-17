@@ -27,7 +27,7 @@ def send_email_with_hook():
     msg['From'] = "FINDAMSG@gov.bc.ca"
     msg['To'] = "eloy.mendez@gov.bc.ca"
     
-    smtp_hook.send_email(msg=msg)
+    smtp_hook.send_email_smtp(msg=msg)
 
 
 with DAG(
