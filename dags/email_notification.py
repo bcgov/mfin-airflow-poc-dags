@@ -1,8 +1,7 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-from airflow.hooks.smtp_hook import SmtpHook
+from airflow.providers.smtp.notifications.smpt import send_smtp_notification
 from datetime import datetime
-from email.mime.text import MIMEText
 import logging
 
 root = logging.getLogger()
@@ -15,16 +14,11 @@ root.addHandler(handler)
 
 
 def send_email_smtp():
-    smtp_hook = SmtpHook(smtp_conn_id = 'Email_Notification')	
-    msg = MIMEText('<h3>Daily iceDB_ICE_BCMOFRMO.zip missing for ETL process</h3>', 'html')
-    msg['Subject'] = 'Airflow SMTP Email'
-    msg['From'] = 'FINDAMSG@gov.bc.ca'
-    msg['To'] = 'eloy.mendez@gov.bc.ca'
-	
-    smtp_hook.send_email(
-        to=['eloy.mendez@gov.bc.ca'],
-        subject = msg['Missing daily source file iceDB_ICE_BCMOFRMO.zip'],
-        html_content = msg.getpayload()
+    send_smtp_notification(
+        from_email="FINDAMSG@gov.bc.ca",
+        to="eloy.mendez@gov.bc.ca",
+        subject = "Missing daily source file iceDB_ICE_BCMOFRMO.zip",
+        html_content = "daily source file iceDB_ICE_BCMOFRMO.zip not available for loading"
 	)
 	
 with DAG(
