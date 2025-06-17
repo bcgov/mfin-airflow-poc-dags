@@ -1,6 +1,6 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-from airflow.providers.smtp.notifications.smpt import send_smtp_notification
+from airflow.providers.smtp.notifications.smtp import send_smtp_notification
 from datetime import datetime
 import logging
 
