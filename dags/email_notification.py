@@ -15,17 +15,17 @@ root.addHandler(handler)
 
 
 def send_email_smtp():
-    smtp_hook =SmtpHook(smtp_conn_id = 'Email_Notification')
+    smtp_hook=SmtpHook(smtp_conn_id = 'Email_Notification')
 	
-	msg = MimeTex('<h3>Daily iceDB_ICE_BCMOFRMO.zip missing for ETL process</h3>, 'html')
+	msg = MIMEText('<h3>Daily iceDB_ICE_BCMOFRMO.zip missing for ETL process</h3>', 'html')
     msg['Subject'] = 'Airflow SMTP Email'
     msg['From'] = 'FINDAMSG@gov.bc.ca'
 	msg['To'] = 'eloy.mendez@gov.bc.ca'
 	
 	smtp_hook.send_email(
-	    to=['eloy.mendez@gov.bc.ca'],
-		subject = msg['Missing daily source file iceDB_ICE_BCMOFRMO.zip'],
-		html_content = msg.getpayload()
+        to=['eloy.mendez@gov.bc.ca'],
+        subject = msg['Missing daily source file iceDB_ICE_BCMOFRMO.zip'],
+        html_content = msg.getpayload()
 	)
 	
 with DAG(
