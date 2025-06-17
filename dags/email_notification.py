@@ -23,7 +23,6 @@ def send_email_smtp():
 	
 with DAG(
     dag_id="email_missing_daily_load",
-    owner = "airflow",    	
     schedule_interval = None,  # Set your schedule interval or leave as None for manual trigger
     start_date = datetime(2025,1,1),
     catchup = False,
