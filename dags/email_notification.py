@@ -25,7 +25,7 @@ with DAG(
     dag_id="email_missing_daily_load",
     owner = "airflow",    	
     schedule_interval = None,  # Set your schedule interval or leave as None for manual trigger
-    start_date = days_ago(1),
+    start_date = datetime(2025,1,1),
     catchup = False,
     tags = ["ice", "email", "missing","daily","load"]
 ) as dag:
