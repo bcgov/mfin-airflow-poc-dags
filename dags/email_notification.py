@@ -20,7 +20,7 @@ def send_email_with_hook():
     
     dYmd = (dt.datetime.today()).strftime('%Y%m%d')
     
-    smtp_hook = SMTPHook(smtp_conn_id='Email_Notification')
+    smtp_hook = SmtpHook(smtp_conn_id='Email_Notification')
     
     msg = MIMEText("Daily source file iceDB_ICE_BCMOFRMO.zip for {dYmd}  not available for loading")
     msg['Subject'] = "Missing daily source file"
