@@ -19,9 +19,9 @@ def send_email_smtp():
     msg = MIMEText('<h3>Daily iceDB_ICE_BCMOFRMO.zip missing for ETL process</h3>', 'html')
     msg['Subject'] = 'Airflow SMTP Email'
     msg['From'] = 'FINDAMSG@gov.bc.ca'
-	msg['To'] = 'eloy.mendez@gov.bc.ca'
+    msg['To'] = 'eloy.mendez@gov.bc.ca'
 	
-	smtp_hook.send_email(
+    smtp_hook.send_email(
         to=['eloy.mendez@gov.bc.ca'],
         subject = msg['Missing daily source file iceDB_ICE_BCMOFRMO.zip'],
         html_content = msg.getpayload()
@@ -29,15 +29,15 @@ def send_email_smtp():
 	
 with DAG(
     dag_id="email_missing_daily_load",
-	owner = "airflow",    	
+    owner = "airflow",    	
     schedule_interval = None,  # Set your schedule interval or leave as None for manual trigger
     start_date = days_ago(1),
     catchup = False,
     tags = ["ice", "email", "missing","daily","load"]
 ) as dag:
     
-	email_task = PythonOperator(
-	    task_id = 'send_email',
-		python_callable = send_email_smtp
+    email_task = PythonOperator(
+        task_id = 'send_email',
+        python_callable = send_email_smtp
     )
 
