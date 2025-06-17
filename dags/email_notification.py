@@ -27,7 +27,13 @@ def send_email_with_hook():
     msg['From'] = "FINDAMSG@gov.bc.ca"
     msg['To'] = "eloy.mendez@gov.bc.ca"
     
-    smtp_hook.send_email_smtp(msg=msg)
+    smtp_hook.send_email_smtp(
+                  to = ['eloy.mendez@gov.bc.ca'],
+                  subject = 'Missing dailynsource file',
+                  html_content = """<h3>Email Notification</h3>
+                                    <p>Daily source file iceDB_ICE_BCMOFRMO.zip {dYmd} for not available for loading</p>""",
+                  from_email = ['FINDAMSG@gov.bc.ca']
+              )
 
 
 with DAG(
