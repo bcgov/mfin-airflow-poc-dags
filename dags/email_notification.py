@@ -27,8 +27,7 @@ def send_email_with_hook():
         sh.send_email_smtp(
                'eloy.mendez@gov.bc.ca',
                'Missing dailynsource file',
-               f"""<h3>Email Notification</h3>
-                  <p>Daily source file iceDB_ICE_BCMOFRMO.zip {dYmd} for not available for loading</p>""",
+               """<h3>Email Notification test</h3>""",
                'FINDAMSG@gov.bc.ca'
         )
 
