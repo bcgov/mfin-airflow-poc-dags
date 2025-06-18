@@ -25,11 +25,11 @@ def send_email_with_hook():
         #sh.smtp_client = 'smtplib.SMTP'
         
         sh.send_email_smtp(
-               to = ['eloy.mendez@gov.bc.ca'],
-               subject = 'Missing dailynsource file',
-               html_content = f"""<h3>Email Notification</h3>
-                                   <p>Daily source file iceDB_ICE_BCMOFRMO.zip {dYmd} for not available for loading</p>""",
-               from_email = ['FINDAMSG@gov.bc.ca']
+               'eloy.mendez@gov.bc.ca',
+               'Missing dailynsource file',
+               f"""<h3>Email Notification</h3>
+                  <p>Daily source file iceDB_ICE_BCMOFRMO.zip {dYmd} for not available for loading</p>""",
+               'FINDAMSG@gov.bc.ca'
         )
 
 
