@@ -20,20 +20,17 @@ def send_email_with_hook():
     
     dYmd = (dt.datetime.today()).strftime('%Y%m%d')
     
-    smtp_hook = SmtpHook(smtp_conn_id='Email_Notification')
-    
-    msg = MIMEText("Daily source file iceDB_ICE_BCMOFRMO.zip for {dYmd}  not available for loading")
-    msg['Subject'] = "Missing daily source file"
-    msg['From'] = "FINDAMSG@gov.bc.ca"
-    msg['To'] = "eloy.mendez@gov.bc.ca"
-    
-    send_email_smtp(
-        to = ['eloy.mendez@gov.bc.ca'],
-        subject = 'Missing dailynsource file',
-        html_content = """<h3>Email Notification</h3>
-                          <p>Daily source file iceDB_ICE_BCMOFRMO.zip {dYmd} for not available for loading</p>""",
-        from_email = ['FINDAMSG@gov.bc.ca']
-    )
+    with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
+        sh.conn_type = 'smtp'
+        sh.smtp_client = 'smtplib.SMTP'
+        
+        sh.send_email_smtp(
+               to = ['eloy.mendez@gov.bc.ca'],
+               subject = 'Missing dailynsource file',
+               html_content = f"""<h3>Email Notification</h3>
+                                   <p>Daily source file iceDB_ICE_BCMOFRMO.zip {dYmd} for not available for loading</p>""",
+               from_email = ['FINDAMSG@gov.bc.ca']
+        )
 
 
 with DAG(
