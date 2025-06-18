@@ -1,8 +1,8 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.providers.smtp.hooks.smtp import SmtpHook
-from email.mime.text import MIMEText
-from airflow.providers.smtp.notifications.smtp import send_smtp_notification
+#from email.mime.text import MIMEText
+#from airflow.providers.smtp.notifications.smtp import send_smtp_notification
 from datetime import datetime
 import datetime as dt
 import logging
@@ -21,8 +21,8 @@ def send_email_with_hook():
     dYmd = (dt.datetime.today()).strftime('%Y%m%d')
     
     with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
-        sh.conn_type = 'smtp'
-        sh.smtp_client = 'smtplib.SMTP'
+        #sh.conn_type = 'smtp'
+        #sh.smtp_client = 'smtplib.SMTP'
         
         sh.send_email_smtp(
                to = ['eloy.mendez@gov.bc.ca'],
