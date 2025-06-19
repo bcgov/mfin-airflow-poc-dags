@@ -21,9 +21,9 @@ def send_email_with_hook():
     
     with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
         
-        SmtpHook(to = 'eloy.mendez@gov.bc.ca')
-        SmtpHook(subject = 'Airflow email test')
-        SmtpHook(html_content = '<h1>Email Notification from Airflow</h1>')
+        SmtpHook('to' = 'eloy.mendez@gov.bc.ca')
+        SmtpHook('subject' = 'Airflow email test')
+        SmtpHook('html_content' = '<h1>Email Notification from Airflow</h1>')
         #msg = EmailMessage()
         #msg["to"] = "eloy.mendez@gov.bc.ca"
         #msg["subject"] = "Missing daily source file"
