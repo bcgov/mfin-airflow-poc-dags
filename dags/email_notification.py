@@ -20,18 +20,21 @@ def send_email_with_hook():
     dYmd = (dt.datetime.today()).strftime('%Y%m%d')
     
     with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
-       
+        
+        SmtpHook(to = 'eloy.mendez@gov.bc.ca')
+        SmtpHook(subject = 'Airflow email test')
+        SmtpHook(html_content = '<h1>Email Notification from Airflow</h1>'
         #msg = EmailMessage()
         #msg["to"] = "eloy.mendez@gov.bc.ca"
         #msg["subject"] = "Missing daily source file"
         #msg["html_content"]= """<h3>Email Notification from Airflow</h3>"""
         #msg["from_email"] = "FINDAMSG@gov.bc.ca"
         #msg.set_content("Email notification test from Airflow.")
-        sh.to = 'eloy.mendez@gov.bc.ca'
-        sh.subject = 'Airfloe email test'
-        sh.html_content = '<h1>Email Notification from Airflow</h1>'
+        #sh.to = 'eloy.mendez@gov.bc.ca'
+        #sh.subject = 'Airfloe email test'
+        #sh.html_content = '<h1>Email Notification from Airflow</h1>'
         
-        sh.send_email_smtp()
+        SmtpHook.send_email_smtp()
 
 
 with DAG(
