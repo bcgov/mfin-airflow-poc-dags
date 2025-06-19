@@ -30,7 +30,6 @@ def send_email_with_hook():
         sh.to = 'eloy.mendez@gov.bc.ca'
         sh.subject = 'Airfloe email test'
         sh.html_content = '<h1>Email Notification from Airflow</h1>'
-        sh.from_email = 'FINDAMSG@gov.bc.ca'
         
         sh.send_email_smtp()
 
