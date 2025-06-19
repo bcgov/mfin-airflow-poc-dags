@@ -2,8 +2,6 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.providers.smtp.hooks.smtp import SmtpHook
 from email.message import EmailMessage
-#from email.mime.text import MIMEText
-#from airflow.providers.smtp.notifications.smtp import send_smtp_notification
 from datetime import datetime
 import datetime as dt
 import logging
@@ -24,10 +22,11 @@ def send_email_with_hook():
     with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
        
         msg = EmailMessage()
-        msg["Subject"] = "Missing daily source file"
-        msg["From"] = "FINDAMSG@gov.bc.ca"
-        msg["To"] = "eloy.mendez@gov.bc.ca"
-        msg.set_content("Email notification test from Airflow.")
+        msg["to"] = "eloy.mendez@gov.bc.ca"
+        msg["subject"] = "Missing daily source file"
+        msg["html_content"]= """<h3>Email Notification from Airflow</h3>"""
+        msg["from_email"] = "FINDAMSG@gov.bc.ca"
+        #msg.set_content("Email notification test from Airflow.")
         
         sh.send_email_smtp(msg)
 
