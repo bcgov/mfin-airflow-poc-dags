@@ -23,9 +23,9 @@ def send_email_with_hook():
         
         
         sh.send_email_smtp(
-           to=['eloy.mendez@go.bc.ca'],
+           to=['kunal.kardam@gov.bc.ca','eloy.mendez@go.bc.ca'],
            subject='Airflow email test',
-           html_content="""<p>This is an email test </p>"""
+           html_content='<p>This is an email test </p>'
         )
 
 
