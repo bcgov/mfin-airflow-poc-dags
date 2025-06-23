@@ -120,7 +120,7 @@ def ice_ptb_load_ondemand():
                     FROM '\\\\fs1.fin.gov.bc.ca\\ptb_ct_prod\\inprogress\\{psource_file}'
                     WITH
 	                ( FIELDTERMINATOR = '|',
-                      ROWTERMINATOR = '\n',
+                      ROWTERMINATOR = '\r\n',
                       MAXERRORS = 20, 
                       ERRORFILE='\\\\fs1.fin.gov.bc.ca\\ptb_ct_prod\\log\\{psource_file}.log'
 	                );
