@@ -119,7 +119,7 @@ def ice_ptb_load_ondemand():
  #           xlen = len(psource_file)-4
  #           pTableName = "ICE_" + psource_file[:xlen]
             
-            logging.info(f"loading table: {pTableName}")
+            logging.info(f"loading table: {vTableName}")
             
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
