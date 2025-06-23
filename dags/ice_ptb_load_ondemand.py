@@ -116,7 +116,7 @@ def ice_ptb_load_ondemand():
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
-            query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{pTableName}]
+            query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[ICE_Agent_PTB]
                     FROM '\\\\fs1.fin.gov.bc.ca\\ptb_ct_prod\\inprogress\\{psource_file}'
                     WITH
 	                ( FIELDTERMINATOR = '|',
@@ -172,7 +172,7 @@ def ice_ptb_load_ondemand():
         #                   "UCAddress.csv","UCGroup.csv",
         #                   "WfAttributeDetail.csv","WfLinkDetail.csv","WfLink.csv","WfAction.csv","WfPage.csv","WfGraph.csv",
         #                   "WfSubAppMethod.csv","WfSubApplication.csv","WfVariables.csv"]
-        source_file_set = ["Agent.csv","LOBCodeLangString.csv"]                   
+        source_file_set = ["Agent.csv"]                   
         
         
         for source_file in source_file_set:
