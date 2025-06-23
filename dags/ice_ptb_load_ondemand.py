@@ -104,7 +104,7 @@ def ice_ptb_load_ondemand():
             return   
             
     
-    def ondemand_load_source(psource_file):
+    def ondemand_load_source(pSourceFile):
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
 
         try:
