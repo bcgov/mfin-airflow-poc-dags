@@ -134,7 +134,7 @@ def ice_ptb_load_ondemand():
 	                );
                 """
             logging.info(f"query: {query}")
-            logging.info(f"inserting table:  {pTableName}")
+            logging.info(f"inserting table:  {vTableName}")
             start_time = time.time()
             cursor.execute(query)
             conn.commit()
