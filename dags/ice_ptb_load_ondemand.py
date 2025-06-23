@@ -108,21 +108,29 @@ def ice_ptb_load_ondemand():
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
 
         try:
-            xlen = len(psource_file)-4
-            pTableName = "ICE_" + psource_file[:xlen]
+            if pSourceFile == 'Agent.csv':
+                vTableName = 'ICE_Agent_PTB'
+                vSourceFile = 'Agent.csv'
+            else:
+                vTableName = 'ICE_LOBCodeLangString'
+                vSourceFile = 'LOBCodeLangString.csv'
+                
+                
+ #           xlen = len(psource_file)-4
+ #           pTableName = "ICE_" + psource_file[:xlen]
             
             logging.info(f"loading table: {pTableName}")
             
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
-            query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[ICE_Agent_PTB]
-                    FROM '\\\\fs1.fin.gov.bc.ca\\ptb_ct_prod\\inprogress\\{psource_file}'
+            query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{vTableName}]
+                    FROM '\\\\fs1.fin.gov.bc.ca\\ptb_ct_prod\\inprogress\\{vSourceFile}'
                     WITH
 	                ( FIELDTERMINATOR = '|',
                       ROWTERMINATOR = '\r\n',
                       MAXERRORS = 20, 
-                      ERRORFILE='\\\\fs1.fin.gov.bc.ca\\ptb_ct_prod\\log\\{psource_file}.log'
+                      ERRORFILE='\\\\fs1.fin.gov.bc.ca\\ptb_ct_prod\\log\\{vSourceFile}.log'
 	                );
                 """
             logging.info(f"query: {query}")
@@ -172,7 +180,7 @@ def ice_ptb_load_ondemand():
         #                   "UCAddress.csv","UCGroup.csv",
         #                   "WfAttributeDetail.csv","WfLinkDetail.csv","WfLink.csv","WfAction.csv","WfPage.csv","WfGraph.csv",
         #                   "WfSubAppMethod.csv","WfSubApplication.csv","WfVariables.csv"]
-        source_file_set = ["Agent.csv"]                   
+        source_file_set = ["Agent.csv","LOBCodeLangString.csv"]                   
         
         
         for source_file in source_file_set:
