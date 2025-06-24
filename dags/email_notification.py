@@ -23,7 +23,7 @@ def send_email_with_hook():
         
         
         sh.send_email_smtp(
-           to=['eloy.mendez@gov.bc.ca'],
+           to=['alexandre.limoges-bourgault@gov.bc.ca'],
            subject='Airflow email test',
            html_content='<html><body><h2>Airflow load daily source file failure</h2><p>CT iceDB_ICE_BCMOFRMO-' + dYmd + '.zip file not received</p></body></html>'
         )
