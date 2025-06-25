@@ -13,8 +13,8 @@ import datetime as dt
 from datetime import datetime
 from datetime import timedelta
 from airflow.operators.python import PythonOperator
-from airflow.operators.email import EmailOperator
-from airflow.utils.context import Context
+from airflow.providers.smtp.hooks.smtp import SmtpHook
+from email.message import EmailMessage
 from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
 from airflow.hooks.base_hook import BaseHook
 from airflow.models import Variable
@@ -71,6 +71,7 @@ def daily_load_data():
     
 
     # Task 2: Backup iceDB_ICE_BCMOFRMO-YYYYMMDD.zip to the completed folder 
+    #         If iceDB_ICE_BCMOFRMO-YYYYMMDD.zip file not found then email RMO executives
     @task
     def backup_daily_source_file():
         log_path = r'/rmo_ct_prod/log/'
@@ -86,9 +87,9 @@ def daily_load_data():
                 hook = SambaHook(conn_id)
                 outfile.write("creating SambaHook\n")
                 #   Set dYmd to yesterdays date
-                dYmd = (dt.datetime.today() + timedelta(days=2)).strftime('%Y%m%d')
+                dYmd = (dt.datetime.today() + timedelta(days=-1)).strftime('%Y%m%d')
                 outfile.write("Setting date extension\n")   
-                foundflag = 0                
+                foundDailyExtract = 0                
                 try:
                     files = hook.listdir(SourcePath)
                     outfile.write("getting hook.listdir\n")
@@ -98,28 +99,23 @@ def daily_load_data():
                         if f == 'iceDB_ICE_BCMOFRMO.zip':
                             hook.replace(SourcePath + f, DestPath + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip') 
                             outfile.write("copying file %s to completed folder\n" % f)
-                            foundflag = 1
+                            foundDailyExtract = 1
                     
-                    if foundflag == 0:
-                        email_operator = EmailOperator(
-                                   task_id = 'Source file not available',
-                                   to = 'eloy.mendez@gov.bc.ca',
-                                   subject = 'Missing daily iceDB_ICE_BCMOFRMO.zip file',
-                                   html_content = '<p>iceDB_ICE_BCMOFRM.zip missing in target folder!/p>',
-                                   dag = None
-                                   )
+                    if foundDailyExtract == 0:
+                        dYmd = (dt.datetime.today()).strftime('%Y%m%d')
                         
-                        context = {'ds' : str(datetime.today()),
-                                   'ts' : str(datetime.now()),
-                                   'task_instance' : None,
-                                  }
+                        with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
+                            sh.send_email_smtp(
+                                to=['eloy.mendez@gov.bc.ca'],
+                                subject='Airflow email test',
+                                html_content='<html><body><h2>Airflow load daily source file failure</h2><p>CT iceDB_ICE_BCMOFRMO-' + dYmd + '.zip file not received</p></body></html>'
+                            )                         
                         
-                        email_operator.execute(context = context)
                     
                 except Exception as e:
                     logging.error(f"Error backing up {file}-{dYmd}.zip source file")
         
-        return
+        return foundDailyExtract
  
     # Task 3: Inprogress subfolder - Removing csv data files    
     @task
@@ -142,54 +138,46 @@ def daily_load_data():
 
     # Task 4: Truncate landing tables prior loading next daily source files    
     @task
-    def truncate_landing_tables():
-        logging.basicConfig(level=logging.INFO) 
-        logging.info(f"truncate_landing_tables procedure")
+    def truncate_landing_tables(pETLcontinue):
+        if pETLcontinue == 'Y':
+            logging.basicConfig(level=logging.INFO) 
+            logging.info(f"truncate_landing_tables procedure")
 
-        #sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
-        conn_id = 'mssql_default'
-        conn = BaseHook.get_connection(conn_id)
-        dbname = 'FIN_SHARED_LANDING_DEV'
-        host = conn.host
-        user = conn.login
-        password = conn.password
+            #sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
+            conn_id = 'mssql_default'
+            conn = BaseHook.get_connection(conn_id)
+            dbname = 'FIN_SHARED_LANDING_DEV'
+            host = conn.host
+            user = conn.login
+            password = conn.password
         
-        connection = None
+            connection = None
                 
-        try:
- 
-            #conn = sql_hook.get_conn()
-            #cursor = conn.cursor()
-            #query = f"""EXEC [FIN_SHARED_LANDING_DEV].[dbo].[PROC_TELEPHONY_ICE_TRUNCATE];"""
-            #cursor.execute(query)
-            #conn.commit()
-            #cursor.execute("EXECUTE PROC_TELEPHONY_ICE_TRUNCATE")
-            #cursor.execute("TRUNCATE TABLE FIN_SHARED_LANDING_DEV.dbo.ICE_Stat_QueueActivity_D")
- 
-            connection =  pymssql.connect(host = host, database = dbname, user = user, password = password)
-            cursor = connection.cursor()
+            try:
+                connection =  pymssql.connect(host = host, database = dbname, user = user, password = password)
+                cursor = connection.cursor()
                     
-            start_time = time.time()
+                start_time = time.time()
 
-            cursor.execute("EXEC [dbo].[PROC_TELEPHONY_ICE_TRUNCATE]")
+                cursor.execute("EXEC [dbo].[PROC_TELEPHONY_ICE_TRUNCATE]")
             
-            connection.commit()            
+                connection.commit()            
                                   
-            logging.info(f"truncate landing tables {time.time() - start_time} seconds")
+                logging.info(f"truncate landing tables {time.time() - start_time} seconds")
         
-        except Exception as e:
-            logging.error(f"Error truncating landing tables {e}")
+            except Exception as e:
+                logging.error(f"Error truncating landing tables {e}")
         
-        finally:
-            if connection:
-                connection.close()
-                logging.info(f"Database {dbname} - Connection closed")
+            finally:
+                if connection:
+                    connection.close()
+                    logging.info(f"Database {dbname} - Connection closed")
  
         return
             
     # Task 5: Loading csv data files to SQL Server database       
     @task
-    def daily_load_source():
+    def daily_load_source(pETLcontinue):
         logging.basicConfig(level=logging.INFO)                
 
         def Agent_Datafix(pSourcePath):
@@ -398,44 +386,50 @@ def daily_load_data():
                
                 
             return
-            
-        #log_path = r'/rmo_ct_prod/log/'
-        #log_name = 'daily_set.txt'
+              
         
-        ConfigPath = Variable.get("vRMOConfigPath")
-        FileName = Variable.get("vConfigName")
-        SourcePath = Variable.get("vRMOSourcePath")
+        if pETLcontinue ==' Y':
+            #log_path = r'/rmo_ct_prod/log/'
+            #log_name = 'daily_set.txt'
+        
+            ConfigPath = Variable.get("vRMOConfigPath")
+            FileName = Variable.get("vConfigName")
+            SourcePath = Variable.get("vRMOSourcePath")
                 
-        source_file_set=[] 
-        data = []
+            source_file_set=[] 
+            data = []
       
-        DBName = Variable.get("vDatabaseName")
+            DBName = Variable.get("vDatabaseName")
 
-        with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
-            
-            with fs_hook.open_file(ConfigPath + FileName,'r') as f:
-                source_file_set = pd.read_csv(f, header = None, quoting=1)
-                data = source_file_set.values.flatten().tolist()   
+            with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
                 
-                data_set = [x for x in data if str(x) != 'nan']
+                with fs_hook.open_file(ConfigPath + FileName,'r') as f:
+                    source_file_set = pd.read_csv(f, header = None, quoting=1)
+                    data = source_file_set.values.flatten().tolist()   
                 
-                #with fs_hook.open_file(log_path + log_name,'w') as outfile:
-                #    for item in data_set:
-                #        outfile.write("%s\n" % item)
+                    data_set = [x for x in data if str(x) != 'nan']
+                
+                    #with fs_hook.open_file(log_path + log_name,'w') as outfile:
+                    #    for item in data_set:
+                    #        outfile.write("%s\n" % item)
                         
        
-        # Data fixes required for relevant daily table process 
-        Agent_Datafix(SourcePath)
-        Stat_CDR_Datafix(SourcePath)
-        Stat_CDR_Summary_Datafix(SourcePath)
-        LOBCodeLangString(SourcePath)
-        EvalCriteriaLangString(SourcePath)
+            # Data fixes required for relevant daily table process 
+            Agent_Datafix(SourcePath)
+            Stat_CDR_Datafix(SourcePath)
+            Stat_CDR_Summary_Datafix(SourcePath)
+            LOBCodeLangString(SourcePath)
+            EvalCriteriaLangString(SourcePath)
               
-        for source_file in data_set:
-            load_db_source(source_file, DBName)
+            for source_file in data_set:
+                load_db_source(source_file, DBName)
  
  
  #Set task dependencies
-    remove_csv_inprogress() >> unzip_move_file() >> backup_daily_source_file() >> truncate_landing_tables() >> daily_load_source() 
+    vETLcontinue = 0
+    remove_csv_inprogress() >> unzip_move_file() 
+    vETLcontinue = backup_daily_source_file()
+    if vETLcontinue == 1:
+        truncate_landing_tables(vETLcontinue) >> daily_load_source(vETLcontinue) 
     
 dag = daily_load_data()
