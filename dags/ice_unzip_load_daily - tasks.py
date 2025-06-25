@@ -87,7 +87,7 @@ def daily_load_data():
                 hook = SambaHook(conn_id)
                 outfile.write("creating SambaHook\n")
                 #   Set dYmd to yesterdays date
-                dYmd = (dt.datetime.today() + timedelta(days=-1)).strftime('%Y%m%d')
+                dYmd = (dt.datetime.today() + timedelta(days=+2)).strftime('%Y%m%d')
                 outfile.write("Setting date extension\n")   
                 foundDailyExtract = 0                
                 try:
@@ -140,46 +140,45 @@ def daily_load_data():
 
     # Task 4: Truncate landing tables prior loading next daily source files    
     @task
-    def truncate_landing_tables(pETLcontinue):
-        if pETLcontinue == 'Y':
-            logging.basicConfig(level=logging.INFO) 
-            logging.info(f"truncate_landing_tables procedure")
+    def truncate_landing_tables():
+        logging.basicConfig(level=logging.INFO) 
+        logging.info(f"truncate_landing_tables procedure")
 
-            #sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
-            conn_id = 'mssql_default'
-            conn = BaseHook.get_connection(conn_id)
-            dbname = 'FIN_SHARED_LANDING_DEV'
-            host = conn.host
-            user = conn.login
-            password = conn.password
+        #sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
+        conn_id = 'mssql_default'
+        conn = BaseHook.get_connection(conn_id)
+        dbname = 'FIN_SHARED_LANDING_DEV'
+        host = conn.host
+        user = conn.login
+        password = conn.password
         
-            connection = None
+        connection = None
                 
-            try:
-                connection =  pymssql.connect(host = host, database = dbname, user = user, password = password)
-                cursor = connection.cursor()
+        try:
+            connection =  pymssql.connect(host = host, database = dbname, user = user, password = password)
+            cursor = connection.cursor()
                     
-                start_time = time.time()
+            start_time = time.time()
 
-                cursor.execute("EXEC [dbo].[PROC_TELEPHONY_ICE_TRUNCATE]")
+            cursor.execute("EXEC [dbo].[PROC_TELEPHONY_ICE_TRUNCATE]")
             
-                connection.commit()            
+            connection.commit()            
                                   
-                logging.info(f"truncate landing tables {time.time() - start_time} seconds")
+            logging.info(f"truncate landing tables {time.time() - start_time} seconds")
         
-            except Exception as e:
-                logging.error(f"Error truncating landing tables {e}")
+        except Exception as e:
+            logging.error(f"Error truncating landing tables {e}")
         
-            finally:
-                if connection:
-                    connection.close()
-                    logging.info(f"Database {dbname} - Connection closed")
+        finally:
+            if connection:
+                connection.close()
+                logging.info(f"Database {dbname} - Connection closed")
  
         return
             
     # Task 5: Loading csv data files to SQL Server database       
     @task
-    def daily_load_source(pETLcontinue):
+    def daily_load_source():
         logging.basicConfig(level=logging.INFO)                
 
         def Agent_Datafix(pSourcePath):
@@ -390,48 +389,49 @@ def daily_load_data():
             return
               
         
-        if pETLcontinue == 1:
-            #log_path = r'/rmo_ct_prod/log/'
-            #log_name = 'daily_set.txt'
+        #log_path = r'/rmo_ct_prod/log/'
+        #log_name = 'daily_set.txt'
         
-            ConfigPath = Variable.get("vRMOConfigPath")
-            FileName = Variable.get("vConfigName")
-            SourcePath = Variable.get("vRMOSourcePath")
+        ConfigPath = Variable.get("vRMOConfigPath")
+        FileName = Variable.get("vConfigName")
+        SourcePath = Variable.get("vRMOSourcePath")
                 
-            source_file_set=[] 
-            data = []
+        source_file_set=[] 
+        data = []
       
-            DBName = Variable.get("vDatabaseName")
+        DBName = Variable.get("vDatabaseName")
 
-            with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+        with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
                 
-                with fs_hook.open_file(ConfigPath + FileName,'r') as f:
-                    source_file_set = pd.read_csv(f, header = None, quoting=1)
-                    data = source_file_set.values.flatten().tolist()   
+            with fs_hook.open_file(ConfigPath + FileName,'r') as f:
+                source_file_set = pd.read_csv(f, header = None, quoting=1)
+                data = source_file_set.values.flatten().tolist()   
                 
-                    data_set = [x for x in data if str(x) != 'nan']
+                data_set = [x for x in data if str(x) != 'nan']
                 
-                    #with fs_hook.open_file(log_path + log_name,'w') as outfile:
-                    #    for item in data_set:
-                    #        outfile.write("%s\n" % item)
+                #with fs_hook.open_file(log_path + log_name,'w') as outfile:
+                #    for item in data_set:
+                #        outfile.write("%s\n" % item)
                         
        
-            # Data fixes required for relevant daily table process 
-            Agent_Datafix(SourcePath)
-            Stat_CDR_Datafix(SourcePath)
-            Stat_CDR_Summary_Datafix(SourcePath)
-            LOBCodeLangString(SourcePath)
-            EvalCriteriaLangString(SourcePath)
+        # Data fixes required for relevant daily table process 
+        Agent_Datafix(SourcePath)
+        Stat_CDR_Datafix(SourcePath)
+        Stat_CDR_Summary_Datafix(SourcePath)
+        LOBCodeLangString(SourcePath)
+        EvalCriteriaLangString(SourcePath)
               
-            for source_file in data_set:
-                load_db_source(source_file, DBName)
+        for source_file in data_set:
+            load_db_source(source_file, DBName)
  
  
  #Set task dependencies
     vETLcontinue = 0
-    remove_csv_inprogress() >> unzip_move_file() 
+    remove_csv_inprogress() 
+    unzip_move_file() 
     vETLcontinue = backup_daily_source_file()
     if vETLcontinue == 1:
-        truncate_landing_tables(vETLcontinue) >> daily_load_source(vETLcontinue) 
+        truncate_landing_tables() 
+        daily_load_source() 
     
 dag = daily_load_data()
