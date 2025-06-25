@@ -71,8 +71,9 @@ def daily_load_data():
     
 
     # Task 2: Backup iceDB_ICE_BCMOFRMO-YYYYMMDD.zip to the completed folder 
-    #         If iceDB_ICE_BCMOFRMO-YYYYMMDD.zip file not found in target folder then email notification RMO/IMB
+    #         If iceDB_ICE_BCMOFRMO-YYYYMMDD.zip file not found in target folder then email notification  RMO/IMB
     @task
+    def backup_daily_source_file():
         log_path = r'/rmo_ct_prod/log/'
         log_name = 'daily_backup.txt'
         
