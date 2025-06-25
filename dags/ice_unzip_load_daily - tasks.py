@@ -115,7 +115,7 @@ def daily_load_data():
                 except Exception as e:
                     logging.error(f"Error backing up {file}-{dYmd}.zip source file")
         
-                outfile.write(foundDailyExtract)
+                outfile.write(str(foundDailyExtract))
         return foundDailyExtract
         
  
