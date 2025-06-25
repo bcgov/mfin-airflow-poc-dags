@@ -71,9 +71,8 @@ def daily_load_data():
     
 
     # Task 2: Backup iceDB_ICE_BCMOFRMO-YYYYMMDD.zip to the completed folder 
-    #         If iceDB_ICE_BCMOFRMO-YYYYMMDD.zip file not found then email RMO executives
+    #         If iceDB_ICE_BCMOFRMO-YYYYMMDD.zip file not found in target folder then email notification RMO/IMB
     @task
-    def backup_daily_source_file():
         log_path = r'/rmo_ct_prod/log/'
         log_name = 'daily_backup.txt'
         
@@ -95,7 +94,7 @@ def daily_load_data():
                     outfile.write("getting hook.listdir\n")
 
                     for f in files:
-                        outfile.write("looking for daily RMO file %s\n" % f)
+                        outfile.write("looking for CT daily RMO source file %s\n" % f)
                         if f == 'iceDB_ICE_BCMOFRMO.zip':
                             hook.replace(SourcePath + f, DestPath + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip') 
                             outfile.write("copying file %s to completed folder\n" % f)
