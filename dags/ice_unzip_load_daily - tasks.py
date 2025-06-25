@@ -115,7 +115,9 @@ def daily_load_data():
                 except Exception as e:
                     logging.error(f"Error backing up {file}-{dYmd}.zip source file")
         
+                outfile.write(" retured value foundDailyExtract= ",foundDailyExtract)
         return foundDailyExtract
+        
  
     # Task 3: Inprogress subfolder - Removing csv data files    
     @task
@@ -388,7 +390,7 @@ def daily_load_data():
             return
               
         
-        if pETLcontinue ==' Y':
+        if pETLcontinue == 1:
             #log_path = r'/rmo_ct_prod/log/'
             #log_name = 'daily_set.txt'
         
