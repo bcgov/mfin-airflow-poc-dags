@@ -51,7 +51,7 @@ def daily_load_data():
         dest_path = r'/rmo_ct_prod/inprogress/'
         file = 'iceDB_ICE_BCMOFRMO.zip'
         zip_loc = '/tmp'
-        
+         
         logging.info("Unzip daily file")        
         try:            
             # Initialize SambaHook with your credentials and connection details
@@ -133,7 +133,8 @@ def daily_load_data():
             for file in files:
                 file_path = f"{DeletePath}/{file}"
                 hook.remove(file_path)
-        except:
+        
+        except Exception as e:
             logging.error(f"Error {e} removing file: {DeletePath}")
             
         return
