@@ -95,3 +95,7 @@ def create_dag():
 	)
 	
 	start >> branch >> [path_a, path_b] >> end
+    
+    return dag
+    
+ dag = create_dag()
