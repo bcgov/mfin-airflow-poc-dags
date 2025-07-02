@@ -66,6 +66,8 @@ def daily_load_data():
         )        
         return
         
+    #Task 1: Deciding what branch to execute
+    #        If daily iceDB_ICE_BCMOFRMO-YYYYMMDD.zip file not found in target folder then email notification RMO/IMB
     @task
     def branching_task():
         
@@ -79,17 +81,19 @@ def daily_load_data():
                     if f == 'iceDB_ICE_BCMOFRMO.zip':
                         filefound = 1
                     
-            if filefound ==1:
+            if filefound == 1:
                 return "remove_csv_inprogress()"
             else:
                 return "ETLend()"
+        
         
         log_path = r'/rmo_ct_prod/log/'
         log_name = 'daily_backup.txt'
         dYmdHMS = (dt.datetime.today()).strftime('%Y%m%d%H%M%S')
         
-        with fs_hook.open_file(log_path + log_name,'W') as outfile:
-            outfile.write("ETL step: 1; Task: Branching task; Time: %s\n" % dYmdHMS) 
+        with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+            with fs_hook.open_file(log_path + log_name,'W') as outfile:
+                outfile.write("ETL step: 1; Task: Branching task; Time: %s\n" % dYmdHMS) 
         
         outfile.close()
         
@@ -99,6 +103,35 @@ def daily_load_data():
         )
          
     
+    # Task 2: Inprogress subfolder - Removing csv data files    
+    @task
+    def remove_csv_inprogress():
+        conn_id = 'fs1_rmo_ice'
+        log_path = r'/rmo_ct_prod/log/'
+        log_name = 'daily_backup.txt'
+        dYmdHMS = (dt.datetime.today()).strftime('%Y%m%d%H%M%S')
+        
+        with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+            with fs_hook.open_file(log_path + log_name,'a') as outfile:
+                outfile.write("ETL step: 2; Task: Remove CSV Inprogress task; Time: %s\n" % dYmdHMS)
+      
+        outfile.close()
+        #DeletePath = r'/rmo_ct_prod/inprogress/'
+        DeletePath = Variable.get("vRMOSourcePath")
+        hook = SambaHook(conn_id)
+        files = hook.listdir(DeletePath)
+
+        try:
+            for file in files:
+                file_path = f"{DeletePath}/{file}"
+                hook.remove(file_path)
+        
+        except Exception as e:
+            logging.error(f"Error {e} removing file: {DeletePath}")
+            
+        return
+
+
     #Task 3: Unzip and Move files from source to destination (using SambaHook)
     @task
     def unzip_move_file():        
@@ -114,8 +147,9 @@ def daily_load_data():
         
         logging.info("Unzip daily file")  
         
-        with fs_hook.open_file(log_path + log_name,'a') as outfile:
-            outfile.write("ETL step: 3; Task: Unzipping and moving file task; Time: %s\n" % dYmdHMS) 
+        with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+            with fs_hook.open_file(log_path + log_name,'a') as outfile:
+                outfile.write("ETL step: 3; Task: Unzipping and moving file task; Time: %s\n" % dYmdHMS) 
         
         outfile.close()        
             
@@ -134,10 +168,10 @@ def daily_load_data():
             logging.error(f"Error unzipping files: {e}")  
 
         return          
-    
 
-    # Task 2: Backup iceDB_ICE_BCMOFRMO-YYYYMMDD.zip to the completed folder 
-    #         If iceDB_ICE_BCMOFRMO-YYYYMMDD.zip file not found in target folder then email notification  RMO/IMB
+
+
+    # Task 4: Backup iceDB_ICE_BCMOFRMO-YYYYMMDD.zip to the completed folder 
     @task
     def backup_daily_source_file():
         log_path = r'/rmo_ct_prod/log/'
@@ -170,36 +204,11 @@ def daily_load_data():
         
                 outfile.write(str(foundDailyExtract))
         return foundDailyExtract
-        
+   
+    
  
-    # Task 2: Inprogress subfolder - Removing csv data files    
-    @task
-    def remove_csv_inprogress():
-        conn_id = 'fs1_rmo_ice'
-        log_path = r'/rmo_ct_prod/log/'
-        log_name = 'daily_backup.txt'
-        dYmdHMS = (dt.datetime.today()).strftime('%Y%m%d%H%M%S')
-        
-        with fs_hook.open_file(log_path + log_name,'a') as outfile:
-            outfile.write("ETL step: 2; Task: Remove CSV Inprogress task; Time: %s\n" % dYmdHMS)
-      
-        outfile.close()
-        #DeletePath = r'/rmo_ct_prod/inprogress/'
-        DeletePath = Variable.get("vRMOSourcePath")
-        hook = SambaHook(conn_id)
-        files = hook.listdir(DeletePath)
 
-        try:
-            for file in files:
-                file_path = f"{DeletePath}/{file}"
-                hook.remove(file_path)
-        
-        except Exception as e:
-            logging.error(f"Error {e} removing file: {DeletePath}")
-            
-        return
-
-    # Task 4: Truncate landing tables prior loading next daily source files    
+    # Task 5: Truncate landing tables prior loading next daily source files    
     @task
     def truncate_landing_tables():
         logging.basicConfig(level=logging.INFO) 
@@ -237,7 +246,7 @@ def daily_load_data():
  
         return
             
-    # Task 5: Loading csv data files to SQL Server database       
+    # Task 6: Loading csv data files to SQL Server database       
     @task
     def daily_load_source():
         logging.basicConfig(level=logging.INFO)                
