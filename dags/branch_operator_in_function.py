@@ -82,15 +82,15 @@ def create_dag():
       task_id = 'email2',
       python_callable = email2,
       dag = dag,
-    )	  
+    )
+
+    end = DummyOperator(
+        task_id = 'end',
+        trigger_rule = 'none_failed_min_one_success',
+        dag = dag
+    )
 	
-	end = DummyOperator(
-	    task_id = 'end',
-		trigger_rule = 'none_failed_min_one_success',
-		dag = dag
-	)
-	
-	start >> branch >> [path_a, path_b] >> end
+    start >> branch >> [path_a, path_b] >> end
     
     return dag
     
