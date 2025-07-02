@@ -84,7 +84,7 @@ def daily_load_data():
             return "ETLend()"
  
     
-    with DAG(
+    with dag(
         "branching_task",
         start_date=days_ago(1),
         schedule_interval="@daily",
