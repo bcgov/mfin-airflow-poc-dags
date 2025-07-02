@@ -86,7 +86,7 @@ def daily_load_data():
     
     with DAG(
         "branching_task",
-        start_date=datetime(2025,01,01),
+        start_date=days_ago(1),
         schedule_interval="@daily",
     ) as dag:
         branching_task = BranchPythonOperator(
