@@ -12,12 +12,13 @@ import time
 import datetime as dt
 from datetime import datetime
 from datetime import timedelta
-from airflow.operators.python import PythonOperator, BranchPythonOperator
+from airflow.operators.python import PythonOperator
 from airflow.providers.smtp.hooks.smtp import SmtpHook
 from email.message import EmailMessage
 from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
 from airflow.hooks.base_hook import BaseHook
 from airflow.models import Variable
+from airflow.exceptions import AirflowFailException
 import pymssql
 
 
@@ -37,23 +38,12 @@ root.addHandler(handler)
     tags=["ice", "etl", "unzip","load","inprogress_folder"]
 )
 
-
+       
 def daily_load_data():
     # Log all steps at INFO level
     logging.basicConfig(level=logging.INFO)
-    
-    @task
-    def ETLend():
-        log_path = r'/rmo_ct_prod/log/'
-        log_name = 'daily_backup.txt'
-        dYmdHMS = (dt.datetime.today()).strftime('%Y%m%d%H%M%S')
-        
-        with fs_hook.open_file(log_path + log_name,'a') as outfile:
-            outfile.write("ETL process ended %s\n" % dYmdHMS)
-            
-        outfile.close()        
-        return
-    
+
+    # Task 0: Email notification process
     @task
     def email_notification():
         dYmd = (dt.datetime.today()).strftime('%Y%m%d')
@@ -65,11 +55,21 @@ def daily_load_data():
                html_content='<html><body><h2>Airflow load daily source file failure</h2><p>CT iceDB_ICE_BCMOFRMO-' + dYmd + '.zip file not received</p></body></html>'
         )        
         return
+    
+    
+    # Task 1: ETL process begins - when daily file is not availableRemoving csv data files       
+    @task
+    def ETLbegin():
+        log_path = r'/rmo_ct_prod/log/'
+        log_name = 'daily_backup.txt'
+        dYmdHMS = (dt.datetime.today()).strftime('%Y%m%d%H%M%S')
         
-    #Task 1: Deciding what branch to execute
-    #        If daily iceDB_ICE_BCMOFRMO-YYYYMMDD.zip file not found in target folder then email notification RMO/IMB
-    def decide_branch():
-        SourcePath = '/rmo_ct_prod/'
+        with fs_hook.open_file(log_path + log_name,'a') as outfile:
+            outfile.write("ETL process begins %s\n" % dYmdHMS)
+            
+        outfile.close()
+
+        SourcePath = '/rmo_ct_prod/'  
         conn_id = 'fs1_rmo_ice'
         filefound = 0
         with SambaHook(samba_conn_id=conn_id) as fs_hook:
@@ -78,54 +78,23 @@ def daily_load_data():
                 if f == 'iceDB_ICE_BCMOFRMO.zip':
                     filefound = 1
                     
-        if filefound == 1:
-            return "remove_csv_inprogress()"
-        else:
-            return "ETLend()"
- 
-    
-    with dag(
-        "branching_task",
-        start_date=days_ago(1),
-        schedule_interval="@daily",
-    ) as dag:
-        branching_task = BranchPythonOperator(
-            task_id = "decide_branch",
-            python_collable=decide_branch,
-        )
- #   @task
- #   def branching_task():
+        if filefound == 0:
+            email_notification()
+            raise AirFlowFailException ("CT daily extract file not available. ETL stops")
+                
+        return
+
+    @task
+    def ETLend():
+        log_path = r'/rmo_ct_prod/log/'
+        log_name = 'daily_backup.txt'
+        dYmdHMS = (dt.datetime.today()).strftime('%Y%m%d%H%M%S')
         
- #       def decide_branch():
- #           SourcePath = '/rmo_ct_prod/'
- #           conn_id = 'fs1_rmo_ice'
- #           filefound = 0
- #           with SambaHook(samba_conn_id=conn_id) as fs_hook:
- #               files = fs_hook.listdir(SourcePath)
- #               for f in files:
- #                   if f == 'iceDB_ICE_BCMOFRMO.zip':
- #                       filefound = 1
-                    
- #           if filefound == 1:
- #               return "remove_csv_inprogress()"
- #           else:
- #               return "ETLend()"
-        
-        
- #       log_path = r'/rmo_ct_prod/log/'
- #       log_name = 'daily_backup.txt'
- #       dYmdHMS = (dt.datetime.today()).strftime('%Y%m%d%H%M%S')
-        
- #       with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
- #           with fs_hook.open_file(log_path + log_name,'w') as outfile:
- #               outfile.write("ETL step: 1; Task: Branching task; Time: %s\n" % dYmdHMS) 
-        
- #       outfile.close()
-        
- #       return BranchPythonOperator(
- #           task_id = "branching_task",
- #           python_callable = decide_branch,
- #       )
+        with fs_hook.open_file(log_path + log_name,'a') as outfile:
+            outfile.write("ETL process ends %s\n" % dYmdHMS)
+            
+        outfile.close()        
+        return
          
     
     # Task 2: Inprogress subfolder - Removing csv data files    
@@ -522,7 +491,6 @@ def daily_load_data():
  
  #Set task dependencies
  
-    branching_task() >> ETLend()
-    branching_task() >> remove_csv_inprogress() >> unzip_move_file() >> backup_daily_source_file() >> truncate_landing_tables() >> daily_load_source() >> ETLend()
+    ETLbegin() >> remove_csv_inprogress() >> unzip_move_file() >> backup_daily_source_file() >> truncate_landing_tables() >> daily_load_source() >> ETLend()
     
 dag = daily_load_data()
