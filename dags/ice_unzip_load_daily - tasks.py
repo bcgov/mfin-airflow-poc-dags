@@ -64,8 +64,9 @@ def daily_load_data():
         log_name = 'daily_backup.txt'
         dYmdHMS = (dt.datetime.today()).strftime('%Y%m%d%H%M%S')
         
-        with fs_hook.open_file(log_path + log_name,'a') as outfile:
-            outfile.write("ETL process begins %s\n" % dYmdHMS)
+        with SambaHook(samba_conn_id=conn_id) as fs_hook:
+            with fs_hook.open_file(log_path + log_name,'a') as outfile:
+                outfile.write("ETL process begins %s\n" % dYmdHMS)
             
         outfile.close()
 
