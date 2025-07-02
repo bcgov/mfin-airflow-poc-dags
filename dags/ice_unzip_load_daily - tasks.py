@@ -12,7 +12,7 @@ import time
 import datetime as dt
 from datetime import datetime
 from datetime import timedelta
-from airflow.operators.python import PythonOperator
+from airflow.operators.python import PythonOperator, BranchPythonOperator
 from airflow.providers.smtp.hooks.smtp import SmtpHook
 from email.message import EmailMessage
 from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
@@ -42,7 +42,64 @@ def daily_load_data():
     # Log all steps at INFO level
     logging.basicConfig(level=logging.INFO)
     
-    #Task 1: Unzip and Move files from source to destination (using SambaHook)
+    @task
+    def ETLend():
+        log_path = r'/rmo_ct_prod/log/'
+        log_name = 'daily_backup.txt'
+        dYmdHMS = (dt.datetime.today()).strftime('%Y%m%d%H%M%S')
+        
+        with fs_hook.open_file(log_path + log_name,'a') as outfile:
+            outfile.write("ETL process ended %s\n" % dYmdHMS)
+            
+        outfile.close()        
+        return
+    
+    @task
+    def email_notification():
+        dYmd = (dt.datetime.today()).strftime('%Y%m%d')
+    
+        with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
+            sh.send_email_smtp(
+               to=['eloy.mendez@gov.bc.ca'],
+               subject='Airflow email test',
+               html_content='<html><body><h2>Airflow load daily source file failure</h2><p>CT iceDB_ICE_BCMOFRMO-' + dYmd + '.zip file not received</p></body></html>'
+        )        
+        return
+        
+    @task
+    def branching_task():
+        
+        def decide_branch():
+            SourcePath = '/rmo_ct_prod/'
+            conn_id = 'fs1_rmo_ice'
+            filefound = 0
+            with SambaHook(samba_conn_id=conn_id) as fs_hook:
+                files = fs_hook.listdir(SourcePath)
+                for f in files:
+                    if f == 'iceDB_ICE_BCMOFRMO.zip':
+                        filefound = 1
+                    
+            if filefound ==1:
+                return "remove_csv_inprogress()"
+            else:
+                return "ETLend()"
+        
+        log_path = r'/rmo_ct_prod/log/'
+        log_name = 'daily_backup.txt'
+        dYmdHMS = (dt.datetime.today()).strftime('%Y%m%d%H%M%S')
+        
+        with fs_hook.open_file(log_path + log_name,'W') as outfile:
+            outfile.write("ETL step: 1; Task: Branching task; Time: %s\n" % dYmdHMS) 
+        
+        outfile.close()
+        
+        return BranchPythonOperator(
+            task_id = "branching_task",
+            python_callable = decide_branch
+        )
+         Task
+    
+    #Task 3: Unzip and Move files from source to destination (using SambaHook)
     @task
     def unzip_move_file():        
         #logging.basicConfig(level=logging.INFO)
@@ -50,10 +107,19 @@ def daily_load_data():
         source_path = r'/rmo_ct_prod/'
         dest_path = r'/rmo_ct_prod/inprogress/'
         file = 'iceDB_ICE_BCMOFRMO.zip'
-        zip_loc = '/tmp'
-         
-        logging.info("Unzip daily file")        
-        try:            
+        zip_loc = r'/tmp/'
+        log_path = r'/rmo_ct_prod/log/'
+        log_name = 'daily_backup.txt'
+        dYmdHMS = (dt.datetime.today()).strftime('%Y%m%d%H%M%S')
+        
+        logging.info("Unzip daily file")  
+        
+        with fs_hook.open_file(log_path + log_name,'a') as outfile:
+            outfile.write("ETL step: 3; Task: Unzipping and moving file task; Time: %s\n" % dYmdHMS) 
+        
+        outfile.close()        
+            
+        try:
             # Initialize SambaHook with your credentials and connection details
             with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
                 with fs_hook.open_file(source_path + file,'rb') as f:
@@ -61,7 +127,7 @@ def daily_load_data():
                     for iceTable in z.infolist():
                         logging.info(iceTable.filename)
                         z.extract(iceTable.filename,path=zip_loc)
-
+            
                         fs_hook.push_from_local(dest_path+iceTable.filename, os.path.join(zip_loc,iceTable.filename))
                     
         except Exception as e:
@@ -78,7 +144,7 @@ def daily_load_data():
         log_name = 'daily_backup.txt'
         
         with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
-            with fs_hook.open_file(log_path + log_name,'w') as outfile:
+            with fs_hook.open_file(log_path + log_name,'a') as outfile:
                       
                 SourcePath = '/rmo_ct_prod/'
                 DestPath = '/rmo_ct_prod/completed/'
@@ -89,7 +155,6 @@ def daily_load_data():
                 #   Set dYmd to yesterdays date
                 dYmd = (dt.datetime.today() + timedelta(days=+2)).strftime('%Y%m%d')
                 outfile.write("Setting date extension\n")   
-                foundDailyExtract = 0                
                 try:
                     files = hook.listdir(SourcePath)
                     outfile.write("getting hook.listdir\n")
@@ -99,18 +164,6 @@ def daily_load_data():
                         if f == 'iceDB_ICE_BCMOFRMO.zip':
                             hook.replace(SourcePath + f, DestPath + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip') 
                             outfile.write("copying file %s to completed folder\n" % f)
-                            foundDailyExtract = 1
-                    
-                    if foundDailyExtract == 0:
-                        dYmd = (dt.datetime.today()).strftime('%Y%m%d')
-                        
-                        with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
-                            sh.send_email_smtp(
-                                to=['eloy.mendez@gov.bc.ca'],
-                                subject='Airflow email test',
-                                html_content='<html><body><h2>Airflow load daily source file failure</h2><p>CT iceDB_ICE_BCMOFRMO-' + dYmd + '.zip file not received</p></body></html>'
-                            )                         
-                        
                     
                 except Exception as e:
                     logging.error(f"Error backing up {file}-{dYmd}.zip source file")
@@ -119,11 +172,18 @@ def daily_load_data():
         return foundDailyExtract
         
  
-    # Task 3: Inprogress subfolder - Removing csv data files    
+    # Task 2: Inprogress subfolder - Removing csv data files    
     @task
     def remove_csv_inprogress():
         conn_id = 'fs1_rmo_ice'
+        log_path = r'/rmo_ct_prod/log/'
+        log_name = 'daily_backup.txt'
+        dYmdHMS = (dt.datetime.today()).strftime('%Y%m%d%H%M%S')
+        
+        with fs_hook.open_file(log_path + log_name,'a') as outfile:
+            outfile.write("ETL step: 2; Task: Remove CSV Inprogress task; Time: %s\n" % dYmdHMS)
       
+        outfile.close()
         #DeletePath = r'/rmo_ct_prod/inprogress/'
         DeletePath = Variable.get("vRMOSourcePath")
         hook = SambaHook(conn_id)
@@ -427,12 +487,8 @@ def daily_load_data():
  
  
  #Set task dependencies
-    vETLcontinue = 0
-    remove_csv_inprogress() 
-    unzip_move_file() 
-    vETLcontinue = backup_daily_source_file()
-    if vETLcontinue == 1:
-        truncate_landing_tables() 
-        daily_load_source() 
+ 
+    branching_task() >> ETLend()
+    branching_task() >> remove_csv_inprogress() >> unzip_move_file() >> backup_daily_source_file() >> truncate_landing_tables() >> daily_load_source() >> ETLend()
     
 dag = daily_load_data()
