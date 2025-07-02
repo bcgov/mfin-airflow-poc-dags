@@ -92,7 +92,7 @@ def daily_load_data():
         dYmdHMS = (dt.datetime.today()).strftime('%Y%m%d%H%M%S')
         
         with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
-            with fs_hook.open_file(log_path + log_name,'W') as outfile:
+            with fs_hook.open_file(log_path + log_name,'w') as outfile:
                 outfile.write("ETL step: 1; Task: Branching task; Time: %s\n" % dYmdHMS) 
         
         outfile.close()
