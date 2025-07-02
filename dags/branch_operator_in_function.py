@@ -8,27 +8,23 @@ from email.message import EmailMessage
 
 def email1():
     dYmd = (dt.datetime.today()).strftime('%Y%m%d')
-    
     with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
         sh.send_email_smtp(
            to=['eloy.mendez@gov.bc.ca'],
            subject='Airflow email test',
            html_content='<html><body><h2>Email 1 Airflow load daily source file failure</h2><p>CT iceDB_ICE_BCMOFRMO-' + dYmd + '.zip file not received</p></body></html>'
         )
-		
-	return
+    return
 
 def email2():
     dYmd = (dt.datetime.today()).strftime('%Y%m%d')
-    
     with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
         sh.send_email_smtp(
            to=['eloy.mendez@gov.bc.ca'],
            subject='Airflow email test',
            html_content='<html><body><h2>Email 2 Airflow load daily source file failure</h2><p>CT iceDB_ICE_BCMOFRMO-' + dYmd + '.zip file not received</p></body></html>'
         )
-		
-	return
+    return
 
 
 def choose_path():
