@@ -82,7 +82,7 @@ def daily_load_data():
                     
         if filefound == 0:
             email_notification()
-            raise AirFlowFailException ("CT daily extract file not available. ETL stops")
+            raise AirflowFailException ("CT daily extract file not available. ETL stops")
                 
         return
 
