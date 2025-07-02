@@ -68,39 +68,64 @@ def daily_load_data():
         
     #Task 1: Deciding what branch to execute
     #        If daily iceDB_ICE_BCMOFRMO-YYYYMMDD.zip file not found in target folder then email notification RMO/IMB
-    @task
-    def branching_task():
-        
-        def decide_branch():
-            SourcePath = '/rmo_ct_prod/'
-            conn_id = 'fs1_rmo_ice'
-            filefound = 0
-            with SambaHook(samba_conn_id=conn_id) as fs_hook:
-                files = fs_hook.listdir(SourcePath)
-                for f in files:
-                    if f == 'iceDB_ICE_BCMOFRMO.zip':
-                        filefound = 1
+    def decide_branch():
+        SourcePath = '/rmo_ct_prod/'
+        conn_id = 'fs1_rmo_ice'
+        filefound = 0
+        with SambaHook(samba_conn_id=conn_id) as fs_hook:
+            files = fs_hook.listdir(SourcePath)
+            for f in files:
+                if f == 'iceDB_ICE_BCMOFRMO.zip':
+                    filefound = 1
                     
-            if filefound == 1:
-                return "remove_csv_inprogress()"
-            else:
-                return "ETLend()"
-        
-        
-        log_path = r'/rmo_ct_prod/log/'
-        log_name = 'daily_backup.txt'
-        dYmdHMS = (dt.datetime.today()).strftime('%Y%m%d%H%M%S')
-        
-        with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
-            with fs_hook.open_file(log_path + log_name,'w') as outfile:
-                outfile.write("ETL step: 1; Task: Branching task; Time: %s\n" % dYmdHMS) 
-        
-        outfile.close()
-        
-        return BranchPythonOperator(
-            task_id = "branching_task",
-            python_callable = decide_branch
+        if filefound == 1:
+            return "remove_csv_inprogress()"
+        else:
+            return "ETLend()"
+ 
+    
+    with DAG(
+        "branching_task",
+        start_date=datetime(2025,01,01),
+        schedule_interval="@daily",
+    ) as dag:
+        branching_task = BranchPythonOperator(
+            task_id = "decide_branch",
+            python_collable=decide_branch,
         )
+ #   @task
+ #   def branching_task():
+        
+ #       def decide_branch():
+ #           SourcePath = '/rmo_ct_prod/'
+ #           conn_id = 'fs1_rmo_ice'
+ #           filefound = 0
+ #           with SambaHook(samba_conn_id=conn_id) as fs_hook:
+ #               files = fs_hook.listdir(SourcePath)
+ #               for f in files:
+ #                   if f == 'iceDB_ICE_BCMOFRMO.zip':
+ #                       filefound = 1
+                    
+ #           if filefound == 1:
+ #               return "remove_csv_inprogress()"
+ #           else:
+ #               return "ETLend()"
+        
+        
+ #       log_path = r'/rmo_ct_prod/log/'
+ #       log_name = 'daily_backup.txt'
+ #       dYmdHMS = (dt.datetime.today()).strftime('%Y%m%d%H%M%S')
+        
+ #       with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+ #           with fs_hook.open_file(log_path + log_name,'w') as outfile:
+ #               outfile.write("ETL step: 1; Task: Branching task; Time: %s\n" % dYmdHMS) 
+        
+ #       outfile.close()
+        
+ #       return BranchPythonOperator(
+ #           task_id = "branching_task",
+ #           python_callable = decide_branch,
+ #       )
          
     
     # Task 2: Inprogress subfolder - Removing csv data files    
