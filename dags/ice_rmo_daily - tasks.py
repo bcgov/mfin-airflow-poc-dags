@@ -466,7 +466,7 @@ def etl_daily_load():
     
 
 def create_dag():
-    dag = DAG(
+    dag = dag(
          dag_id = 'ice_rmo_daily - task',
          start_date = days_ago(1),
          schedule_interval = None,
