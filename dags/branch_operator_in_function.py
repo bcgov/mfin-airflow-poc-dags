@@ -76,13 +76,13 @@ def create_dag():
     )
 
     path_a = PythonOperator(
-      task_id = 'email1',
+      task_id = 'path_a',
       python_callable = email1,
       dag = dag
     )	  
 
     path_b = PythonOperator(
-      task_id = 'email2',
+      task_id = 'path_b',
       python_callable = email2,
       dag = dag
     )
