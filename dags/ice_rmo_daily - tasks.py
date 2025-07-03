@@ -149,7 +149,7 @@ def etl_backup():
             conn_id = 'fs1_rmo_ice'
             file = 'iceDB_ICE_BCMOFRMO.zip'
             hook = SambaHook(conn_id)
-            outfile.write("ETL step: 4, Task: Backup iceDB_ICE_BCMOFRMO-YYYYMMDD.zip task, Time: %s\n" % dYmdHMS")
+            outfile.write("ETL step: 4, Task: Backup iceDB_ICE_BCMOFRMO-YYYYMMDD.zip task, Time: %s\n" % dYmdHMS)
             #   Set dYmd to yesterdays date
             dYmd = (dt.datetime.today() + timedelta(days=-1)).strftime('%Y%m%d')
             try:
@@ -174,7 +174,7 @@ def etl_truncate():
     log_path = r'/rmo_ct_prod/log/'
     log_name = 'daily_backup.txt'
     with fs_hook.open_file(log_path + log_name,'a') as outfile:
-        outfile.write("ETL step: 5, Task: Truncating tables in FIN_SHARED_LANDING_DEV, Time: %s\n" % dYmdHMS")
+        outfile.write("ETL step: 5, Task: Truncating tables in FIN_SHARED_LANDING_DEV, Time: %s\n" % dYmdHMS)
 
     outfile.close()
 
@@ -425,7 +425,7 @@ def etl_daily_load():
     
     dYmdHMS = (dt.datetime.today()).strftime('%Y%m%d:%H%M%S')
     with fs_hook.open_file(log_path + log_name,'a') as outfile:
-        outfile.write("ETL step: 6, Task: Loading csv data to FIN_SHARED_LANDING_DEV tables, Time: %s\n" % dYmdHMS")
+        outfile.write("ETL step: 6, Task: Loading csv data to FIN_SHARED_LANDING_DEV tables, Time: %s\n" % dYmdHMS)
 
     outfile.close()
 
