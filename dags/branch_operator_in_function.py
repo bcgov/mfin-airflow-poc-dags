@@ -6,6 +6,8 @@ from datetime import datetime
 from airflow.providers.samba.hooks.samba import SambaHook
 from airflow.providers.smtp.hooks.smtp import SmtpHook
 from email.message import EmailMessage
+import datetime as dt
+
 
 def email1():
     dYmd = (dt.datetime.today()).strftime('%Y%m%d')
