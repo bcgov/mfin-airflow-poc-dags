@@ -499,19 +499,19 @@ def create_dag():
 
     path_backup = PythonOperator(
     task_id = 'path_backup',
-    python_callable = etl_backup
+    python_callable = etl_backup,
     dag = dag
     )
 
     path_backup = PythonOperator(
     task_id = 'path_truncate',
-    python_callable = etl_truncate
+    python_callable = etl_truncate,
     dag = dag
     )
     
     path_daily_load = PythonOperator(
     task_id = 'path_daily_load',
-    python_callable = etl_daily_load
+    python_callable = etl_daily_load,
     dag = dag
     )
     
