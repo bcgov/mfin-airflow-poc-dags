@@ -274,7 +274,7 @@ def etl_daily_load():
                 df1 = csv_reader.loc[:, [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]]
  
                 with fs_hook.open_file(pSourcePath + output_file, 'w') as outfile:
-                        df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
+                    df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
                                 
             outfile.close()
                 
@@ -354,7 +354,6 @@ def etl_daily_load():
                     
                 with fs_hook.open_file(pSourcePath + output_file, 'w') as outfile:
                     df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
-  
                                 
             outfile.close()                    
         
