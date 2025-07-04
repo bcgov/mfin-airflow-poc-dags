@@ -1,4 +1,5 @@
 import csv, sys, argparse
+from airflow import DAG
 import os
 import numpy as np
 import pandas as pd
@@ -461,17 +462,16 @@ def etl_daily_load():
     for source_file in data_set:
         load_db_source(source_file, DBName)
     
-    
-    
+    return
     
 
 def create_dag():
-    dag = dag(
-         dag_id = 'ice_rmo_daily - task',
-         start_date = days_ago(1),
-         schedule_interval = None,
-         catchup = False,
-         tags = ["ice","rmo","etl","daily_task"]
+    dag = DAG(
+        dag_id = 'ice_rmo_daily - task',
+        start_date = days_ago(1),
+        schedule_interval = None,
+        catchup = False,
+        tags = ["ice","rmo","etl","daily_task"]
     )
     
     start = DummyOperator(
@@ -480,51 +480,51 @@ def create_dag():
     )
 
     branch = BranchPythonOperator(
-         task_id = 'branch_decision',
-         python_callable = choose_path,
-         dag = dag  
+        task_id = 'branch_decision',
+        python_callable = choose_path,
+        dag = dag  
     ) 
     
     path_remove = PythonOperator(
-      task_id = 'path_remove',
-      python_callable = etl_remove,
-      dag = dag
+        task_id = 'path_remove',
+        python_callable = etl_remove,
+        dag = dag
     )
     
     path_unzip = PythonOperator(
-    task_id = 'path_unzip',
-    python_callable = etl_unzip,
-    dag = dag
+        task_id = 'path_unzip',
+        python_callable = etl_unzip,
+        dag = dag
     )
 
     path_backup = PythonOperator(
-    task_id = 'path_backup',
-    python_callable = etl_backup,
-    dag = dag
+        task_id = 'path_backup',
+        python_callable = etl_backup,
+        dag = dag
     )
 
     path_backup = PythonOperator(
-    task_id = 'path_truncate',
-    python_callable = etl_truncate,
-    dag = dag
+        task_id = 'path_truncate',
+        python_callable = etl_truncate,
+        dag = dag
     )
     
     path_daily_load = PythonOperator(
-    task_id = 'path_daily_load',
-    python_callable = etl_daily_load,
-    dag = dag
+        task_id = 'path_daily_load',
+        python_callable = etl_daily_load,
+        dag = dag
     )
     
     path_email = PythonOperator(
-      task_id = 'path_email',
-      python_callable = email_notification,
-      dag = dag
+        task_id = 'path_email',
+        python_callable = email_notification,
+        dag = dag
     )
     
     end = DummyOperator(
-      task_id = 'end',
-      #trigger_rule = 'none_failed_min_one_success',
-      dag = dag
+        task_id = 'end',
+        trigger_rule = 'none_failed_min_one_success',
+        dag = dag
     )
     
     
