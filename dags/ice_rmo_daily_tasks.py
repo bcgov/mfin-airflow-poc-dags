@@ -479,7 +479,7 @@ def create_dag():
         dag=dag
     )
 
-    branch = BranchPythonOperator(
+    branch_decision = BranchPythonOperator(
         task_id = 'branch_decision',
         python_callable = choose_path,
         dag = dag  
@@ -528,7 +528,7 @@ def create_dag():
     )
     
     
-    start >> branch >> [path_email, [path_remove, path_unzip, path_backup, path_truncate, path_daily_load]] >> path_end
+    start >> branch_decision >> [path_email, [path_remove, path_unzip, path_backup, path_truncate, path_daily_load]] >> end
     
     return dag
     
