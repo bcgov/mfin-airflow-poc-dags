@@ -453,6 +453,11 @@ def etl_daily_load():
                         
        
     # Data fixes required for relevant daily table process 
+    etl_remove()
+    etl_unzip()
+    etl_backup()
+    etl_truncate()
+    
     Agent_Datafix(SourcePath)
     Stat_CDR_Datafix(SourcePath)
     Stat_CDR_Summary_Datafix(SourcePath)
@@ -528,7 +533,7 @@ def create_dag():
     )
     
     
-    start >> branch_decision >> [path_email, [path_remove, path_unzip, path_backup, path_truncate, path_daily_load]] >> end
+    start >> branch_decision >> [path_email, path_daily_load] >> end
     
     return dag
     
