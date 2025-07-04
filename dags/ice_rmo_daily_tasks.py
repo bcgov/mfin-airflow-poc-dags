@@ -503,7 +503,7 @@ def create_dag():
         dag = dag
     )
 
-    path_backup = PythonOperator(
+    path_truncate = PythonOperator(
         task_id = 'path_truncate',
         python_callable = etl_truncate,
         dag = dag
@@ -528,7 +528,7 @@ def create_dag():
     )
     
     
-    start >> branch >> [path_email, [path_remove,path_unzip,path_backup,path_truncate,path_daily_load]] >> path_end
+    start >> branch >> [path_email, [path_remove, path_unzip, path_backup, path_truncate, path_daily_load]] >> path_end
     
     return dag
     
