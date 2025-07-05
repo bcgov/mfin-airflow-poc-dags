@@ -41,7 +41,7 @@ root.addHandler(handler)
 #)
 
 def email_notification():
-        dYmd = (dt.datetime.today())+ timedelta(days=-1)).strftime('%Y-%m-%d')
+        dYmd = (dt.datetime.today()+ timedelta(days=-1)).strftime('%Y-%m-%d')
     
         with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
             sh.send_email_smtp(
