@@ -41,12 +41,12 @@ root.addHandler(handler)
 #)
 
 def email_notification():
-        dYmd = (dt.datetime.today()).strftime('%Y%m%d')
+        dYmd = (dt.datetime.today())+ timedelta(days=-1)).strftime('%Y-%m-%d')
     
         with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
             sh.send_email_smtp(
                to=['eloy.mendez@gov.bc.ca'],
-               subject='Airflow email test',
+               subject='Airflow Email Notification',
                html_content='<html><body><h2>Airflow RMO daily source file failure</h2><p>CT iceDB_ICE_BCMOFRMO-' + dYmd + '.zip file not received/available</p></body></html>'
         )        
         return
@@ -56,14 +56,14 @@ def choose_path():
     log_path = r'/rmo_ct_prod/log/'
     log_name = 'daily_backup.txt'
     SourcePath = '/rmo_ct_prod/'  
-    conn_id = 'fs1_rmo_ice'
+    conn_id = 'fs1_prod_conn'
     filefound = 0
         
     dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
         
     with SambaHook(samba_conn_id=conn_id) as fs_hook:
-        with fs_hook.open_file(log_path + log_name,'a') as outfile:
-            outfile.write("ETL process begins %s\n" % dYmdHMS)
+        with fs_hook.open_file(log_path + log_name,'w') as outfile:
+            outfile.write("ETL setp: 1, Task: ETL process task begins, Time: %s\n" % dYmdHMS)
             
         outfile.close()
 
@@ -78,14 +78,14 @@ def choose_path():
             return 'path_remove'
 
 
-def etl_remove():
-    conn_id = 'fs1_rmo_ice'
-    log_path = r'/rmo_ct_prod/log/'
-    log_name = 'daily_backup.txt'
-    dYmdHMS = (dt.datetime.today()).strftime('%Y%m%d%H%M%S')
+def etl_remove(pconn_id, plog_path, plog_name):
+#    conn_id = 'fs1_rmo_ice'
+#    log_path = r'/rmo_ct_prod/log/'
+#    log_name = 'daily_backup.txt'
+    dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
         
-    with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
-        with fs_hook.open_file(log_path + log_name,'a') as outfile:
+    with SambaHook(samba_conn_id=pconn_id) as fs_hook:
+        with fs_hook.open_file(plog_path + plog_name,'a') as outfile:
             outfile.write("ETL step: 2, Task: Remove CSV Inprogress task, Time: %s\n" % dYmdHMS)
       
     outfile.close()
@@ -104,19 +104,19 @@ def etl_remove():
     return
     
 #Task 3: Unzip and Move files from source to destination (using SambaHook)    
-def etl_unzip():
+def etl_unzip(pconn_id, plog_path, plog_name):
     source_path = r'/rmo_ct_prod/'
     dest_path = r'/rmo_ct_prod/inprogress/'
     file = 'iceDB_ICE_BCMOFRMO.zip'
     zip_loc = r'/tmp/'
-    log_path = r'/rmo_ct_prod/log/'
-    log_name = 'daily_backup.txt'
-    dYmdHMS = (dt.datetime.today()).strftime('%Y%m%d:%H%M%S')
+#    log_path = r'/rmo_ct_prod/log/'
+#    log_name = 'daily_backup.txt'
+    dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
         
     logging.info("Unzip daily file")  
         
-    with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
-        with fs_hook.open_file(log_path + log_name,'a') as outfile:
+    with SambaHook(samba_conn_id=pconn_id) as fs_hook:
+        with fs_hook.open_file(plog_path + plog_name,'a') as outfile:
             outfile.write("ETL step: 3, Task: Unzipping and moving file task, Time: %s\n" % dYmdHMS) 
         
         outfile.close()        
@@ -137,19 +137,18 @@ def etl_unzip():
     return       
     
 # Task 4: Backup iceDB_ICE_BCMOFRMO-YYYYMMDD.zip to the completed folder    
-def etl_backup():
-    log_path = r'/rmo_ct_prod/log/'
-    log_name = 'daily_backup.txt'
-    dYmdHMS = (dt.datetime.today()).strftime('%Y%m%d:%H%M%S')
+def etl_backup(pconn_id, plog_path, plog_name):
+#    log_path = r'/rmo_ct_prod/log/'
+#    log_name = 'daily_backup.txt'
+    dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
         
-    with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
-        with fs_hook.open_file(log_path + log_name,'a') as outfile:
+    with SambaHook(samba_conn_id=pconn_id) as fs_hook:
+        with fs_hook.open_file(plog_path + plog_name,'a') as outfile:
                       
             SourcePath = '/rmo_ct_prod/'
             DestPath = '/rmo_ct_prod/completed/'
-            conn_id = 'fs1_rmo_ice'
             file = 'iceDB_ICE_BCMOFRMO.zip'
-            hook = SambaHook(conn_id)
+            hook = SambaHook(pconn_id)
             outfile.write("ETL step: 4, Task: Backup iceDB_ICE_BCMOFRMO-YYYYMMDD.zip task, Time: %s\n" % dYmdHMS)
             #   Set dYmd to yesterdays date
             dYmd = (dt.datetime.today() + timedelta(days=-1)).strftime('%Y%m%d')
@@ -168,20 +167,21 @@ def etl_backup():
    
 
 # Task 5: Truncate landing tables prior loading next daily source files    
-def etl_truncate():
+def etl_truncate(pconn_id, plog_path, plog_name):
     logging.basicConfig(level=logging.INFO) 
     logging.info(f"truncate_landing_tables procedure")
-    dYmdHMS = (dt.datetime.today()).strftime('%Y%m%d:%H%M%S')
-    log_path = r'/rmo_ct_prod/log/'
-    log_name = 'daily_backup.txt'
-    with fs_hook.open_file(log_path + log_name,'a') as outfile:
-        outfile.write("ETL step: 5, Task: Truncating tables in FIN_SHARED_LANDING_DEV, Time: %s\n" % dYmdHMS)
+    dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
+#    log_path = r'/rmo_ct_prod/log/'
+#    log_name = 'daily_backup.txt'
+    with SambaHook(samba_conn_id=pconn_id) as fs_hook:
+        with fs_hook.open_file(plog_path + plog_name,'a') as outfile:
+            outfile.write("ETL step: 5, Task: Truncating tables in FIN_SHARED_LANDING_DEV, Time: %s\n" % dYmdHMS)
 
     outfile.close()
 
     #sql_hook = MsSqlHook(mssql_conn_id='mssql_default')
     conn_id = 'mssql_default'
-    conn = BaseHook.get_connection(conn_id)
+    conn = BaseHook.get_connection(pconn_id)
     dbname = 'FIN_SHARED_LANDING_DEV'
     host = conn.host
     user = conn.login
@@ -420,10 +420,7 @@ def etl_daily_load():
         return
               
         
-    log_path = r'/rmo_ct_prod/log/'
-    log_name = 'daily_set.txt'
-    
-    dYmdHMS = (dt.datetime.today()).strftime('%Y%m%d:%H%M%S')
+    dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
     with fs_hook.open_file(log_path + log_name,'a') as outfile:
         outfile.write("ETL step: 6, Task: Loading csv data to FIN_SHARED_LANDING_DEV tables, Time: %s\n" % dYmdHMS)
 
@@ -433,30 +430,31 @@ def etl_daily_load():
     ConfigPath = Variable.get("vRMOConfigPath")
     FileName = Variable.get("vConfigName")
     SourcePath = Variable.get("vRMOSourcePath")
+    
+    conn_id = 'fs1_prod_conn'
+    log_path = '/rmo_ct_prod/log/'
+    log_name = 'daily_set.txt'
+    
                 
     source_file_set=[] 
     data = []
       
     DBName = Variable.get("vDatabaseName")
 
-    with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+    with SambaHook(samba_conn_id=conn_id) as fs_hook:
                 
         with fs_hook.open_file(ConfigPath + FileName,'r') as f:
             source_file_set = pd.read_csv(f, header = None, quoting=1)
             data = source_file_set.values.flatten().tolist()   
                 
             data_set = [x for x in data if str(x) != 'nan']
-                
-                #with fs_hook.open_file(log_path + log_name,'w') as outfile:
-                #    for item in data_set:
-                #        outfile.write("%s\n" % item)
-                        
+            
        
     # Data fixes required for relevant daily table process 
-    etl_remove()
-    etl_unzip()
-    etl_backup()
-    etl_truncate()
+    etl_remove(conn_id, log_path, log_name)
+    etl_unzip(conn_id, log_path, log_name)
+    etl_backup(conn_id, log_path, log_name)
+    etl_truncate(conn_id, log_path, log_name)
     
     Agent_Datafix(SourcePath)
     Stat_CDR_Datafix(SourcePath)
