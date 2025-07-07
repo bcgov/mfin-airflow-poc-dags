@@ -51,7 +51,7 @@ def email_notification():
         
         with SambaHook(samba_conn_id=conn_id) as fs_hook:
             with fs_hook.open_file(log_path + log_name,'a') as outfile:
-                outfile.writelines("ETL setp: 2, Task: ETL process stops NO daily extract available for processing, Time: %s\n" % dYmdHMS)
+                outfile.writelines("ETL: ETL failure,Step:2,Task:ETL process stops NO daily extract available for processing,Time: %s\n" % dYmdHMS) 
             
         outfile.close()
 
