@@ -237,7 +237,7 @@ def etl_daily_load():
         return
               
         
-    conn_id = 'fs1_rmo_ice'
+    conn_id = 'fs1_prod_conn'
     log_path = '/rmo_ct_prod/log/'
     log_name = 'daily_set.txt'    
     dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
