@@ -63,7 +63,7 @@ def choose_path():
     dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
         
     with SambaHook(samba_conn_id=conn_id) as fs_hook:
-        with fs_hook.open_file(log_path + log_name,'a') as outfile:
+        with fs_hook.open_file(log_path + log_name,'w') as outfile:
             outfile.writelines("ETL setp: 1, Task: ETL process task begins, Time: %s\n" % dYmdHMS)
             
         outfile.close()
