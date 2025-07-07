@@ -23,7 +23,6 @@ from airflow.hooks.base_hook import BaseHook
 from airflow.models import Variable
 import pymssql
 
-
 root = logging.getLogger()
 root.setLevel(logging.DEBUG)
 handler = logging.StreamHandler()
@@ -35,7 +34,7 @@ root.addHandler(handler)
 def email_notification():
         log_path = r'/rmo_ct_prod/log/'
         log_name = 'daily_backup.txt'
-        conn_id = 'fs1_rmo_ice'
+        conn_id = 'fs1_prod_conn'
         dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
         
         with SambaHook(samba_conn_id=conn_id) as fs_hook:
@@ -60,8 +59,7 @@ def choose_path():
     log_name = 'daily_backup.txt'
     SourcePath = '/rmo_ct_prod/'  
     conn_id = 'fs1_rmo_ice'
-    filefound = 0
-        
+    filefound = 0        
     dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
         
     with SambaHook(samba_conn_id=conn_id) as fs_hook:
@@ -69,7 +67,6 @@ def choose_path():
             outfile.write("ETL setp: 1, Task: ETL process task begins, Time: %s\n" % dYmdHMS)
             
         outfile.close()
-
         files = fs_hook.listdir(SourcePath)
         for f in files:
             if f == 'iceDB_ICE_BCMOFRMO.zip':
@@ -85,7 +82,7 @@ def etl_remove(pconn_id, plog_path, plog_name):
     dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
         
     with SambaHook(samba_conn_id=pconn_id) as fs_hook:
-        with fs_hook.open_file(plog_path + plog_name,'a') as outfile:
+        with fs_hook.open_file(plog_path + plog_name,'w') as outfile:
             outfile.write("ETL step: 2, Task: Remove CSV Inprogress task, Time: %s\n" % dYmdHMS)
       
         outfile.close()
@@ -108,12 +105,11 @@ def etl_unzip(pconn_id, plog_path, plog_name):
     dest_path = r'/rmo_ct_prod/inprogress/'
     file = 'iceDB_ICE_BCMOFRMO.zip'
     zip_loc = r'/tmp/'
-    dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
-        
+    dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')        
     logging.info("Unzip daily file")  
         
     with SambaHook(samba_conn_id=pconn_id) as fs_hook:
-        with fs_hook.open_file(plog_path + plog_name,'a') as outfile:
+        with fs_hook.open_file(plog_path + plog_name,'w') as outfile:
             outfile.write("ETL step: 3, Task: Unzipping and moving file task, Time: %s\n" % dYmdHMS) 
         
         outfile.close()        
@@ -138,8 +134,7 @@ def etl_backup(pconn_id, plog_path, plog_name):
     dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
         
     with SambaHook(samba_conn_id=pconn_id) as fs_hook:
-        with fs_hook.open_file(plog_path + plog_name,'a') as outfile:
-                      
+        with fs_hook.open_file(plog_path + plog_name,'w') as outfile:                      
             SourcePath = '/rmo_ct_prod/'
             DestPath = '/rmo_ct_prod/completed/'
             file = 'iceDB_ICE_BCMOFRMO.zip'
@@ -166,11 +161,10 @@ def etl_truncate(pconn_id, plog_path, plog_name):
     logging.info(f"truncate_landing_tables procedure")
     dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
     with SambaHook(samba_conn_id=pconn_id) as fs_hook:
-        with fs_hook.open_file(plog_path + plog_name,'a') as outfile:
+        with fs_hook.open_file(plog_path + plog_name,'w') as outfile:
             outfile.write("ETL step: 5, Task: Truncating tables in FIN_SHARED_LANDING_DEV, Time: %s\n" % dYmdHMS)
 
     outfile.close()
-
     conn_id = 'mssql_default'
     conn = BaseHook.get_connection(pconn_id)
     dbname = 'FIN_SHARED_LANDING_DEV'
@@ -213,12 +207,9 @@ def etl_daily_load():
             xlen = len(pSourceFile)-4
             vTableName = 'ICE_' + pSourceFile[:xlen]
             vSourceFile = pSourceFile
-
-            logging.info(f"loading table: {vTableName}")
-            
+            logging.info(f"loading table: {vTableName}")            
             conn = sql_hook.get_conn()
-            cursor = conn.cursor()
-                
+            cursor = conn.cursor()                
             vRMOInProgress = Variable.get("vRMOInProgressFolder")
             vRMOLog = Variable.get("vRMOLogFolder")
             
@@ -237,8 +228,7 @@ def etl_daily_load():
             logging.info(f"inserting table:  {vSourceFile}")
             start_time = time.time()
             cursor.execute(query)
-            conn.commit()
-                                  
+            conn.commit()                                  
             logging.info(f"bulk insert {time.time() - start_time} seconds")
         
         except Exception as e:
@@ -253,25 +243,21 @@ def etl_daily_load():
     dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
     
     with SambaHook(samba_conn_id=conn_id) as fs_hook:
-        with fs_hook.open_file(log_path + log_name,'a') as outfile:
+        with fs_hook.open_file(log_path + log_name,'w') as outfile:
                 outfile.write("ETL step: 6, Task: Loading csv data to FIN_SHARED_LANDING_DEV tables, Time: %s\n" % dYmdHMS)
 
-    outfile.close()
-        
+    outfile.close()        
     ConfigPath = Variable.get("vRMOConfigPath")
     FileName = Variable.get("vConfigName")
-    SourcePath = Variable.get("vRMOSourcePath")
-                
+    SourcePath = Variable.get("vRMOSourcePath")                
     source_file_set=[] 
-    data = []
-      
+    data = []      
     DBName = Variable.get("vDatabaseName")
 
     with SambaHook(samba_conn_id=conn_id) as fs_hook:                
         with fs_hook.open_file(ConfigPath + FileName,'r') as f:
             source_file_set = pd.read_csv(f, header = None, quoting=1)
-            data = source_file_set.values.flatten().tolist()   
-                
+            data = source_file_set.values.flatten().tolist()
             data_set = [x for x in data if str(x) != 'nan']
             
        
@@ -285,7 +271,7 @@ def etl_daily_load():
         
     dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
     with SambaHook(samba_conn_id=conn_id) as fs_hook:
-        with fs_hook.open_file(log_path + log_name,'a') as outfile:
+        with fs_hook.open_file(log_path + log_name,'w') as outfile:
             outfile.write("ETL step: 7, Task: ETL process completed, Time: %s\n" % dYmdHMS)
 
     outfile.close()    
