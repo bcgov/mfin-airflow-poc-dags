@@ -76,8 +76,8 @@ def choose_path():
         
     with SambaHook(samba_conn_id=conn_id) as fs_hook:
         with fs_hook.open_file(log_path + log_name,'w') as outfile:
-            outfile.writelines("ETL setp: 1, Task: ETL process task begins, Time: %s\n" % dYmdHMS)
-            
+            outfile.writelines("ETL: Starting process,Step:1,Task:ETL process starting,Time: %s\n" % dYmdHMS)
+
         outfile.close()
         files = fs_hook.listdir(SourcePath)
         for f in files:
@@ -254,28 +254,28 @@ def etl_daily_load():
             data = source_file_set.values.flatten().tolist()
             data_set = [x for x in data if str(x) != 'nan']
             
-        with fs_hook.open_file(log_path + log_name,'a') as outfile:
+        with fs_hook.open_file(log_path + log_etl,'a') as outfile:
             dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
-            outfile.writelines("ETL Remove Step: 2, Task: Remove CSV Inprogress task, Time: %s\n" % dYmdHMS)   
+            outfile.writelines("ETL:Remove files,Step:2,Task: Remove CSV file Inprogress folder task,Time: %s\n" % dYmdHMS)   
             etl_remove(conn_id, log_path, log_name)
     
             dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
-            outfile.writelines("ETL Unzip Step: 3, Task: Unzipping daily CSV file task, Time: %s\n" % dYmdHMS)   
+            outfile.writelines("ETL:Unzip CSV,Step:3,Task:Unzipping daily CSV extract file task,Time: %s\n" % dYmdHMS)   
             etl_unzip(conn_id, log_path, log_name)
 
             dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
-            outfile.writelines("ETL Backup Step: 4, Task: Backing up CT daily source file task, Time: %s\n" % dYmdHMS)            
+            outfile.writelines("ETL:Backup extract,Step:4,Task:Backing up CT daily source file task,Time: %s\n" % dYmdHMS)            
             etl_backup(conn_id, log_path, log_name)
             
             dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
-            outfile.writelines("ETL Truncating Landing tables Step: 5, Task: Truncating landing tables in DB task, Time: %s\n" % dYmdHMS)            
+            outfile.writelines("ETL:Truncating tables,Step:5,Task:Truncating landing tables in DB task,Time: %s\n" % dYmdHMS)            
             etl_truncate(conn_id, log_path, log_name)
     
             for source_file in data_set:
                 load_db_source(source_file, DBName)
         
             dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
-            outfile.writelines("ETL step: 8, Task: ETL process completed, Time: %s\n" % dYmdHMS)
+            outfile.writelines("ETL: Completion,Step:6,Task:ETL process completed,Time: %s\n" % dYmdHMS)
 
     outfile.close()    
     
