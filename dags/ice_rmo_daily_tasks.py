@@ -86,7 +86,7 @@ def choose_path():
         if filefound == 0:		    
             return 'path_email'
         else:
-            return 'path_remove'
+            return 'path_daily_load'
 
 
 def etl_remove(pconn_id, plog_path, plog_name):
