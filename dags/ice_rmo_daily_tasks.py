@@ -477,7 +477,7 @@ def etl_daily_load():
     EvalCriteriaLangString(SourcePath)
               
     for source_file in data_set:
-        load_db_source(source_file, DBName
+        load_db_source(source_file, DBName)
         
     dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
     with fs_hook.open_file(log_path + log_name,'a') as outfile:
