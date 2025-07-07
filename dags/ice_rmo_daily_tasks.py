@@ -79,9 +79,6 @@ def choose_path():
 
 
 def etl_remove(pconn_id, plog_path, plog_name):
-#    conn_id = 'fs1_rmo_ice'
-#    log_path = r'/rmo_ct_prod/log/'
-#    log_name = 'daily_backup.txt'
     dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
         
     with SambaHook(samba_conn_id=pconn_id) as fs_hook:
@@ -109,8 +106,6 @@ def etl_unzip(pconn_id, plog_path, plog_name):
     dest_path = r'/rmo_ct_prod/inprogress/'
     file = 'iceDB_ICE_BCMOFRMO.zip'
     zip_loc = r'/tmp/'
-#    log_path = r'/rmo_ct_prod/log/'
-#    log_name = 'daily_backup.txt'
     dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
         
     logging.info("Unzip daily file")  
@@ -138,8 +133,6 @@ def etl_unzip(pconn_id, plog_path, plog_name):
     
 # Task 4: Backup iceDB_ICE_BCMOFRMO-YYYYMMDD.zip to the completed folder    
 def etl_backup(pconn_id, plog_path, plog_name):
-#    log_path = r'/rmo_ct_prod/log/'
-#    log_name = 'daily_backup.txt'
     dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
         
     with SambaHook(samba_conn_id=pconn_id) as fs_hook:
@@ -171,8 +164,6 @@ def etl_truncate(pconn_id, plog_path, plog_name):
     logging.basicConfig(level=logging.INFO) 
     logging.info(f"truncate_landing_tables procedure")
     dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
-#    log_path = r'/rmo_ct_prod/log/'
-#    log_name = 'daily_backup.txt'
     with SambaHook(samba_conn_id=pconn_id) as fs_hook:
         with fs_hook.open_file(plog_path + plog_name,'a') as outfile:
             outfile.write("ETL step: 5, Task: Truncating tables in FIN_SHARED_LANDING_DEV, Time: %s\n" % dYmdHMS)
@@ -450,12 +441,12 @@ def etl_daily_load():
             data_set = [x for x in data if str(x) != 'nan']
             
        
-    # Data fixes required for relevant daily table process 
     etl_remove(conn_id, log_path, log_name)
     etl_unzip(conn_id, log_path, log_name)
     etl_backup(conn_id, log_path, log_name)
     etl_truncate(conn_id, log_path, log_name)
     
+    # Data fixes required for relevant daily table process 
     Agent_Datafix(SourcePath)
     Stat_CDR_Datafix(SourcePath)
     Stat_CDR_Summary_Datafix(SourcePath)
@@ -488,29 +479,29 @@ def create_dag():
         dag = dag  
     ) 
     
-    path_remove = PythonOperator(
-        task_id = 'path_remove',
-        python_callable = etl_remove,
-        dag = dag
-    )
+    #path_remove = PythonOperator(
+    #    task_id = 'path_remove',
+    #    python_callable = etl_remove,
+    #    dag = dag
+    #)
     
-    path_unzip = PythonOperator(
-        task_id = 'path_unzip',
-        python_callable = etl_unzip,
-        dag = dag
-    )
+    #path_unzip = PythonOperator(
+    #    task_id = 'path_unzip',
+    #    python_callable = etl_unzip,
+    #    dag = dag
+    #)
 
-    path_backup = PythonOperator(
-        task_id = 'path_backup',
-        python_callable = etl_backup,
-        dag = dag
-    )
+    #path_backup = PythonOperator(
+    #    task_id = 'path_backup',
+    #    python_callable = etl_backup,
+    #    dag = dag
+    #)
 
-    path_truncate = PythonOperator(
-        task_id = 'path_truncate',
-        python_callable = etl_truncate,
-        dag = dag
-    )
+    #path_truncate = PythonOperator(
+    #    task_id = 'path_truncate',
+    #    python_callable = etl_truncate,
+    #    dag = dag
+    #)
     
     path_daily_load = PythonOperator(
         task_id = 'path_daily_load',
