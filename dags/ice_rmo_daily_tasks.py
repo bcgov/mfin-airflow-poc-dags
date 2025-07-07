@@ -371,25 +371,25 @@ def etl_daily_load():
         dYmd = (dt.datetime.today() + timedelta(days = -1)).strftime('%Y%m%d')
 
         try:
-            if pSourceFile == 'Stat_CDR.csv':
-                vTableName = 'ICE_Stat_CDR'
-                vSourceFile = 'Stat_CDR_fixed.csv'
-            elif pSourceFile == 'Agent.csv':
-                vTableName = 'ICE_Agent'
-                vSourceFile = 'Agent_fixed.csv'
-            elif pSourceFile == 'Stat_CDR_Summary.csv':
-                vTableName = 'ICE_Stat_CDR_Summary'
-                vSourceFile = 'Stat_CDR_Summary_fixed.csv' 
-            elif pSourceFile == 'LOBCodeLangString.csv':   
-                vTableName = 'ICE_LOBCodeLangString'
-                vSourceFile = 'LOBCodeLangString_fixed.csv'
-            elif pSourceFile == 'EvalCriteriaLangString.csv':   
-                vTableName = 'ICE_EvalCriteriaLangString'
-                vSourceFile = 'EvalCriteriaLangString_fixed.csv'     
-            else:
-                xlen = len(pSourceFile)-4
-                vTableName = 'ICE_' + pSourceFile[:xlen]
-                vSourceFile = pSourceFile
+            #if pSourceFile == 'Stat_CDR.csv':
+            #    vTableName = 'ICE_Stat_CDR'
+            #    vSourceFile = 'Stat_CDR_fixed.csv'
+            #elif pSourceFile == 'Agent.csv':
+            #    vTableName = 'ICE_Agent'
+            #    vSourceFile = 'Agent_fixed.csv'
+            #elif pSourceFile == 'Stat_CDR_Summary.csv':
+            #    vTableName = 'ICE_Stat_CDR_Summary'
+            #    vSourceFile = 'Stat_CDR_Summary_fixed.csv' 
+            #elif pSourceFile == 'LOBCodeLangString.csv':   
+            #    vTableName = 'ICE_LOBCodeLangString'
+            #    vSourceFile = 'LOBCodeLangString_fixed.csv'
+            #elif pSourceFile == 'EvalCriteriaLangString.csv':   
+            #    vTableName = 'ICE_EvalCriteriaLangString'
+            #    vSourceFile = 'EvalCriteriaLangString_fixed.csv'     
+            #else:
+            xlen = len(pSourceFile)-4
+            vTableName = 'ICE_' + pSourceFile[:xlen]
+            vSourceFile = pSourceFile
 
             logging.info(f"loading table: {vTableName}")
             
@@ -470,11 +470,11 @@ def etl_daily_load():
     etl_truncate(conn_id, log_path, log_name)
     
     # Data fixes required for relevant daily table process 
-    Agent_Datafix(SourcePath)
-    Stat_CDR_Datafix(SourcePath)
-    Stat_CDR_Summary_Datafix(SourcePath)
-    LOBCodeLangString(SourcePath)
-    EvalCriteriaLangString(SourcePath)
+    #Agent_Datafix(SourcePath)
+    #Stat_CDR_Datafix(SourcePath)
+    #Stat_CDR_Summary_Datafix(SourcePath)
+    #LOBCodeLangString(SourcePath)
+    #EvalCriteriaLangString(SourcePath)
               
     for source_file in data_set:
         load_db_source(source_file, DBName)
