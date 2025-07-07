@@ -41,6 +41,17 @@ root.addHandler(handler)
 #)
 
 def email_notification():
+        log_path = r'/rmo_ct_prod/log/'
+        log_name = 'daily_backup.txt'
+        conn_id = 'fs1_rmo_ice'
+        dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
+        
+        with SambaHook(samba_conn_id=conn_id) as fs_hook:
+            with fs_hook.open_file(log_path + log_name,'w') as outfile:
+                outfile.write("ETL setp: 2, Task: ETL process stops NO daily extract available for processing, Time: %s\n" % dYmdHMS)
+            
+        outfile.close()
+
         dYmd = (dt.datetime.today()+ timedelta(days=-1)).strftime('%Y-%m-%d')
     
         with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
@@ -388,15 +399,27 @@ def etl_daily_load():
             vRMOInProgress = Variable.get("vRMOInProgressFolder")
             vRMOLog = Variable.get("vRMOLogFolder")
             
+#            query = f""" BULK INSERT [{pDBName}].[dbo].[{vTableName}]
+#                         FROM '{vRMOInProgress}{vSourceFile}'
+#                         WITH
+#	                     ( FORMAT='CSV', 
+#                           MAXERRORS=100, 
+#                           ERRORFILE='{vRMOLog}{vTableName}_{dYmd}.log',
+#                           TABLOCK 
+#	                     );
+#                     """
+
             query = f""" BULK INSERT [{pDBName}].[dbo].[{vTableName}]
                          FROM '{vRMOInProgress}{vSourceFile}'
                          WITH
-	                     ( FORMAT='CSV', 
-                           MAXERRORS=100, 
+	                     ( FIELDTERMINATOR = '|',
+                           ROWTERMINATOR = '\r\n',                         
+                           MAXERRORS = 20, 
                            ERRORFILE='{vRMOLog}{vTableName}_{dYmd}.log',
-                           TABLOCK                               
+                           TABLOCK 
 	                     );
                      """
+
             logging.info(f"query: {query}")
             logging.info(f"inserting table:  {vSourceFile}")
             start_time = time.time()
@@ -454,7 +477,13 @@ def etl_daily_load():
     EvalCriteriaLangString(SourcePath)
               
     for source_file in data_set:
-        load_db_source(source_file, DBName)
+        load_db_source(source_file, DBName
+        
+    dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
+    with fs_hook.open_file(log_path + log_name,'a') as outfile:
+        outfile.write("ETL step: 7, Task: ETL process completed, Time: %s\n" % dYmdHMS)
+
+    outfile.close()    
     
     return
     
