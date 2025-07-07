@@ -31,6 +31,18 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s -%(message
 handler.setFormatter(formatter)
 root.addHandler(handler) 
 
+
+def email_completion():
+        dYmdHMS = (dt.datetime.today()+ timedelta(days=-1)).strftime('%Y-%m-%d:%H%M%S')
+    
+        with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
+            sh.send_email_smtp(
+               to=['eloy.mendez@gov.bc.ca'],
+               subject='Airflow ETL Process Notification',
+               html_content='<html><body><h2>Airflow RMO-ETL daily source file completion</h2><p>CT iceDB_ICE_BCMOFRMO-' + dYmdHMS + '.zip daily file processed succesfully </p></body></html>'
+        )        
+        return
+
 def email_notification():
         log_path = r'/rmo_ct_prod/log/'
         log_name = 'daily_backup.txt'
@@ -275,6 +287,8 @@ def etl_daily_load():
             outfile.writelines("ETL step: 7, Task: ETL process completed, Time: %s\n" % dYmdHMS)
 
     outfile.close()    
+    
+    email_completion()
     
     return
     
