@@ -155,7 +155,7 @@ def etl_backup(pconn_id, plog_path, plog_name):
             hook = SambaHook(pconn_id)
             outfile.write("ETL step: 4, Task: Backup iceDB_ICE_BCMOFRMO-YYYYMMDD.zip task, Time: %s\n" % dYmdHMS)
             #   Set dYmd to yesterdays date
-            dYmd = (dt.datetime.today() + timedelta(days=-1)).strftime('%Y%m%d')
+            dYmd = (dt.datetime.today() + timedelta(days=+2)).strftime('%Y%m%d')
             try:
                 files = hook.listdir(SourcePath)
  
