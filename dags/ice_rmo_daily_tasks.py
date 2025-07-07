@@ -68,7 +68,7 @@ def email_notification():
 
 def choose_path():
     log_path = r'/rmo_ct_prod/log/'
-    log_name = 'daily_backup.txt'
+    log_name = 'daily_etl.txt'
     SourcePath = '/rmo_ct_prod/'  
     conn_id = 'fs1_prod_conn'
     filefound = 0        
@@ -232,7 +232,8 @@ def etl_daily_load():
         
     conn_id = 'fs1_prod_conn'
     log_path = '/rmo_ct_prod/log/'
-    log_name = 'daily_set.txt'    
+    log_name = 'daily_set.txt'  
+    log_etl = 'daily_etl.txt'    
     dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
     
     with SambaHook(samba_conn_id=conn_id) as fs_hook:
