@@ -434,9 +434,14 @@ def etl_daily_load():
         return
               
         
+    conn_id = 'fs1_rmo_ice'
+    log_path = '/rmo_ct_prod/log/'
+    log_name = 'daily_set.txt'    
     dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
-    with fs_hook.open_file(log_path + log_name,'a') as outfile:
-        outfile.write("ETL step: 6, Task: Loading csv data to FIN_SHARED_LANDING_DEV tables, Time: %s\n" % dYmdHMS)
+    
+    with SambaHook(samba_conn_id=conn_id) as fs_hook:
+        with fs_hook.open_file(log_path + log_name,'a') as outfile:
+                outfile.write("ETL step: 6, Task: Loading csv data to FIN_SHARED_LANDING_DEV tables, Time: %s\n" % dYmdHMS)
 
     outfile.close()
 
@@ -445,9 +450,6 @@ def etl_daily_load():
     FileName = Variable.get("vConfigName")
     SourcePath = Variable.get("vRMOSourcePath")
     
-    conn_id = 'fs1_rmo_ice'
-    log_path = '/rmo_ct_prod/log/'
-    log_name = 'daily_set.txt'
     
                 
     source_file_set=[] 
@@ -455,8 +457,7 @@ def etl_daily_load():
       
     DBName = Variable.get("vDatabaseName")
 
-    with SambaHook(samba_conn_id=conn_id) as fs_hook:
-                
+    with SambaHook(samba_conn_id=conn_id) as fs_hook:                
         with fs_hook.open_file(ConfigPath + FileName,'r') as f:
             source_file_set = pd.read_csv(f, header = None, quoting=1)
             data = source_file_set.values.flatten().tolist()   
@@ -480,8 +481,9 @@ def etl_daily_load():
         load_db_source(source_file, DBName)
         
     dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
-    with fs_hook.open_file(log_path + log_name,'a') as outfile:
-        outfile.write("ETL step: 7, Task: ETL process completed, Time: %s\n" % dYmdHMS)
+    with SambaHook(samba_conn_id=conn_id) as fs_hook:
+        with fs_hook.open_file(log_path + log_name,'a') as outfile:
+            outfile.write("ETL step: 7, Task: ETL process completed, Time: %s\n" % dYmdHMS)
 
     outfile.close()    
     
