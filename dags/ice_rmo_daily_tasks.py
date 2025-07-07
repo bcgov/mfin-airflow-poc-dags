@@ -45,7 +45,7 @@ def email_completion():
 
 def email_notification():
         log_path = r'/rmo_ct_prod/log/'
-        log_name = 'daily_backup.txt'
+        log_name = 'daily_etl.txt'
         conn_id = 'fs1_prod_conn'
         dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
         
