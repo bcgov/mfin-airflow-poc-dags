@@ -250,7 +250,7 @@ def etl_daily_load():
             data_set = [x for x in data if str(x) != 'nan']
             
         with fs_hook.open_file(log_path + log_etl,'a') as outfile:
-            dYmdHMS = (dt.datetime.today() - timedalta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
+            dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
             outfile.writelines("Time:%s,Step:2,Task:Removing old data extract,Description:Remove old CSV file Inprogress folder task\n" % dYmdHMS)
             etl_remove(conn_id)
     
