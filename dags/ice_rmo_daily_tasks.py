@@ -70,7 +70,8 @@ def choose_path():
     log_path = r'/rmo_ct_prod/log/'
     log_name = 'daily_etl.txt'
     SourcePath = '/rmo_ct_prod/'  
-    conn_id = 'fs1_prod_conn'
+    #conn_id = 'fs1_prod_conn'
+    conn_id = 'fs1_rmo_ice'
     filefound = 0        
     dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
         
@@ -229,7 +230,9 @@ def etl_daily_load():
         return
               
         
-    conn_id = 'fs1_prod_conn'
+#    conn_id = 'fs1_prod_conn'
+    conn_id = 'fs1_rmo_ice'
+
     log_path = '/rmo_ct_prod/log/'
     #log_path = '/ptb_ct_prod/log/'
     log_name = 'daily_set.txt'  
