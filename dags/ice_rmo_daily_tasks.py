@@ -136,7 +136,7 @@ def etl_backup(pconn_id):
         
     with SambaHook(samba_conn_id=pconn_id) as fs_hook:
         SourcePath = Variable.get("vRMOSourcePath")
-        DestPath = = Variable.get("vRMOCompletePath")
+        DestPath = Variable.get("vRMOCompletePath")
         file = 'iceDB_ICE_BCMOFRMO.zip'
         # Set dYmd to yesterdays date
         dYmd = (dt.datetime.today() + timedelta(days=-1)).strftime('%Y%m%d')
