@@ -33,45 +33,42 @@ root.addHandler(handler)
 
 
 def email_completion():
-        dYmdHMS = (dt.datetime.today()+ timedelta(days=-1)).strftime('%Y-%m-%d:%H%M%S')
+    dYmdHMS = (dt.datetime.today()+ timedelta(days=-1)).strftime('%Y-%m-%d:%H%M%S')
     
-        with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
-            sh.send_email_smtp(
-               to=['eloy.mendez@gov.bc.ca'],
-               subject='Airflow ETL Process Notification',
-               html_content='<html><body><h2>Airflow RMO-ETL daily source file completion</h2><p>CT iceDB_ICE_BCMOFRMO-' + dYmdHMS + '.zip daily file processed succesfully </p></body></html>'
-        )        
-        return
+    with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
+        sh.send_email_smtp(
+           to=['eloy.mendez@gov.bc.ca'],
+           subject='Airflow ETL Process Notification',
+           html_content='<html><body><h2>Airflow RMO-ETL daily source file completion</h2><p>CT iceDB_ICE_BCMOFRMO-' + dYmdHMS + '.zip daily file processed succesfully </p></body></html>'
+    )        
+    return
 
 def email_notification():
-        LogPath = = Variable.get("vRMOLogPath")
-#        log_path = r'/rmo_ct_prod/log/'
-        log_name = 'daily_etl.txt'
-        conn_id = 'fs1_prod_conn'
-        dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
+    LogPath = Variable.get("vRMOLogPath")
+    log_name = 'daily_etl.txt'
+    conn_id = 'fs1_prod_conn'
+    dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
         
-        with SambaHook(samba_conn_id=conn_id) as fs_hook:
-            with fs_hook.open_file(LogPath + log_name,'a') as outfile:
-                outfile.writelines("Time:%s,Step:2,Task:ETL process failed,Description:ETL process stops NO daily extract available for processing\n" % dYmdHMS)
+    with SambaHook(samba_conn_id=conn_id) as fs_hook:
+        with fs_hook.open_file(LogPath + log_name,'a') as outfile:
+            outfile.writelines("Time:%s,Step:2,Task:ETL process failed,Description:ETL process stops NO daily extract available for processing\n" % dYmdHMS)
             
-        outfile.close()
+    outfile.close()
 
-        dYmd = (dt.datetime.today()+ timedelta(days=-1)).strftime('%Y-%m-%d')
+    dYmd = (dt.datetime.today()+ timedelta(days=-1)).strftime('%Y-%m-%d')
     
-        with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
-            sh.send_email_smtp(
-               to=['eloy.mendez@gov.bc.ca'],
-               subject='Airflow Email Notification',
-               html_content='<html><body><h2>Airflow RMO daily source file failure</h2><p>CT iceDB_ICE_BCMOFRMO-' + dYmd + '.zip file not received/available</p></body></html>'
-        )        
-        return
+    with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
+        sh.send_email_smtp(
+           to=['eloy.mendez@gov.bc.ca'],
+           subject='Airflow Email Notification',
+           html_content='<html><body><h2>Airflow RMO daily source file failure</h2><p>CT iceDB_ICE_BCMOFRMO-' + dYmd + '.zip file not received/available</p></body></html>'
+    )        
+    return
 
 
 def choose_path():
     LogPath = Variable.get("vRMOLogPath")
     SourcePath = Variable.get("vRMOSourcePath")
-#    SourcePath = '/rmo_ct_prod/'  
-#    log_path = r'/rmo_ct_prod/log/'
     log_name = 'daily_etl.txt'
     conn_id = 'fs1_prod_conn'
     #conn_id = 'fs1_rmo_ice'
@@ -162,6 +159,8 @@ def etl_truncate():
     logging.info(f"truncate_landing_tables procedure")
 
     conn_id = 'mssql_default'
+#   conn_id = 'mssql_conn_finafdbt
+#   conn_id = 'mssql_conn_finafdbp    
     conn = BaseHook.get_connection(conn_id)
     dbname = Variable.get("vDatabaseName")
     host = conn.host
