@@ -50,7 +50,7 @@ def email_notification():
     dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
         
     with SambaHook(samba_conn_id=conn_id) as fs_hook:
-        with fs_hook.open_file(LogPath + log_name,'a') as outfile:
+        with fs_hook.open_file(r'/rmo_ct_prod/log/daily_etl.txt','a') as outfile:
             outfile.writelines("Time:%s,Step:2,Task:ETL process failed,Description:ETL process stops NO daily extract available for processing\n" % dYmdHMS)
             
     outfile.close()
@@ -76,7 +76,7 @@ def choose_path():
     dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
         
     with SambaHook(samba_conn_id=conn_id) as fs_hook:
-        with fs_hook.open_file(LogPath + log_name,'w') as outfile:
+        with fs_hook.open_file(r'/rmo_ct_prod/log/daily_etl.txt','w') as outfile:
             outfile.writelines("Time:%s,Step:1,Task:ETL process,Description:Starting ETL process\n" % dYmdHMS)
 
         outfile.close()
