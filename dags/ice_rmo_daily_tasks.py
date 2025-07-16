@@ -80,7 +80,7 @@ def choose_path():
             outfile.writelines("Time:%s,Step:1,Task:ETL process,Description:Starting ETL process\n" % dYmdHMS)
 
         outfile.close()
-        files = fs_hook.listdir(SourcePath)
+        files = fs_hook.listdir(r'/rmo_ct_prod/')
         for f in files:
             if f == 'iceDB_ICE_BCMOFRMO.zip':
                 filefound = 1
@@ -95,15 +95,15 @@ def etl_remove(pconn_id):
         
     with SambaHook(samba_conn_id=pconn_id) as fs_hook:
         DeletePath = Variable.get("vRMOProgressPath")
-        files = fs_hook.listdir(DeletePath)
+        files = fs_hook.listdir(r'/rmo_ct_prod/inprogress')
 
         try:
             for file in files:
-                file_path = f"{DeletePath}/{file}"
+                file_path = f"{r'/rmo_ct_prod/inprogress'}/{file}"
                 fs_hook.remove(file_path)
         
         except Exception as e:
-            logging.error(f"Error {e} removing file: {DeletePath}")
+            logging.error(f"Error {e} removing file: {r'/rmo_ct_prod/inprogress'}")
             
     return
     
