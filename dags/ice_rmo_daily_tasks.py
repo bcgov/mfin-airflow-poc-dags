@@ -45,12 +45,12 @@ def email_completion():
 
 def email_notification():
     LogPath = Variable.get("vRMOLogPath")
-    log_name = 'daily_etl.txt'
+    LogName = 'daily_etl.txt'
     conn_id = 'fs1_prod_conn'
     dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
         
     with SambaHook(samba_conn_id=conn_id) as fs_hook:
-        with fs_hook.open_file(r'/rmo_ct_prod/log/daily_etl.txt','a') as outfile:
+        with fs_hook.open_file(LogPath + LogName,'a') as outfile:
             outfile.writelines("Time:%s,Step:2,Task:ETL process failed,Description:ETL process stops NO daily extract available for processing\n" % dYmdHMS)
             
     outfile.close()
@@ -69,18 +69,18 @@ def email_notification():
 def choose_path():
     LogPath = Variable.get("vRMOLogPath")
     SourcePath = Variable.get("vRMOSourcePath")
-    log_name = 'daily_etl.txt'
+    LogName = 'daily_etl.txt'
     conn_id = 'fs1_prod_conn'
     #conn_id = 'fs1_rmo_ice'
     filefound = 0        
     dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
         
     with SambaHook(samba_conn_id=conn_id) as fs_hook:
-        with fs_hook.open_file(r'/rmo_ct_prod/log/daily_etl.txt','w') as outfile:
+        with fs_hook.open_file(LogPath + LogName,'w') as outfile:
             outfile.writelines("Time:%s,Step:1,Task:ETL process,Description:Starting ETL process\n" % dYmdHMS)
 
         outfile.close()
-        files = fs_hook.listdir(r'/rmo_ct_prod/')
+        files = fs_hook.listdir(SourcePath)
         for f in files:
             if f == 'iceDB_ICE_BCMOFRMO.zip':
                 filefound = 1
@@ -94,12 +94,12 @@ def choose_path():
 def etl_remove(pconn_id):
         
     with SambaHook(samba_conn_id=pconn_id) as fs_hook:
-        DeletePath = Variable.get("vRMOProgressPath")
-        files = fs_hook.listdir(r'/rmo_ct_prod/inprogress')
+        ProgressPath = Variable.get("vRMOProgressPath")
+        files = fs_hook.listdir(ProgressPath)
 
         try:
             for file in files:
-                file_path = f"{r'/rmo_ct_prod/inprogress'}/{file}"
+                file_path = f"{ProgressPath}/{file}"
                 fs_hook.remove(file_path)
         
         except Exception as e:
