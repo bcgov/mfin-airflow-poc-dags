@@ -207,14 +207,15 @@ def etl_daily_load():
             cursor = conn.cursor()                
             vRMOInProgress = Variable.get("vRMOProgressPath")
             vRMOLog = Variable.get("vRMOLogPath")
+            vFS1 = Variable.get("vFS1")
             
             query = f""" BULK INSERT [{pDBName}].[dbo].[{vTableName}]
-                         FROM '{vRMOInProgress}{vSourceFile}'
+                         FROM '{vFS1}{vRMOInProgress}{vSourceFile}'
                          WITH
 	                     ( FIELDTERMINATOR = '|',
                            ROWTERMINATOR = '\r\n',                         
                            MAXERRORS = 20, 
-                           ERRORFILE='{vRMOLog}{vTableName}_{dYmd}.log',
+                           ERRORFILE='{vFS1}{vRMOLog}{vTableName}_{dYmd}.log',
                            TABLOCK 
 	                     );
                      """
