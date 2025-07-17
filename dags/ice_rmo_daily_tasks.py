@@ -215,7 +215,7 @@ def etl_daily_load():
 	                     ( FIELDTERMINATOR = '|',
                            ROWTERMINATOR = '\r\n',                         
                            MAXERRORS = 20, 
-                           ERRORFILE='{vFS1}{vRMOLog}{vTableName}_{dYmd}.log',
+                           ERRORFILE='\\fs1.fin.gov.bc.ca{vRMOLog}{vTableName}_{dYmd}.log',
                            TABLOCK 
 	                     );
                      """
