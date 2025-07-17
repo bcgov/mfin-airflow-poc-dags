@@ -210,12 +210,12 @@ def etl_daily_load():
             vFS1 = Variable.get("vFS1")
             
             query = f""" BULK INSERT [{pDBName}].[dbo].[{vTableName}]
-                         FROM '\\fs1.fin.gov.bc.ca{vRMOInProgress}{vSourceFile}'
+                         FROM '\\fs1.fin.gov.bc.ca\rmo_ct_prod\inprogress\{vSourceFile}'
                          WITH
 	                     ( FIELDTERMINATOR = '|',
                            ROWTERMINATOR = '\r\n',                         
                            MAXERRORS = 20, 
-                           ERRORFILE='\\fs1.fin.gov.bc.ca{vRMOLog}{vTableName}_{dYmd}.log',
+                           ERRORFILE='\\fs1.fin.gov.bc.ca\rmo_ct_prod\log\{vTableName}_{dYmd}.log',
                            TABLOCK 
 	                     );
                      """
