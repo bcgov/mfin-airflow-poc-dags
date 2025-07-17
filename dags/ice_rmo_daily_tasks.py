@@ -210,7 +210,7 @@ def etl_daily_load():
             vFS1 = Variable.get("vFS1")
             
             query = f""" BULK INSERT [{pDBName}].[dbo].[{vTableName}]
-                         FROM '{vFS1}{vRMOInProgress}{vSourceFile}'
+                         FROM '\\fs1.fin.gov.bc.ca{vRMOInProgress}{vSourceFile}'
                          WITH
 	                     ( FIELDTERMINATOR = '|',
                            ROWTERMINATOR = '\r\n',                         
