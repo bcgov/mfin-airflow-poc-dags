@@ -137,7 +137,7 @@ def etl_backup(pconn_id):
         
     with SambaHook(samba_conn_id=pconn_id) as fs_hook:
         SourcePath = Variable.get("vPTBSourcePath") 
-        DestPath = = Variable.get("vPTBCompletePath")
+        DestPath = Variable.get("vPTBCompletePath")
         dYmd = (dt.datetime.today()).strftime('%Y-%m-%d')
         file = 'iceDB_ICE_BCMOFPT_' + dYmd + '_0700.zip'
 
