@@ -212,13 +212,13 @@ def etl_daily_load():
             vPTBInProgress = Variable.get("vPTBProgressPath")
             vPTBLog = Variable.get("vPTBLogPath")
             
-            query = f""" BULK INSERT [{pDBName}].[dbo].[{vTableName}]
-                         FROM '{vPTBInProgress}{vSourceFile}'
+            query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{vTableName}]
+                         FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{vSourceFile}'
                          WITH
 	                     ( FIELDTERMINATOR = '|',
                            ROWTERMINATOR = '\r\n',                         
                            MAXERRORS = 20, 
-                           ERRORFILE='{vPTBLog}{vTableName}_{dYmd}.log',
+                           ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{vTableName}_{dYmd}.log',
                            TABLOCK 
 	                     );
                      """
