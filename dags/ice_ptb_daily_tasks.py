@@ -216,7 +216,7 @@ def etl_daily_load():
                          FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{vSourceFile}'
                          WITH
 	                     ( FIELDTERMINATOR = '|',
-                           ROWTERMINATOR = '\r\n',                         
+                           ROWTERMINATOR = '\\r\\n',                         
                            MAXERRORS = 20, 
                            ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{vTableName}_{dYmd}.log',
                            TABLOCK 
@@ -243,7 +243,7 @@ def etl_daily_load():
     SourcePath = Variable.get("vPTBSourcePath")                
     DBName = Variable.get("vDatabaseName")
 
-    log_name = 'daily_set.txt'  
+    log_name = 'daily_set.txt' 
     log_etl = 'daily_etl.txt'    
     dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
     source_file_set=[] 
