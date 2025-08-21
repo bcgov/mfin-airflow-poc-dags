@@ -103,10 +103,27 @@ def etl_remove(pconn_id):
                 fs_hook.remove(file_path)
         
         except Exception as e:
-            logging.error(f"Error {e} removing file: {DeletePath}")
+            logging.error(f"Error {e} removing files in InProgress folder: {DeletePath}")
             
     return
     
+def log_remove(pconn_id):
+        
+    with SambaHook(samba_conn_id=pconn_id) as fs_hook:
+        DeletePath = Variable.get("vPTBLogPath")
+        files = fs_hook.listdir(DeletePath)
+
+        try:
+            for file in files:
+                file_path = f"{DeletePath}/{file}"
+                fs_hook.remove(file_path)
+        
+        except Exception as e:
+            logging.error(f"Error {e} removing files in log folder: {DeletePath}")
+            
+    return
+
+
 #Task 3: Unzip and Move files from source to destination (using SambaHook)    
 def etl_unzip(pconn_id):
     SourcePath = Variable.get("vPTBSourcePath")
@@ -257,15 +274,19 @@ def etl_daily_load():
             
         with fs_hook.open_file(LogPath + log_etl,'a') as outfile:
             dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
-            outfile.writelines("Time:%s,Step:2,Task:Removing old data extract,Description:Remove old CSV file Inprogress folder task\n" % dYmdHMS)
+            outfile.writelines("Time:%s,Step:2,Task:Removing previous data extracted,Description:Remove previous CSV files Inprogress folder task\n" % dYmdHMS)
             etl_remove(conn_id)
-    
+
             dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
-            outfile.writelines("Time:%s,Step:3,Task:Unzipping CSV files,Description:Unzipping daily CSV extract file task\n" % dYmdHMS)
+            outfile.writelines("Time:%s,Step:2.1,Task:Removing previous log data,Description:Remove old Log files Log folder task\n" % dYmdHMS)
+            log_remove(conn_id)    
+            
+            dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
+            outfile.writelines("Time:%s,Step:3,Task:Unzipping current CSV files,Description:Unzipping current daily CSV extract file task\n" % dYmdHMS)
             etl_unzip(conn_id)
 
             dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
-            outfile.writelines("Time:%s,Step:4,Task:Backing up extract,Description:Backing up CT daily source file task\n" % dYmdHMS)
+            outfile.writelines("Time:%s,Step:4,Task:Backing up current extract,Description:Backing up current CT daily source file task\n" % dYmdHMS)
             etl_backup(conn_id)
             
             dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
@@ -273,7 +294,7 @@ def etl_daily_load():
             etl_truncate()
             
             dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
-            outfile.writelines("Time:%s,Step:6,Task:DB data load,Description:Loading csv daily data to FIN_SHARED_LANDING_Env tables task\n" % dYmdHMS)
+            outfile.writelines("Time:%s,Step:6,Task:DB data load,Description:Loading csv daily data to FIN_SHARED_LANDING_DEV tables task\n" % dYmdHMS)
     
             for source_file in data_set:
                 load_db_source(source_file, DBName)
