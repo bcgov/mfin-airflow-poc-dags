@@ -208,7 +208,41 @@ def etl_truncate():
     return
    
 
-# Task 6: Loading daily csv data files to FIN_SHARED SQL Server database
+# Task 6: Loading daily data from landing tables to target tables in the database     
+def loading_target_tables_db():
+    logging.basicConfig(level=logging.INFO) 
+    logging.info(f"loading_db_data_procedure")
+
+    conn_id = 'mssql_default'
+#   conn_id = 'mssql_conn_finafdbt
+#   conn_id = 'mssql_conn_finafdbp     
+    conn = BaseHook.get_connection(conn_id)
+    dbname = Variable.get("vDatabaseName")
+    host = conn.host
+    user = conn.login
+    password = conn.password        
+    connection = None
+                
+    try:
+        connection =  pymssql.connect(host = host, database = dbname, user = user, password = password)
+        cursor = connection.cursor()                    
+        start_time = time.time()
+        cursor.execute("EXEC [dbo].[PROC_TELEPHONY_PTB_BUILD_ALL]")            
+        connection.commit()                                  
+        logging.info(f"truncate landing tables {time.time() - start_time} seconds")
+        
+    except Exception as e:
+        logging.error(f"Error loading data to db target tables {e}")
+        
+    finally:
+        if connection:
+            connection.close()
+            logging.info(f"Database {dbname} - Connection closed")
+ 
+    return
+
+
+# Task 7: Loading daily csv data files to FIN_SHARED SQL Server database
 def etl_daily_load():
     # Log all steps at INFO level
     logging.basicConfig(level=logging.INFO)
@@ -290,7 +324,7 @@ def etl_daily_load():
             etl_backup(conn_id)
             
             dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
-            outfile.writelines("Time:%s,Step:5,Task:cTruncating tables,Description:Truncating landing tables in DB task\n" % dYmdHMS)
+            outfile.writelines("Time:%s,Step:5,Task:Truncating tables,Description:Truncating landing tables in DB task\n" % dYmdHMS)
             etl_truncate()
             
             dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
@@ -300,7 +334,12 @@ def etl_daily_load():
                 load_db_source(source_file, DBName)
         
             dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
-            outfile.writelines("Time:%s,Step:7,Task:ETL process completed,Description:ETL process completed successfully task\n" % dYmdHMS)
+            outfile.writelines("Time:%s,Step:7,Task:Loading targte tables in database,Description: Loading target tables from landing tables in DB task\n" % dYmdHMS)
+            loading_target_tables_db()
+                        
+            
+            dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
+            outfile.writelines("Time:%s,Step:8,Task:ETL process completed,Description:ETL process completed successfully task\n" % dYmdHMS)
 
     outfile.close()    
     
