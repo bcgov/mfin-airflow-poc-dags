@@ -20,8 +20,13 @@ jobs:
           repositories: |
             mfin-airflow-poc
       - name: Trigger repository_dispatch
+        id: trigger_dispatch
         run: |
-          curl -X POST https://api.github.com/repos/bcgov-c/mfin-airflow-poc/dispatches \
+          status_code=$(curl -w "%{http_code}" -o /dev/null -s -X POST https://api.github.com/repos/bcgov-c/mfin-airflow-poc/dispatches \
             -H "Authorization: Bearer ${{ steps.generate_token.outputs.token }}" \
             -H "Accept: application/vnd.github.v3+json" \
-            -d '{"event_type":"submodule_update"}'
+            -d '{"event_type":"submodule_update"}')
+          echo "status_code=$status_code" >> $GITHUB_OUTPUT
+
+      - name: Log curl HTTP status code
+        run: echo "Repository dispatch curl returned HTTP status code: ${{ steps.trigger_dispatch.outputs.status_code }}"
