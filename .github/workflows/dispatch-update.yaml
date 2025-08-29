@@ -1,0 +1,24 @@
+name: Dispatch Submodule Update
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate GitHub App token
+        id: generate_token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.GH_APP_ID }}
+          private-key: ${{ secrets.GH_PRIVATE_KEY }}
+
+      - name: Trigger repository_dispatch
+        run: |
+          curl -X POST https://api.github.com/repos/bcgov-c/mfin-airflow-poc.git/dispatches \
+            -H "Authorization: Bearer ${{ steps.generate_token.outputs.token }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -d '{"event_type":"submodule_update"}'
