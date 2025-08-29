@@ -29,4 +29,5 @@ jobs:
           echo "status_code=$status_code" >> $GITHUB_OUTPUT
 
       - name: Log curl HTTP status code
-        run: echo "Repository dispatch curl returned HTTP status code: ${{ steps.trigger_dispatch.outputs.status_code }}"
+        run: |
+          echo "Repository dispatch curl returned HTTP status code: ${{ steps.trigger_dispatch.outputs.status_code }}"
