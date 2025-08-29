@@ -21,7 +21,7 @@ jobs:
             mfin-airflow-poc
       - name: Trigger repository_dispatch
         run: |
-          curl -X POST https://api.github.com/repos/bcgov-c/mfin-airflow-poc.git/dispatches \
+          curl -X POST https://api.github.com/repos/bcgov-c/mfin-airflow-poc/dispatches \
             -H "Authorization: Bearer ${{ steps.generate_token.outputs.token }}" \
             -H "Accept: application/vnd.github.v3+json" \
             -d '{"event_type":"submodule_update"}'
