@@ -15,7 +15,9 @@ jobs:
         with:
           app-id: ${{ secrets.GH_APP_ID }}
           private-key: ${{ secrets.GH_PRIVATE_KEY }}
-
+          owner: bcgov-c
+          repositories: |
+            mfin-airflow-poc
       - name: Trigger repository_dispatch
         run: |
           curl -X POST https://api.github.com/repos/bcgov-c/mfin-airflow-poc.git/dispatches \
