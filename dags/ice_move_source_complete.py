@@ -9,7 +9,8 @@ from datetime import timedelta
 
 def fs1_ice_connection():
     # Replace these with your SMB server details    
-    conn_id = 'fs1_prod_conn'
+    # conn_id = 'fs1_prod_conn'
+    conn_id = 'fs1_rmo_ice'
     print ('connection =',conn_id)
     
     # share_name = 'fs1.fin.gov.bc.ca'
