@@ -8,13 +8,16 @@ from datetime import timedelta
 
 
 def fs1_ice_connection():
-    # Replace these with your SMB server details
+    # Replace these with your SMB server details    
     conn_id = 'fs1_prod_conn'
-      
+    print ('connection =',conn_id)
+    
     # share_name = 'fs1.fin.gov.bc.ca'
     directory = '/rmo_ct_prod/'
     path = directory
+    print ('hooking connection')
     hook = SambaHook(conn_id)
+    print('getting file list')
     files = hook.listdir(path)
     destination = '/rmo_ct_prod/completed/'
 
