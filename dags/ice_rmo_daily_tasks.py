@@ -46,7 +46,8 @@ def email_completion():
 def email_notification():
     LogPath = Variable.get("vRMOLogPath")
     LogName = 'daily_etl.txt'
-    conn_id = 'fs1_prod_conn'
+    #conn_id = 'fs1_prod_conn'
+    conn_id = 'fs1_rmo_ice'
     dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
         
     with SambaHook(samba_conn_id=conn_id) as fs_hook:
@@ -70,8 +71,8 @@ def choose_path():
     LogPath = Variable.get("vRMOLogPath")
     SourcePath = Variable.get("vRMOSourcePath")
     LogName = 'daily_etl.txt'
-    conn_id = 'fs1_prod_conn'
-    #conn_id = 'fs1_rmo_ice'
+    #conn_id = 'fs1_prod_conn'
+    conn_id = 'fs1_rmo_ice'
     filefound = 0        
     dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
         
