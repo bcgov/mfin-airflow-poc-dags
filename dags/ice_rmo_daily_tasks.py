@@ -46,8 +46,8 @@ def email_completion():
 def email_notification():
     LogPath = Variable.get("vRMOLogPath")
     LogName = 'daily_etl.txt'
-    #conn_id = 'fs1_prod_conn'
-    conn_id = 'fs1_rmo_ice'
+    conn_id = 'fs1_prod_conn'
+    #conn_id = 'fs1_rmo_ice'
     dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
         
     with SambaHook(samba_conn_id=conn_id) as fs_hook:
@@ -71,8 +71,8 @@ def choose_path():
     LogPath = Variable.get("vRMOLogPath")
     SourcePath = Variable.get("vRMOSourcePath")
     LogName = 'daily_etl.txt'
-    #conn_id = 'fs1_prod_conn'
-    conn_id = 'fs1_rmo_ice'
+    conn_id = 'fs1_prod_conn'
+    #conn_id = 'fs1_rmo_ice'
     filefound = 0        
     dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
         
@@ -107,6 +107,23 @@ def etl_remove(pconn_id):
             logging.error(f"Error {e} removing file: {r'/rmo_ct_prod/inprogress'}")
             
     return
+
+def log_remove(pconn_id):
+        
+    with SambaHook(samba_conn_id=pconn_id) as fs_hook:
+        DeletePath = Variable.get("vPTBLogPath")
+        files = fs_hook.listdir(DeletePath)
+
+        try:
+            for file in files:
+                file_path = f"{DeletePath}/{file}"
+                fs_hook.remove(file_path)
+        
+        except Exception as e:
+            logging.error(f"Error {e} removing files in log folder: {DeletePath}")
+            
+    return
+
     
 #Task 3: Unzip and Move files from source to destination (using SambaHook)    
 def etl_unzip(pconn_id):
@@ -186,9 +203,44 @@ def etl_truncate():
             logging.info(f"Database {dbname} - Connection closed")
  
     return
+
+
+# Task 6: Loading daily data from landing tables to target tables in the database     
+def loading_target_tables_db():
+    logging.basicConfig(level=logging.INFO) 
+    logging.info(f"loading_db_data_procedure")
+
+    conn_id = 'mssql_default'
+#   conn_id = 'mssql_conn_finafdbt
+#   conn_id = 'mssql_conn_finafdbp     
+    conn = BaseHook.get_connection(conn_id)
+    dbname = Variable.get("vDatabaseName")
+    host = conn.host
+    user = conn.login
+    password = conn.password        
+    connection = None
+                
+    try:
+        connection =  pymssql.connect(host = host, database = dbname, user = user, password = password)
+        cursor = connection.cursor()                    
+        start_time = time.time()
+        cursor.execute("EXEC [FIN_SHARED_STAGING_DEV].[dbo].[PROC_TELEPHONY_RMO_BUILD_ALL]")            
+        connection.commit()                                  
+        logging.info(f"truncate rmo landing tables {time.time() - start_time} seconds")
+        
+    except Exception as e:
+        logging.error(f"Error loading rmo data to db target tables {e}")
+        
+    finally:
+        if connection:
+            connection.close()
+            logging.info(f"Database {dbname} - Connection closed")
+ 
+    return
+
    
 
-# Task 6: Loading daily csv data files to FIN_SHARED SQL Server database
+# Task 7: Loading daily csv data files to FIN_SHARED SQL Server database
 def etl_daily_load():
     # Log all steps at INFO level
     logging.basicConfig(level=logging.INFO)
@@ -234,21 +286,20 @@ def etl_daily_load():
         return
               
         
-#    conn_id = 'fs1_prod_conn'
-    conn_id = 'fs1_rmo_ice'
-
+    conn_id = 'fs1_prod_conn'
+    #conn_id = 'fs1_rmo_ice'
     LogPath = Variable.get("vRMOLogPath")
-    #log_path = '/ptb_ct_prod/log/'
-    log_name = 'daily_set.txt'  
-    log_etl = 'daily_etl.txt'    
-    dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
-    
+    #log_path = '/rmo_ct_prod/log/'
     ConfigPath = Variable.get("vRMOConfigPath")
     FileName = Variable.get("vConfigName")
     SourcePath = Variable.get("vRMOSourcePath")                
+    DBName = Variable.get("vDatabaseName")
+
+    log_name = 'daily_set.txt'  
+    log_etl = 'daily_etl.txt'    
+    dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')    
     source_file_set=[] 
     data = []      
-    DBName = Variable.get("vDatabaseName")
 
     with SambaHook(samba_conn_id=conn_id) as fs_hook:                
         with fs_hook.open_file(ConfigPath + FileName,'r') as f:
@@ -260,7 +311,11 @@ def etl_daily_load():
             dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
             outfile.writelines("Time:%s,Step:2,Task:Removing old data extract,Description:Remove old CSV file Inprogress folder task\n" % dYmdHMS)
             etl_remove(conn_id)
-    
+
+            dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
+            outfile.writelines("Time:%s,Step:2.1,Task:Removing previous log data,Description:Remove old Log files Log folder task\n" % dYmdHMS)
+            log_remove(conn_id)    
+            
             dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
             outfile.writelines("Time:%s,Step:3,Task:Unzipping CSV files,Description:Unzipping daily CSV extract file task\n" % dYmdHMS)
             etl_unzip(conn_id)
@@ -278,10 +333,14 @@ def etl_daily_load():
     
             for source_file in data_set:
                 load_db_source(source_file, DBName)
-        
+                
             dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
-            outfile.writelines("Time:%s,Step:7,Task:ETL process completed,Description:ETL process completed successfully task\n" % dYmdHMS)
-
+            outfile.writelines("Time:%s,Step:7,Task:Loading targte tables in database,Description: Loading target tables from landing tables in DB task\n" % dYmdHMS)
+            loading_target_tables_db()                        
+            
+            dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
+            outfile.writelines("Time:%s,Step:8,Task:ETL process completed,Description:ETL process completed successfully task\n" % dYmdHMS)
+        
     outfile.close()    
     
     email_completion()
