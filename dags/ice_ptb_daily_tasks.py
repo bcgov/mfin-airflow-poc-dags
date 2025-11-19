@@ -75,8 +75,8 @@ def choose_path():
     conn_id = 'fs1_prod_conn'
     #conn_id = 'fs1_rmo_ice'
     filefound = 0        
-    dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
-    dYmd = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d')
+    dYmdHMS = (dt.datetime.today() - timedelta(hours=8)).strftime('%Y-%m-%d:%H%M%S')
+    dYmd = (dt.datetime.today() - timedelta(hours=8)).strftime('%Y-%m-%d')
         
     with SambaHook(samba_conn_id=conn_id) as fs_hook:
         with fs_hook.open_file(LogPath + log_name,'w') as outfile:
@@ -87,6 +87,8 @@ def choose_path():
             #pattern = "iceDB_ICE_BCMOFPT.*"
             for f in files:
                 outfile.writelines(f)
+                outfile.writelines('iceDB_ICE_BCMOFPT_'+ dYmd +'_0700.zip')
+                outfile.writelines('iceDB_ICE_BCMOFPT_'+ dYmd +'_0800.zip')                
                 if ((f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0700.zip') or (f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0800.zip')):
                     filefound = 1
                     #Downloading existing file to memory
