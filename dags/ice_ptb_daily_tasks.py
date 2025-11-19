@@ -22,7 +22,7 @@ from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
 from airflow.hooks.base_hook import BaseHook
 from airflow.models import Variable
 import pymssql
-import re
+#import re
 
 root = logging.getLogger()
 root.setLevel(logging.DEBUG)
@@ -86,10 +86,12 @@ def choose_path():
         files = fs_hook.listdir(SourcePath)
         pattern = "iceDB_ICE_BCMOFPT.*"
         for f in files:
-            if re.search(pattern, f)
-            #if f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0700.zip' :
+            if f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0700.zip' or
+               f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0800.zip':
                 filefound = 1
+                #Downloading existing file to memory
                 file_bytes = fs_hook.retrieve_file(f)
+                #Upload it with the new name
                 fs_hook.store_file('iceDB_ICE_BCMOFPT_'+ dYmd +'.zip'
 				
         if filefound == 0:		    
