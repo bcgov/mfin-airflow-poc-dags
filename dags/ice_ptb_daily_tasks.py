@@ -92,6 +92,9 @@ def choose_path():
                     #Downloading existing file to memory
                     old_path = f"{SourcePath}/{f}"
                     new_path = f"{SourcePath}/{'iceDB_ICE_BCMOFPT_'+ dYmd +'.zip'}"
+                    outfile.writelines(old_path)
+                    outfile.writelines()
+                    outfile.writelines(new_path)
                     fs_hook.rename(old_path, new_path)
                     #file_bytes = fs_hook.retrieve_file(old_path)
                     #Upload it with the new name
