@@ -22,6 +22,7 @@ from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
 from airflow.hooks.base_hook import BaseHook
 from airflow.models import Variable
 import pymssql
+import re
 
 root = logging.getLogger()
 root.setLevel(logging.DEBUG)
@@ -47,6 +48,7 @@ def email_notification():
     LogPath = Variable.get("vPTBLogPath") 
     log_name = 'daily_etl.txt'
     conn_id = 'fs1_prod_conn'
+    #conn_id = 'fs1_rmo_ice'
     dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d')
         
     with SambaHook(samba_conn_id=conn_id) as fs_hook:
@@ -71,6 +73,7 @@ def choose_path():
     SourcePath = Variable.get("vPTBSourcePath")   
     log_name = 'daily_etl.txt'
     conn_id = 'fs1_prod_conn'
+    #conn_id = 'fs1_rmo_ice'
     filefound = 0        
     dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
     dYmd = (dt.datetime.today()).strftime('%Y-%m-%d')
@@ -81,9 +84,13 @@ def choose_path():
 
         outfile.close()
         files = fs_hook.listdir(SourcePath)
+        pattern = "iceDB_ICE_BCMOFPT.*"
         for f in files:
-            if f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0700.zip':
+            if re.search(pattern, f)
+            #if f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0700.zip' :
                 filefound = 1
+                file_bytes = fs_hook.retrieve_file(f)
+                fs_hook.store_file('iceDB_ICE_BCMOFPT_'+ dYmd +'.zip'
 				
         if filefound == 0:		    
             return 'path_email'
@@ -288,7 +295,9 @@ def etl_daily_load():
               
         
     conn_id = 'fs1_prod_conn'
+    #conn_id = 'fs1_rmo_ice'
     LogPath = Variable.get("vPTBLogPath")
+    
     ConfigPath = Variable.get("vPTBConfigPath")
     FileName = Variable.get("vConfigName")
     SourcePath = Variable.get("vPTBSourcePath")                
@@ -334,10 +343,9 @@ def etl_daily_load():
                 load_db_source(source_file, DBName)
         
             dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
-            outfile.writelines("Time:%s,Step:7,Task:Loading targte tables in database,Description: Loading target tables from landing tables in DB task\n" % dYmdHMS)
+            outfile.writelines("Time:%s,Step:7,Task:Loading target tables in database,Description: Loading target tables from landing tables in DB task\n" % dYmdHMS)
             loading_target_tables_db()
                         
-            
             dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
             outfile.writelines("Time:%s,Step:8,Task:ETL process completed,Description:ETL process completed successfully task\n" % dYmdHMS)
 
