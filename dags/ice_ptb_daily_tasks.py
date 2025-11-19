@@ -76,25 +76,25 @@ def choose_path():
     #conn_id = 'fs1_rmo_ice'
     filefound = 0        
     dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
-    dYmd = (dt.datetime.today()).strftime('%Y-%m-%d')
+    dYmd = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d')
         
     with SambaHook(samba_conn_id=conn_id) as fs_hook:
         with fs_hook.open_file(LogPath + log_name,'w') as outfile:
             outfile.writelines("Time:%s,Step:1,Task:ETL process,Description:Starting ETL process\n" % dYmdHMS)
 
-        #outfile.close()
-        files = fs_hook.listdir(SourcePath)
-        #pattern = "iceDB_ICE_BCMOFPT.*"
-        for f in files:
-            outfile.writelines(f)
-            if ((f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0700.zip') or (f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0800.zip')):
-                filefound = 1
-                #Downloading existing file to memory
-                file_bytes = fs_hook.retrieve_file(f)
-                #Upload it with the new name
-                fs_hook.store_file('iceDB_ICE_BCMOFPT_'+ dYmd +'.zip', file_bytes)
+            #outfile.close()
+            files = fs_hook.listdir(SourcePath)
+            #pattern = "iceDB_ICE_BCMOFPT.*"
+            for f in files:
+                outfile.writelines(f)
+                if ((f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0700.zip') or (f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0800.zip')):
+                    filefound = 1
+                    #Downloading existing file to memory
+                    file_bytes = fs_hook.retrieve_file(f)
+                    #Upload it with the new name
+                    fs_hook.store_file('iceDB_ICE_BCMOFPT_'+ dYmd +'.zip', file_bytes)
 				
-        if filefound == 0:		    
+        if filefound == 0:
             return 'path_email'
         else:
             return 'path_daily_load'
