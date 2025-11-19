@@ -82,10 +82,11 @@ def choose_path():
         with fs_hook.open_file(LogPath + log_name,'w') as outfile:
             outfile.writelines("Time:%s,Step:1,Task:ETL process,Description:Starting ETL process\n" % dYmdHMS)
 
-        outfile.close()
+        #outfile.close()
         files = fs_hook.listdir(SourcePath)
         #pattern = "iceDB_ICE_BCMOFPT.*"
         for f in files:
+            outfile.writelines(f)
             if ((f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0700.zip') or (f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0800.zip')):
                 filefound = 1
                 #Downloading existing file to memory
