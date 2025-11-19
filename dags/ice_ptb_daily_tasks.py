@@ -91,7 +91,7 @@ def choose_path():
                 #Downloading existing file to memory
                 file_bytes = fs_hook.retrieve_file(f)
                 #Upload it with the new name
-                fs_hook.store_file('iceDB_ICE_BCMOFPT_'+ dYmd +'.zip'
+                fs_hook.store_file('iceDB_ICE_BCMOFPT_'+ dYmd +'.zip', file_bytes)
 				
         if filefound == 0:		    
             return 'path_email'
