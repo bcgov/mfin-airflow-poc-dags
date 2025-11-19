@@ -84,10 +84,9 @@ def choose_path():
 
         outfile.close()
         files = fs_hook.listdir(SourcePath)
-        pattern = "iceDB_ICE_BCMOFPT.*"
+        #pattern = "iceDB_ICE_BCMOFPT.*"
         for f in files:
-            if f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0700.zip' or
-               f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0800.zip':
+            if ((f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0700.zip') or (f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0800.zip')):
                 filefound = 1
                 #Downloading existing file to memory
                 file_bytes = fs_hook.retrieve_file(f)
