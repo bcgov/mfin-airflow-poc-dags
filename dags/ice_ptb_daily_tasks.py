@@ -134,7 +134,7 @@ def log_remove(pconn_id):
 def etl_unzip(pconn_id):
     SourcePath = Variable.get("vPTBSourcePath")
     DestPath = Variable.get("vPTBProgressPath")
-    dYmd = (dt.datetime.today()).strftime('%Y-%m-%d')
+    dYmd = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d')
     file = 'iceDB_ICE_BCMOFPT_' + dYmd + '.zip'
     #file = 'iceDB_ICE_BCMOFPT_' + dYmd + '_0700.zip'
     zip_loc = r'/tmp/'
@@ -164,7 +164,7 @@ def etl_backup(pconn_id):
         DestPath = Variable.get("vPTBCompletePath")
 
         # Set dYmd to todays date        
-        dYmd = (dt.datetime.today()).strftime('%Y-%m-%d')
+        dYmd = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d')
         #file = 'iceDB_ICE_BCMOFPT_' + dYmd + '_0700.zip'
         file = 'iceDB_ICE_BCMOFPT_' + dYmd + '.zip'
 
