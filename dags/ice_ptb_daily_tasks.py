@@ -76,7 +76,7 @@ def choose_path():
     #conn_id = 'fs1_rmo_ice'
     filefound = 0        
     dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
-    dYmd = (dt.datetime.today()).strftime('%Y-%m-%d')
+    dYmd = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d')
         
     with SambaHook(samba_conn_id=conn_id) as fs_hook:
         with fs_hook.open_file(LogPath + log_name,'w') as outfile:
