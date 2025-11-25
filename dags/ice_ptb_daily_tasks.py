@@ -121,8 +121,9 @@ def log_remove(pconn_id):
 
         try:
             for file in files:
-                file_path = f"{DeletePath}/{file}"
-                fs_hook.remove(file_path)
+                if file <> 'daily_etl.txt':
+                    file_path = f"{DeletePath}/{file}"
+                    fs_hook.remove(file_path)
         
         except Exception as e:
             logging.error(f"Error {e} removing files in log folder: {DeletePath}")
