@@ -37,7 +37,7 @@ def email_completion():
     
     with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
         sh.send_email_smtp(
-           to=['eloy.mendez@gov.bc.ca'],
+           to=['eloy.mendez@gov.bc.ca','rmobusinessstrategy@gov.bc.ca'],
            subject='Airflow ETL Process Notification',
            html_content='<html><body><h2>Airflow RMO-ETL daily source file completion</h2><p>CT iceDB_ICE_BCMOFRMO-' + dYmdHMS + '.zip daily file processed succesfully </p></body></html>'
     )        
@@ -47,7 +47,6 @@ def email_notification():
     LogPath = Variable.get("vRMOLogPath")
     LogName = 'daily_etl.txt'
     conn_id = 'fs1_prod_conn'
-    #conn_id = 'fs1_rmo_ice'
     dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
         
     with SambaHook(samba_conn_id=conn_id) as fs_hook:
@@ -60,7 +59,7 @@ def email_notification():
     
     with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
         sh.send_email_smtp(
-           to=['eloy.mendez@gov.bc.ca'],
+           to=['eloy.mendez@gov.bc.ca','rmobusinessstrategy@gov.bc.ca'],
            subject='Airflow Email Notification',
            html_content='<html><body><h2>Airflow RMO daily source file failure</h2><p>CT iceDB_ICE_BCMOFRMO-' + dYmd + '.zip file not received/available</p></body></html>'
     )        
@@ -72,7 +71,6 @@ def choose_path():
     SourcePath = Variable.get("vRMOSourcePath")
     LogName = 'daily_etl.txt'
     conn_id = 'fs1_prod_conn'
-    #conn_id = 'fs1_rmo_ice'
     filefound = 0        
     dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
         
@@ -107,6 +105,7 @@ def etl_remove(pconn_id):
             logging.error(f"Error {e} removing file: {r'/rmo_ct_prod/inprogress'}")
             
     return
+    
 
 def log_remove(pconn_id):
         
@@ -145,7 +144,7 @@ def etl_unzip(pconn_id):
                     fs_hook.push_from_local(DestPath + iceTable.filename, os.path.join(zip_loc,iceTable.filename))
                     
         except Exception as e:
-            logging.error(f"Error unzipping files: {e}")  
+            logging.error(f"Task 3: Error unzipping files: {e}")  
 
     return       
     
@@ -166,7 +165,7 @@ def etl_backup(pconn_id):
                     fs_hook.replace(SourcePath + f, DestPath + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip') 
                     
         except Exception as e:
-            logging.error(f"Error backing up {file}-{dYmd}.zip source file")
+            logging.error(f"Task 4: Error backing up {file}-{dYmd}.zip source file")
         
     return   
    
@@ -195,7 +194,7 @@ def etl_truncate():
         logging.info(f"truncate landing tables {time.time() - start_time} seconds")
         
     except Exception as e:
-        logging.error(f"Error truncating landing tables {e}")
+        logging.error(f"Task 5: Error truncating landing tables {e}")
         
     finally:
         if connection:
@@ -226,10 +225,10 @@ def loading_target_tables_db():
         start_time = time.time()
         cursor.execute("EXEC [FIN_SHARED_STAGING_DEV].[dbo].[PROC_TELEPHONY_RMO_BUILD_ALL]")            
         connection.commit()                                  
-        logging.info(f"truncate rmo landing tables {time.time() - start_time} seconds")
+        logging.info(f"Truncate RMO landing tables {time.time() - start_time} seconds")
         
     except Exception as e:
-        logging.error(f"Error loading rmo data to db target tables {e}")
+        logging.error(f"Task 6: Error loading RMO data to db target tables {e}")
         
     finally:
         if connection:
@@ -281,13 +280,12 @@ def etl_daily_load():
             logging.info(f"bulk insert {time.time() - start_time} seconds")
         
         except Exception as e:
-            logging.error(f"Error bulk loading table: {vTableName} source file: {vSourceFile} {e}")
+            logging.error(f"Task 7: Error bulk loading table: {vTableName} source file: {vSourceFile} {e}")
                
         return
               
         
     conn_id = 'fs1_prod_conn'
-    #conn_id = 'fs1_rmo_ice'
     LogPath = Variable.get("vRMOLogPath")
     #log_path = '/rmo_ct_prod/log/'
     ConfigPath = Variable.get("vRMOConfigPath")
@@ -352,7 +350,8 @@ def create_dag():
     dag = DAG(
         dag_id = 'ice_rmo_daily_task',
         start_date = days_ago(1),
-        schedule_interval = None,
+        schedule_interval = "01 15 * * *",
+#        schedule_interval = None,
         catchup = False,
         tags = ["ice","rmo","etl","daily_task"]
     )
