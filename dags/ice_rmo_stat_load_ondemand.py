@@ -80,7 +80,7 @@ def ice_rmo_stat_load_ondemand():
                            "Stat_AgentActivityByQueue_I_16.csv","Stat_AgentActivityByQueue_I_17.csv","Stat_AgentActivityByQueue_I_18.csv", "Stat_AgentActivityByQueue_I_19.csv",
                            "Stat_AgentActivityByQueue_I_20.csv","Stat_AgentActivityByQueue_I_21.csv","Stat_AgentActivityByQueue_I_22.csv", "Stat_AgentActivityByQueue_I_23.csv",
                            "Stat_AgentActivityByQueue_I_24.csv","Stat_AgentActivityByQueue_I_25.csv","Stat_AgentActivityByQueue_I_26.csv", "Stat_AgentActivityByQueue_I_27.csv",
-                           "Stat_AgentActivityByQueue_I_28.csv","Stat_AgentActivityByQueue_I_29.csv","Stat_AgentActivityByQueue_I_30.csv", "Stat_AgentActivityByQueue_I_31.csv"]
+                           "Stat_AgentActivityByQueue_I_28.csv","Stat_AgentActivityByQueue_I_29.csv","Stat_AgentActivityByQueue_I_30.csv"]#, "Stat_AgentActivityByQueue_I_31.csv"]
         
         
         for source_file in source_file_set:
