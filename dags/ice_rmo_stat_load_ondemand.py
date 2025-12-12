@@ -41,7 +41,7 @@ def ice_rmo_stat_load_ondemand():
 
         try:
             
-            logging.info(f"loading table: {pTableName}")
+            logging.info(f"loading table: ICE_Stat_AgentActivityByQueue_I")
             
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
@@ -55,7 +55,7 @@ def ice_rmo_stat_load_ondemand():
 	                );
                 """
             logging.info(f"query: {query}")
-            logging.info(f"inserting table:  {pTableName}")
+            logging.info(f"inserting table:  ICE_Stat_AgentActivityByQueue_I")
             start_time = time.time()
             cursor.execute(query)
             conn.commit()
@@ -65,7 +65,7 @@ def ice_rmo_stat_load_ondemand():
        
         
         except Exception as e:
-            logging.error(f"Error bulk loading table: {pTableName} source file: {psource_file} {e}")
+            logging.error(f"Error bulk loading table: ICE_Stat_AgentActivityByQueue_I source file: {psource_file} {e}")
  
 
     @task
