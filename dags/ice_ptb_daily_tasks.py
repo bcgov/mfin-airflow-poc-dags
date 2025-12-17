@@ -38,7 +38,7 @@ def email_completion():
     
     with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
         sh.send_email_smtp(
-           to=['eloy.mendez@gov.bc.ca'],
+           to=['eloy.mendez@gov.bc.ca','alexandre.limoges-bourgault@gov.bc.ca'],
            subject='Airflow ETL Process Notification',
            html_content='<html><body><h2>Airflow PTB-ETL daily source file completion</h2><p>CT iceDB_ICE_BCMOFPT-' + dYmdHMS + '.zip daily file processed succesfully </p></body></html>'
     )        
@@ -61,7 +61,7 @@ def email_notification():
     
     with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
         sh.send_email_smtp(
-           to=['eloy.mendez@gov.bc.ca'],
+           to=['eloy.mendez@gov.bc.ca','alexandre.limoges-bourgault@gov.bc.ca'],
            subject='Airflow Email Notification',
            html_content='<html><body><h2>Airflow PTB daily source file failure</h2><p>CT iceDB_ICE_BCMOFPT_' + dYmd + '.zip file not received/available</p></body></html>'
     )        
@@ -361,9 +361,11 @@ def create_dag():
     dag = DAG(
         dag_id = 'ice_ptb_daily_task',
         start_date = days_ago(1),
-        schedule_interval = None,
+        schedule_interval = "05 15 * * *",
         catchup = False,
-        tags = ["ice","ptb","etl","daily_task"]
+        tags = ["ice","ptb","etl","daily_task"],
+        description='PTB Computer Talk ETL daily process',
+        
     )
     
     start = DummyOperator(
