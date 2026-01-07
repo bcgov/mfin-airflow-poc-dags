@@ -37,7 +37,7 @@ def email_completion():
     
     with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
         sh.send_email_smtp(
-           to=['eloy.mendez@gov.bc.ca','rmobusinessstrategy@gov.bc.ca'],
+           to=['eloy.mendez@gov.bc.ca'],
            subject='Airflow ETL Process Notification',
            html_content='<html><body><h2>Airflow RMO-ETL daily source file completion</h2><p>CT iceDB_ICE_BCMOFRMO-' + dYmdHMS + '.zip daily file processed succesfully </p></body></html>'
     )        
@@ -59,7 +59,7 @@ def email_notification():
     
     with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
         sh.send_email_smtp(
-           to=['eloy.mendez@gov.bc.ca','rmobusinessstrategy@gov.bc.ca'],
+           to=['eloy.mendez@gov.bc.ca'],
            subject='Airflow Email Notification',
            html_content='<html><body><h2>Airflow RMO daily source file failure</h2><p>CT iceDB_ICE_BCMOFRMO-' + dYmd + '.zip file not received/available</p></body></html>'
     )        
