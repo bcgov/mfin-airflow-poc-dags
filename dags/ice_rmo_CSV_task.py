@@ -265,6 +265,7 @@ def etl_daily_load():
                          FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\inprogress\\{vSourceFile}'
                          WITH
 	                     ( FORMAT = 'CSV',
+                           ROWTERMINATOR = '\r\n',
                            MAXERRORS = 20, 
                            ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{vTableName}_{dYmd}.log',
                            TABLOCK 
