@@ -37,8 +37,7 @@ def ice_rmo_load_ondemand():
     def Agent_Datafix():
             source_path = r'/rmo_ct_prod/ondemand/'
             file = 'Agent.csv'
-            output_file = 'Agent_fixed.csv'
-            
+            output_file = 'Agent_fixed.csv'            
 
             logging.info("Agent fixing code")
             
@@ -184,8 +183,7 @@ def ice_rmo_load_ondemand():
             try:
                 # Initialize SambaHook with your credentials and connection details
                 with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
-                    names = ["CodeID","Lang","Value"]
-                               
+                    names = ["CodeID","Lang","Value"]                               
                     
                     with fs_hook.open_file(source_path + file,'r') as f:
                         csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(3)], quoting=1)   
@@ -193,8 +191,7 @@ def ice_rmo_load_ondemand():
                     df1 = csv_reader.loc[:,[0,1,2]]
                     
                     with fs_hook.open_file(source_path + output_file, 'w') as outfile:
-                        df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
-  
+                        df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')  
                                 
                 outfile.close()                    
         
@@ -237,19 +234,19 @@ def ice_rmo_load_ondemand():
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
 
         try:
-            if psource_file == "Stat_CDR.csv":
+            if psource_file == "Stat_CDR6.csv":
                 pTableName = "ICE_Stat_CDR"
                 psource_file = "Stat_CDR_fixed.csv"
-            elif psource_file == "Agent.csv":
+            elif psource_file == "Agent6.csv":
                 pTableName = "ICE_Agent"
                 psource_file = "Agent_fixed.csv"
-            elif psource_file == "Stat_CDR_Summary.csv":
+            elif psource_file == "Stat_CDR_Summary6.csv":
                 pTableName = "ICE_Stat_CDR_Summary"
                 psource_file = "Stat_CDR_Summary_fixed.csv" 
-            elif psource_file == "LOBCodeLangString.csv":   
+            elif psource_file == "LOBCodeLangString6.csv":   
                 pTableName = "ICE_LOBCodeLangString"
                 psource_file = "LOBCodeLangString_fixed.csv"
-            elif psource_file == "EvalCriteriaLangString.csv":   
+            elif psource_file == "EvalCriteriaLangString6.csv":   
                 pTableName = "ICE_EvalCriteriaLangString"
                 psource_file = "EvalCriteriaLangString_fixed.csv"                
             else:
@@ -265,7 +262,8 @@ def ice_rmo_load_ondemand():
                     FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\ondemand\\{psource_file}'
                     WITH
 	                ( FORMAT = 'CSV',
-                      MAXERRORS = 50, 
+                      ROWTERMINATOR = '\r\n',
+                      MAXERRORS = 100, 
                       ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{psource_file}.log'
 	                );
                 """
@@ -277,9 +275,7 @@ def ice_rmo_load_ondemand():
             
                       
             logging.info(f"bulk insert {time.time() - start_time} seconds")
-            #print(f"bulk insert duration: --- {time.time() - start_time} seconds ---")
-            #print(f"bulk insert {rows} rows test, duration: --- {time.time() - start_time} seconds ---")
-        
+       
         
         except Exception as e:
             logging.error(f"Error bulk loading table: {pTableName} source file: {psource_file} {e}")
@@ -316,13 +312,14 @@ def ice_rmo_load_ondemand():
         #                   "UCAddress.csv","UCGroup.csv",
         #                   "WfAttributeDetail.csv","WfLinkDetail.csv","WfLink.csv","WfAction.csv","WfPage.csv","WfGraph.csv",
         #                   "WfSubAppMethod.csv","WfSubApplication.csv","WfVariables.csv"]
-        source_file_set = ["EvalCriteriaLangString.csv"]                   
+        source_file_set = ["Agent.csv","EvalCriteriaLangString.csv","LOBCodeLangString.csv","IMRecording.csv","Stat_CDR.csv","Stat_CDR_Summary.csv"]                   
+        
         
         #Stat_CDR_Datafix()
         #Stat_CDR_Summary_Datafix()
         #Agent_Datafix()
         #LOBCodeLangString()
-        EvalCriteriaLangString()
+        #EvalCriteriaLangString()
         
         
         for source_file in source_file_set:
