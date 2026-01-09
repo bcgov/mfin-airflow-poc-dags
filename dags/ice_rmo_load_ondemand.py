@@ -339,7 +339,6 @@ def ice_rmo_load_ondemand():
                     FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\ondemand\\{psource_file}'
                     WITH
 	                ( FORMAT = 'CSV',
-                      ROWTERMINATOR = '\r\n',
                       MAXERRORS = 100, 
                       ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{psource_file}.log'
 	                );
@@ -392,14 +391,14 @@ def ice_rmo_load_ondemand():
         #Agent_Datafix()
         #LOBCodeLangString()
         #EvalCriteriaLangString()
-        etl_truncate()
-        
+        etl_truncate()       
         
         for source_file in source_file_set:
             ondemand_load_source(source_file)
-            
-        
+
         loading_target_tables_db() 
+        
+        return
 
     ondemand_load_data()
     
