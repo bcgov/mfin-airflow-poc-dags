@@ -374,7 +374,7 @@ def ice_rmo_load_ondemand():
                            "Stat_AgentActivity_D.csv", "Stat_AgentActivity_I.csv", "Stat_AgentActivity_M.csv", "Stat_AgentActivity_W.csv","Stat_AgentActivity_Y.csv",
                            "Stat_AgentActivityByQueue_D.csv", "Stat_AgentActivityByQueue_I.csv", "Stat_AgentActivityByQueue_M.csv","Stat_AgentActivityByQueue_W.csv", "Stat_AgentActivityByQueue_Y.csv",
                            "Stat_AgentLineOfBusiness_D.csv", "Stat_AgentLineOfBusiness_I.csv", "Stat_AgentLineOfBusiness_M.csv","Stat_AgentLineOfBusiness_W.csv", "Stat_AgentLineOfBusiness_Y.csv",
-                           "Stat_AgentNotReadyBreakdown_D","Stat_AgentNotReadyBreakdown_I.csv","Stat_AgentNotReadyBreakdown_M.csv","Stat_AgentNotReadyBreakdown_W.csv", "Stat_AgentNotReadyBreakdown_Y.csv",
+                           "Stat_AgentNotReadyBreakdown_D.csv","Stat_AgentNotReadyBreakdown_I.csv","Stat_AgentNotReadyBreakdown_M.csv","Stat_AgentNotReadyBreakdown_W.csv", "Stat_AgentNotReadyBreakdown_Y.csv",
                            "Stat_CDR.csv","Stat_CDR_LastSummarized.csv","Stat_CDR_Summary.csv",
                            "Stat_DNISActivity_D.csv", "Stat_DNISActivity_I.csv", "Stat_DNISActivity_M.csv", "Stat_DNISActivity_W.csv", "Stat_DNISActivity_Y.csv",
                            "Stat_QueueActivity_D.csv","Stat_QueueActivity_I.csv","Stat_QueueActivity_M.csv", "Stat_QueueActivity_W.csv", "Stat_QueueActivity_Y.csv",
