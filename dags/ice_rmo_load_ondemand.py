@@ -228,6 +228,74 @@ def ice_rmo_load_ondemand():
                 logging.error(f"Error data fixing table LOBCodeLangString {e}")
                 
             return   
+    
+    
+
+    def etl_truncate():
+        logging.basicConfig(level=logging.INFO) 
+        logging.info(f"truncate_landing_tables procedure")
+
+        conn_id = 'mssql_default'
+#       conn_id = 'mssql_conn_finafdbt
+#       conn_id = 'mssql_conn_finafdbp    
+        conn = BaseHook.get_connection(conn_id)
+        dbname = Variable.get("vDatabaseName")
+        host = conn.host
+        user = conn.login
+        password = conn.password        
+        connection = None
+                
+        try:
+            connection =  pymssql.connect(host = host, database = dbname, user = user, password = password)
+            cursor = connection.cursor()                    
+            start_time = time.time()
+            cursor.execute("EXEC [dbo].[PROC_TELEPHONY_ICE_TRUNCATE]")            
+            connection.commit()                                  
+            logging.info(f"truncate landing tables {time.time() - start_time} seconds")
+        
+        except Exception as e:
+            logging.error(f"Task 5: Error truncating landing tables {e}")
+        
+        finally:
+            if connection:
+                connection.close()
+                logging.info(f"Database {dbname} - Connection closed")
+ 
+        return
+
+
+
+    def loading_target_tables_db():
+        logging.basicConfig(level=logging.INFO) 
+        logging.info(f"loading_db_data_procedure")
+
+        conn_id = 'mssql_default'
+#       conn_id = 'mssql_conn_finafdbt
+#       conn_id = 'mssql_conn_finafdbp     
+        conn = BaseHook.get_connection(conn_id)
+        dbname = Variable.get("vDatabaseName")
+        host = conn.host
+        user = conn.login
+        password = conn.password        
+        connection = None
+                
+        try:
+            connection =  pymssql.connect(host = host, database = dbname, user = user, password = password)
+            cursor = connection.cursor()                    
+            start_time = time.time()
+            cursor.execute("EXEC [FIN_SHARED_STAGING_DEV].[dbo].[PROC_TELEPHONY_RMO_BUILD_ALL]")            
+            connection.commit()                                  
+            logging.info(f"Truncate RMO landing tables {time.time() - start_time} seconds")
+        
+        except Exception as e:
+            logging.error(f"Task 6: Error loading RMO data to db target tables {e}")
+        
+        finally:
+            if connection:
+                connection.close()
+                logging.info(f"Database {dbname} - Connection closed")
+ 
+        return
 
     
     def ondemand_load_source(psource_file):
@@ -284,46 +352,45 @@ def ice_rmo_load_ondemand():
     @task
     def ondemand_load_data():
         
-        #source_file_set = ["ACDQueue.csv","Agent.csv","AudioMessage.csv", "AgentAssignment.csv", "AgentSkill.csv",
-        #                   "ContactLink.csv","ContactSegment.csv",
-        #                   "Email.csv","EmailGroup.csv","Eval_Contact.csv","EvalScore.csv","EvalCategory.csv","EvalCategoryLangString.csv",
-        #                   "EvalCriteria.csv","EvalCriteriaLangString.csv","EvalCriteriaValue.csv","EvalCriteriaValueLangString.csv",
-        #                   "EvalEvaluation.csv","EvalForm.csv","EvalFormLangString.csv",
-        #                   "Holiday.csv","IMRecording.csv","icePay.csv",
-        #                   "Languages.csv","LOBCategory.csv","LOBCategoryLangString.csv","LOBCode.csv","LOBCodeLangString.csv",
-        #                   "Node.csv","NotReadyReason.csv","NotReadyReasonLangString.csv",
-        #                   "OperatingDates.csv",
-        #                   "Recordings.csv","RecordingsFaultedFiles.csv","RequiredSkill.csv", 
-        #                   "SegmentAgent.csv","SegmentQueue.csv","Server.csv","Site.csv","Skill.csv","Stat_CDR_LastSummarized.csv","Switch.csv",
-        #                   "Stat_AgentActivity_D.csv", "Stat_AgentActivity_I.csv", "Stat_AgentActivity_M.csv", "Stat_AgentActivity_W.csv", "Stat_AgentActivity_Y.csv",
-        #                   "Stat_AgentActivityByQueue_D.csv", "Stat_AgentActivityByQueue_I.csv", "Stat_AgentActivityByQueue_M.csv", "Stat_AgentActivityByQueue_W.csv", "Stat_AgentActivityByQueue_Y.csv",
-        #                   "Stat_AgentLineOfBusiness_D.csv", "Stat_AgentLineOfBusiness_I.csv", "Stat_AgentLineOfBusiness_M.csv", "Stat_AgentLineOfBusiness_W.csv", "Stat_AgentLineOfBusiness_Y.csv",
-                          #"Stat_AgentNotReadyBreakdown_D" 2024 missing Jan30-Feb, 
-        #                   "Stat_AgentNotReadyBreakdown_M.csv",
-        #                   "Stat_AgentNotReadyBreakdown_I.csv", "Stat_AgentNotReadyBreakdown_W.csv", "Stat_AgentNotReadyBreakdown_Y.csv",
-        #                   "Stat_DNISActivity_D.csv", "Stat_DNISActivity_I.csv", "Stat_DNISActivity_M.csv", "Stat_DNISActivity_W.csv", "Stat_DNISActivity_Y.csv",
-        #                   "Stat_CDR.csv","Stat_CDR_LastSummarized.csv","Stat_CDR_Summary.csv",
-        #                   "Stat_ADR.csv",
-        #                   "Stat_QueueActivity_D.csv","Stat_QueueActivity_M.csv","Stat_QueueActivity_I.csv", "Stat_QueueActivity_W.csv", "Stat_QueueActivity_Y.csv",
-        #                   "Stat_SkillActivity_D.csv", "Stat_SkillActivity_I.csv", "Stat_SkillActivity_M.csv", "Stat_SkillActivity_W.csv", "Stat_SkillActivity_Y.csv",
-        #                   "Stat_TrunkActivity_D.csv", "Stat_TrunkActivity_I.csv", "Stat_TrunkActivity_M.csv", "Stat_TrunkActivity_W.csv", "Stat_TrunkActivity_Y.csv",    
-        #                   "Stat_WorkflowActionActivity_D.csv", "Stat_WorkflowActionActivity_I.csv", "Stat_WorkflowActionActivity_M.csv", "Stat_WorkflowActionActivity_W.csv", "Stat_WorkflowActionActivity_Y.csv",
-        #                   "Team.csv","TeamAssignment.csv",
-        #                   "UCAddress.csv","UCGroup.csv",
+        source_file_set = ["ACDQueue.csv","Agent.csv","AgentAssignment.csv",
+                           "ContactLink.csv","ContactSegment.csv",
+                           "Email.csv","EmailGroup.csv","Eval_Contact.csv","EvalScore.csv","EvalCategory.csv","EvalCategoryLangString.csv",
+                           "EvalCriteria.csv","EvalCriteriaValue.csv","EvalCriteriaValueLangString.csv","EvalCriteriaLangString.csv",
+                           "EvalEvaluation.csv","EvalForm.csv","EvalFormLangString.csv",
+                           "Holiday.csv","IMRecording.csv","icePay.csv",
+                           "Languages.csv","LOBCategory.csv","LOBCategoryLangString.csv","LOBCode.csv","LOBCodeLangString.csv",
+                           "Node.csv","NotReadyReason.csv","NotReadyReasonLangString.csv",
+                           "OperatingDates.csv",
+                           "SegmentAgent.csv","SegmentQueue.csv","Server.csv","Skill.csv","Server.csv","Site.csv","Switch.csv",
+                           "Stat_ADR.csv",
+                           "Stat_AgentActivity_D.csv", "Stat_AgentActivity_I.csv", "Stat_AgentActivity_M.csv", "Stat_AgentActivity_W.csv","Stat_AgentActivity_Y.csv",
+                           "Stat_AgentActivityByQueue_D.csv", "Stat_AgentActivityByQueue_I.csv", "Stat_AgentActivityByQueue_M.csv","Stat_AgentActivityByQueue_W.csv", "Stat_AgentActivityByQueue_Y.csv",
+                           "Stat_AgentLineOfBusiness_D.csv", "Stat_AgentLineOfBusiness_I.csv", "Stat_AgentLineOfBusiness_M.csv","Stat_AgentLineOfBusiness_W.csv", "Stat_AgentLineOfBusiness_Y.csv",
+                           "Stat_AgentNotReadyBreakdown_D","Stat_AgentNotReadyBreakdown_I.csv","Stat_AgentNotReadyBreakdown_M.csv","Stat_AgentNotReadyBreakdown_W.csv", "Stat_AgentNotReadyBreakdown_Y.csv",
+                           "Stat_CDR.csv","Stat_CDR_LastSummarized.csv","Stat_CDR_Summary.csv",
+                           "Stat_DNISActivity_D.csv", "Stat_DNISActivity_I.csv", "Stat_DNISActivity_M.csv", "Stat_DNISActivity_W.csv", "Stat_DNISActivity_Y.csv",
+                           "Stat_QueueActivity_D.csv","Stat_QueueActivity_I.csv","Stat_QueueActivity_M.csv", "Stat_QueueActivity_W.csv", "Stat_QueueActivity_Y.csv",
+                           "Stat_SkillActivity_D.csv", "Stat_SkillActivity_I.csv", "Stat_SkillActivity_M.csv", "Stat_SkillActivity_W.csv", "Stat_SkillActivity_Y.csv",
+                           "Stat_TrunkActivity_D.csv", "Stat_TrunkActivity_I.csv", "Stat_TrunkActivity_M.csv", "Stat_TrunkActivity_W.csv", "Stat_TrunkActivity_Y.csv",    
+                           "Stat_WorkflowActionActivity_D.csv", "Stat_WorkflowActionActivity_I.csv", "Stat_WorkflowActionActivity_M.csv", "Stat_WorkflowActionActivity_W.csv", "Stat_WorkflowActionActivity_Y.csv",
+                           "Team.csv","TeamAssignment.csv",
+                           "UCAddress.csv","UCGroup.csv"]
         #                   "WfAttributeDetail.csv","WfLinkDetail.csv","WfLink.csv","WfAction.csv","WfPage.csv","WfGraph.csv",
         #                   "WfSubAppMethod.csv","WfSubApplication.csv","WfVariables.csv"]
-        source_file_set = ["Agent.csv","EvalCriteriaLangString.csv","LOBCodeLangString.csv","IMRecording.csv","Stat_CDR.csv","Stat_CDR_Summary.csv"]                   
-        
         
         #Stat_CDR_Datafix()
         #Stat_CDR_Summary_Datafix()
         #Agent_Datafix()
         #LOBCodeLangString()
         #EvalCriteriaLangString()
+        etl_truncate()
         
         
         for source_file in source_file_set:
             ondemand_load_source(source_file)
+            
+        
+        loading_target_tables_db() 
 
     ondemand_load_data()
     
