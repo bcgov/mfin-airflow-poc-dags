@@ -240,6 +240,22 @@ def ice_rmo_load_ondemand():
     
     
 
+    def log_remove():
+        with SambaHook(samba_conn_id='fs1_prod_conn') as fs_hook:
+            DeletePath = Variable.get("vPTBLogPath")
+            files = fs_hook.listdir(DeletePath)
+
+            try:
+                for file in files:
+                    file_path = f"{DeletePath}/{file}"
+                    fs_hook.remove(file_path)
+        
+            except Exception as e:
+                logging.error(f"Error {e} removing files in log folder: {DeletePath}")
+            
+        return
+
+    
     def etl_truncate():
         logging.basicConfig(level=logging.INFO) 
         logging.info(f"truncate_landing_tables procedure")
@@ -391,6 +407,8 @@ def ice_rmo_load_ondemand():
         #Agent_Datafix()
         #LOBCodeLangString()
         #EvalCriteriaLangString()
+        
+        log_remove()
         etl_truncate()       
         
         for source_file in source_file_set:
