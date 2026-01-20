@@ -242,7 +242,7 @@ def ice_rmo_load_ondemand():
 
     def log_remove():
         with SambaHook(samba_conn_id='fs1_prod_conn') as fs_hook:
-            DeletePath = Variable.get("vPTBLogPath")
+            DeletePath = Variable.get("vRMOLogPath")
             files = fs_hook.listdir(DeletePath)
 
             try:
