@@ -381,7 +381,7 @@ def ice_ptb_load_ondemand():
                            "Email.csv","EmailGroup.csv","Eval_Contact.csv","EvalScore.csv","EvalCategory.csv","EvalCategoryLangString.csv",
                            "EvalCriteria.csv","EvalCriteriaValue.csv","EvalCriteriaValueLangString.csv","EvalCriteriaLangString.csv",
                            "EvalEvaluation.csv","EvalForm.csv","EvalFormLangString.csv",
-                           "Holiday.csv","IMRecording.csv","icePay.csv",
+                           "Holiday.csv","IMRecording.csv",
                            "Languages.csv","LOBCategory.csv","LOBCategoryLangString.csv","LOBCode.csv","LOBCodeLangString.csv",
                            "Node.csv","NotReadyReason.csv","NotReadyReasonLangString.csv",
                            "OperatingDates.csv",
