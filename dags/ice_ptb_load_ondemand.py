@@ -40,7 +40,7 @@ root.addHandler(handler)
     tags=["ice","ondemand","load","PTB source file"]
 )
 
-def ice_rmo_load_ondemand():
+def ice_ptb_load_ondemand():
     logging.basicConfig(level=logging.INFO)
     
     def Agent_Datafix():
