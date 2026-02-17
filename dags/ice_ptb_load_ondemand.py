@@ -354,9 +354,11 @@ def ice_ptb_load_ondemand():
             query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{pTableName}]
                     FROM '\\\\fs1.fin.gov.bc.ca\\ptb_ct_prod\\ondemand\\{psource_file}'
                     WITH
-	                ( FORMAT = 'CSV',
-                      MAXERRORS = 100, 
-                      ERRORFILE='\\\\fs1.fin.gov.bc.ca\\ptb_ct_prod\\log\\{psource_file}.log'
+	                ( FIELDTERMINATOR = '|',
+                           ROWTERMINATOR = '\r\n',                         
+                           MAXERRORS = 20, 
+                           ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{vTableName}_{dYmd}.log',
+                           TABLOCK 
 	                );
                 """
             logging.info(f"query: {query}")
