@@ -357,7 +357,7 @@ def ice_ptb_load_ondemand():
 	                ( FIELDTERMINATOR = '|',
                            ROWTERMINATOR = '\r\n',                         
                            MAXERRORS = 20, 
-                           ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{vTableName}_{dYmd}.log',
+                           ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{pTableName}_{dYmd}.log',
                            TABLOCK 
 	                );
                 """
