@@ -325,6 +325,7 @@ def ice_ptb_load_ondemand():
     
     def ondemand_load_source(psource_file):
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
+        dYmd = (dt.datetime.today() + timedelta(days = -1)).strftime('%Y%m%d')
 
         try:
             if psource_file == "Stat_CDR6.csv":
