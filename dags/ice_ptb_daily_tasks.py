@@ -84,7 +84,8 @@ def choose_path():
 
             files = fs_hook.listdir(SourcePath)
             for f in files:
-                if ((f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0700.zip') or (f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0800.zip')):
+                if ((f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0700.zip') or (f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0800.zip') or
+                    (f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_1000.zip')):
                     filefound = 1
                     old_path = f"{SourcePath}/{f}"
                     new_path = f"{SourcePath}/{'iceDB_ICE_BCMOFPT_'+ dYmd +'.zip'}"
