@@ -40,7 +40,7 @@ root.addHandler(handler)
     tags=["ice","ondemand","load","source file"]
 )
 
-def ice_rmo_load_ondemand():
+def ice_rmo_load_ondemand_icepay():
     logging.basicConfig(level=logging.INFO)
     
     def Agent_Datafix():
@@ -395,4 +395,4 @@ def ice_rmo_load_ondemand():
 
     ondemand_load_data()
     
-ice_rmo_load_ondemand()
+ice_rmo_load_ondemand_icepay()
