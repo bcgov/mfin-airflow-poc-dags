@@ -358,12 +358,10 @@ def ice_rmo_load_ondemand_icepay():
             query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{pTableName}]
                     FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\ondemand\\{psource_file}'
                     WITH
-	                     ( FIELDTERMINATOR = '|',
-                           ROWTERMINATOR = '\r\n',
-                           MAXERRORS = 20, 
-                           ERRORFILE='\\\\fs1.fin.gov.bc.ca\\ptb_ct_prod\\log\\{pTableName}_{dYmd}.log',
-                           TABLOCK 
-	                     );
+	                ( FORMAT = 'CSV',
+                      MAXERRORS = 100, 
+                      ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{psource_file}.log'
+	                );                    
                 """
             logging.info(f"query: {query}")
             logging.info(f"inserting table:  {pTableName}")
@@ -383,8 +381,8 @@ def ice_rmo_load_ondemand_icepay():
     def ondemand_load_data():
         
         source_file_set = ["icePay01.csv","icePay02.csv","icePay03.csv","icePay04.csv","icePay05.csv","icePay06.csv","icePay07.csv","icePay08.csv","icePay09.csv","icePay10.csv",
-                           "icePay11.csv","icePay15.csv","icePay16.csv","icePay17.csv","icePay18.csv","icePay19.csv","icePay20.csv", 
-                           "icePay21.csv","icePay22.csv","icePay23.csv"
+                           "icePay11.csv","icePay12.csv","icePay13.csv","icePay14.csv","icePay15.csv","icePay16.csv","icePay17.csv","icePay18.csv","icePay19.csv","icePay20.csv", 
+                           "icePay21.csv","icePay22.csv","icePay23.csv","icePay24.csv","icePay25.csv","icePay26.csv","icePay27.csv","icePay28.csv","icePay29.csv","icePay30.csv"
                            ]
         
         
