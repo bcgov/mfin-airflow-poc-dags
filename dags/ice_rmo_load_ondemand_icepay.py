@@ -323,6 +323,20 @@ def ice_rmo_load_ondemand_icepay():
         return
 
     
+    #WITH
+	#                     ( FIELDTERMINATOR = '|',
+    #                       ROWTERMINATOR = '\r\n',
+    #                       MAXERRORS = 20, 
+    #                       ERRORFILE='\\\\fs1.fin.gov.bc.ca\\ptb_ct_prod\\log\\{vTableName}_{dYmd}.log',
+    #                       TABLOCK 
+	#                     );
+    
+    #WITH
+	#                ( FORMAT = 'CSV',
+    #                  MAXERRORS = 100, 
+    #                  ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{psource_file}.log'
+	#                );
+    
     def ondemand_load_source(psource_file):
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
         dYmd = (dt.datetime.today() + timedelta(days = -1)).strftime('%Y%m%d')
@@ -358,10 +372,12 @@ def ice_rmo_load_ondemand_icepay():
             query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{pTableName}]
                     FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\ondemand\\{psource_file}'
                     WITH
-	                ( FORMAT = 'CSV',
-                      MAXERRORS = 100, 
-                      ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{psource_file}.log'
-	                );                    
+	                     ( FIELDTERMINATOR = '|',
+                           ROWTERMINATOR = '\r\n',
+                           MAXERRORS = 20, 
+                           ERRORFILE='\\\\fs1.fin.gov.bc.ca\\ptb_ct_prod\\log\\{vTableName}_{dYmd}.log',
+                           TABLOCK 
+	                     );                   
                 """
             logging.info(f"query: {query}")
             logging.info(f"inserting table:  {pTableName}")
