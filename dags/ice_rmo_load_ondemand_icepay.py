@@ -367,7 +367,7 @@ def ice_rmo_load_ondemand_icepay():
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
-            pTableName = "ICE_icePay"
+            pTableName = "ICE_Stat_CDR_Summary"
             
             query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{pTableName}]
                     FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\ondemand\\{psource_file}'
