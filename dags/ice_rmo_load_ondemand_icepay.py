@@ -372,12 +372,10 @@ def ice_rmo_load_ondemand_icepay():
             query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{pTableName}]
                     FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\ondemand\\{psource_file}'
                     WITH
-	                     ( FIELDTERMINATOR = '|',
-                           ROWTERMINATOR = '\r\n',
-                           MAXERRORS = 20, 
-                           ERRORFILE='\\\\fs1.fin.gov.bc.ca\\ptb_ct_prod\\log\\{pTableName}_{dYmd}.log',
-                           TABLOCK 
-	                     );                   
+	                 ( FORMAT = 'CSV',
+                       MAXERRORS = 100, 
+                       ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{psource_file}.log'
+	                  );                  
                 """
             logging.info(f"query: {query}")
             logging.info(f"inserting table:  {pTableName}")
@@ -396,10 +394,10 @@ def ice_rmo_load_ondemand_icepay():
     @task
     def ondemand_load_data():
         
-        source_file_set = ["icePay01.csv","icePay02.csv","icePay03.csv","icePay04.csv"]#,"icePay05.csv","icePay06.csv","icePay07.csv","icePay08.csv","icePay09.csv","icePay10.csv",
-                           #"icePay11.csv","icePay12.csv","icePay13.csv","icePay15.csv","icePay16.csv","icePay17.csv","icePay18.csv","icePay19.csv","icePay20.csv", 
-                           #"icePay22.csv","icePay23.csv","icePay24.csv","icePay25.csv","icePay26.csv","icePay27.csv"                           
-                           #]
+        source_file_set = ["Summa01.csv","Summa02.csv","Summa03.csv","Summa04.csv","Summa05.csv","Summa06.csv","Summa07.csv","Summa08.csv","Summa09.csv","Summa10.csv",
+                           "Summa11.csv","Summa12.csv","Summa13.csv","Summa14.csv","Summa15.csv","Summa16.csv","Summa17.csv","Summa18.csv","Summa19.csv","Summa20.csv",
+                           "Summa21.csv","Summa22.csv","Summa23.csv","Summa24.csv","Summa25.csv","Summa26.csv","Summa27.csv","Summa28.csv","Summa29.csv","Summa30.csv"
+                           ]
         
         
         log_remove()
