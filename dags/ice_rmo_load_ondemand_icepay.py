@@ -374,8 +374,8 @@ def ice_rmo_load_ondemand_icepay():
                     WITH
 	                 ( FIELDTERMINATOR = '|',
                        ROWTERMINATOR = '\r\n',
-                       MAXERRORS = 20, 
-                       ERRORFILE='\\\\fs1.fin.gov.bc.ca\\ptb_ct_prod\\log\\{pTableName}_{dYmd}.log',
+                       MAXERRORS = 20,
+                       ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{pTableName}_{dYmd}.log',
                        TABLOCK 
 	                  );                  
                 """
