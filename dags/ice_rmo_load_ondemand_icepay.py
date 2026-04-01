@@ -183,60 +183,60 @@ def ice_rmo_load_ondemand_icepay():
                 
             return   
             
-    def LOBCodeLangString():
-            source_path = r'/rmo_ct_prod/ondemand/'
-            file = 'LOBCodeLangString.csv'
-            output_file = 'LOBCodeLangString_fixed.csv'
+ #   def LOBCodeLangString():
+ #           source_path = r'/rmo_ct_prod/ondemand/'
+ #           file = 'LOBCodeLangString.csv'
+ #           output_file = 'LOBCodeLangString_fixed.csv'
 
-            logging.info("LOBCodeLangString_fixing code")
-            try:
+ #           logging.info("LOBCodeLangString_fixing code")
+ #           try:
                 # Initialize SambaHook with your credentials and connection details
-                with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
-                    names = ["CodeID","Lang","Value"]                               
+ #               with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+ #                   names = ["CodeID","Lang","Value"]                               
                     
-                    with fs_hook.open_file(source_path + file,'r') as f:
-                        csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(3)], quoting=1)   
+ #                   with fs_hook.open_file(source_path + file,'r') as f:
+ #                       csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(3)], quoting=1)   
 
-                    df1 = csv_reader.loc[:,[0,1,2]]
-                    
-                    with fs_hook.open_file(source_path + output_file, 'w') as outfile:
-                        df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')  
+  #                  df1 = csv_reader.loc[:,[0,1,2]]
+  #                  
+  #                  with fs_hook.open_file(source_path + output_file, 'w') as outfile:
+  #                      df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')  
                                 
-                outfile.close()                    
+  #              outfile.close()                    
         
-            except Exception as e:
-                logging.error(f"Error data fixing table LOBCodeLangString {e}")
+  #          except Exception as e:
+  #              logging.error(f"Error data fixing table LOBCodeLangString {e}")
                 
-            return   
+  #          return   
            
 
-    def EvalCriteriaLangString():
-            source_path = r'/rmo_ct_prod/ondemand/'
-            file = 'EvalCriteriaLangString.csv'
-            output_file = 'EvalCriteriaLangString_fixed.csv'
+ #   def EvalCriteriaLangString():
+ #           source_path = r'/rmo_ct_prod/ondemand/'
+ #           file = 'EvalCriteriaLangString.csv'
+ #           output_file = 'EvalCriteriaLangString_fixed.csv'
 
-            logging.info("EvalCriteriaLangString_fixing code")
-            try:
-                # Initialize SambaHook with your credentials and connection details
-                with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
-                    names = ["ID","Lang","Value"]
+ #          logging.info("EvalCriteriaLangString_fixing code")
+ #           try:
+               # Initialize SambaHook with your credentials and connection details
+ #               with SambaHook(samba_conn_id="fs1_rmo_ice") as fs_hook:
+  #                  names = ["ID","Lang","Value"]
                                
                     
-                    with fs_hook.open_file(source_path + file,'r') as f:
-                        csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(3)], quoting=1)   
+   #                 with fs_hook.open_file(source_path + file,'r') as f:
+   #                     csv_reader = pd.read_csv(f, header = None, usecols=[i for i in range(3)], quoting=1)   
 
-                    df1 = csv_reader.loc[:,[0,1,2]]
+    #                df1 = csv_reader.loc[:,[0,1,2]]
                     
-                    with fs_hook.open_file(source_path + output_file, 'w') as outfile:
-                        df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
+    #                with fs_hook.open_file(source_path + output_file, 'w') as outfile:
+    #                    df1.to_csv(outfile, header=False,index=False,lineterminator='\r\n')
   
                                 
-                outfile.close()                    
+    #            outfile.close()                    
         
-            except Exception as e:
-                logging.error(f"Error data fixing table LOBCodeLangString {e}")
+    #        except Exception as e:
+    #            logging.error(f"Error data fixing table LOBCodeLangString {e}")
                 
-            return   
+    #        return   
     
     
 
@@ -397,10 +397,10 @@ def ice_rmo_load_ondemand_icepay():
     def ondemand_load_data():
         
         #source_file_set = ["Stat_CDR_Summary01.csv","Stat_CDR_Summary02.csv","Stat_CDR_Summary03.csv","Stat_CDR_Summary04.csv","Stat_CDR_Summary05.csv","Stat_CDR_Summary06.csv","Stat_CDR_Summary07.csv","Stat_CDR_Summary08.csv","Stat_CDR_Summary09.csv","Stat_CDR_Summary10.csv",
-         source_file_set = ["Stat_CDR_Summary03.csv","Stat_CDR_Summary04.csv","Stat_CDR_Summary05.csv","Stat_CDR_Summary06.csv","Stat_CDR_Summary07.csv","Stat_CDR_Summary08.csv","Stat_CDR_Summary09.csv","Stat_CDR_Summary10.csv",
-                            "Stat_CDR_Summary11.csv","Stat_CDR_Summary12.csv","Stat_CDR_Summary13.csv","Stat_CDR_Summary14.csv","Stat_CDR_Summary15.csv","Stat_CDR_Summary16.csv","Stat_CDR_Summary17.csv","Stat_CDR_Summary18.csv","Stat_CDR_Summary19.csv","Stat_CDR_Summary20.csv",
-                            "Stat_CDR_Summary21.csv","Stat_CDR_Summary22.csv","Stat_CDR_Summary23.csv","Stat_CDR_Summary24.csv","Stat_CDR_Summary25.csv","Stat_CDR_Summary26.csv","Stat_CDR_Summary27.csv","Stat_CDR_Summary28.csv","Stat_CDR_Summary29.csv"
-                           ]
+        source_file_set = ["Stat_CDR_Summary03.csv","Stat_CDR_Summary04.csv","Stat_CDR_Summary05.csv","Stat_CDR_Summary06.csv","Stat_CDR_Summary07.csv","Stat_CDR_Summary08.csv","Stat_CDR_Summary09.csv","Stat_CDR_Summary10.csv",
+                           "Stat_CDR_Summary11.csv","Stat_CDR_Summary12.csv","Stat_CDR_Summary13.csv","Stat_CDR_Summary14.csv","Stat_CDR_Summary15.csv","Stat_CDR_Summary16.csv","Stat_CDR_Summary17.csv","Stat_CDR_Summary18.csv","Stat_CDR_Summary19.csv","Stat_CDR_Summary20.csv",
+                           "Stat_CDR_Summary21.csv","Stat_CDR_Summary22.csv","Stat_CDR_Summary23.csv","Stat_CDR_Summary24.csv","Stat_CDR_Summary25.csv","Stat_CDR_Summary26.csv","Stat_CDR_Summary27.csv","Stat_CDR_Summary28.csv","Stat_CDR_Summary29.csv"
+                          ]
         
         
         log_remove()
