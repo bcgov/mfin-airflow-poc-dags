@@ -147,41 +147,22 @@ def ice_rmo_load_ondemand_icepay():
 
 
         try:
-            if psource_file == "Stat_CDR6.csv":
-                pTableName = "ICE_Stat_CDR"
-                psource_file = "Stat_CDR_fixed.csv"
-            elif psource_file == "Agent6.csv":
-                pTableName = "ICE_Agent"
-                psource_file = "Agent_fixed.csv"
-            elif psource_file == "Stat_CDR_Summary6.csv":
-                pTableName = "ICE_Stat_CDR_Summary"
-                psource_file = "Stat_CDR_Summary_fixed.csv" 
-            elif psource_file == "LOBCodeLangString6.csv":   
-                pTableName = "ICE_LOBCodeLangString"
-                psource_file = "LOBCodeLangString_fixed.csv"
-            elif psource_file == "EvalCriteriaLangString6.csv":   
-                pTableName = "ICE_EvalCriteriaLangString"
-                psource_file = "EvalCriteriaLangString_fixed.csv"                
-            else:
-                xlen = len(psource_file)-4
-                pTableName = "ICE_" + psource_file[:xlen]
+            
+            pTableName = "ICE_Stat_CDR_Summary"
             
             logging.info(f"loading table: {pTableName}")
             
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
-            pTableName = "ICE_Stat_CDR_Summary"
             
             query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{pTableName}]
                     FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\ondemand\\{psource_file}'
                     WITH
-	                 ( FIELDTERMINATOR = '|',
-                       ROWTERMINATOR = '\r\n',
-                       MAXERRORS = 20,
-                       ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{psource_file}_{dYmd}.log',
-                       TABLOCK 
-	                  );                  
+                    ( FORMAT = 'CSV',
+                      MAXERRORS = 100, 
+                      ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{psource_file}.log'
+	                );                  
                 """
             logging.info(f"query: {query}")
             logging.info(f"inserting table:  {pTableName}")
@@ -200,10 +181,9 @@ def ice_rmo_load_ondemand_icepay():
     @task
     def ondemand_load_data():
         
-        #source_file_set = ["Stat_CDR_Summary01.csv","Stat_CDR_Summary02.csv","Stat_CDR_Summary03.csv","Stat_CDR_Summary04.csv","Stat_CDR_Summary05.csv","Stat_CDR_Summary06.csv","Stat_CDR_Summary07.csv","Stat_CDR_Summary08.csv","Stat_CDR_Summary09.csv","Stat_CDR_Summary10.csv",
-        source_file_set = ["Stat_CDR_Summary03.csv","Stat_CDR_Summary04.csv","Stat_CDR_Summary05.csv","Stat_CDR_Summary06.csv","Stat_CDR_Summary07.csv","Stat_CDR_Summary08.csv","Stat_CDR_Summary09.csv","Stat_CDR_Summary10.csv",
+        source_file_set = ["Stat_CDR_Summary01.csv","Stat_CDR_Summary02.csv","Stat_CDR_Summary03.csv","Stat_CDR_Summary04.csv","Stat_CDR_Summary05.csv","Stat_CDR_Summary06.csv","Stat_CDR_Summary07.csv","Stat_CDR_Summary08.csv","Stat_CDR_Summary09.csv","Stat_CDR_Summary10.csv",
                            "Stat_CDR_Summary11.csv","Stat_CDR_Summary12.csv","Stat_CDR_Summary13.csv","Stat_CDR_Summary14.csv","Stat_CDR_Summary15.csv","Stat_CDR_Summary16.csv","Stat_CDR_Summary17.csv","Stat_CDR_Summary18.csv","Stat_CDR_Summary19.csv","Stat_CDR_Summary20.csv",
-                           "Stat_CDR_Summary21.csv","Stat_CDR_Summary22.csv","Stat_CDR_Summary23.csv","Stat_CDR_Summary24.csv","Stat_CDR_Summary25.csv","Stat_CDR_Summary26.csv","Stat_CDR_Summary27.csv","Stat_CDR_Summary28.csv","Stat_CDR_Summary29.csv"
+                           "Stat_CDR_Summary21.csv","Stat_CDR_Summary22.csv","Stat_CDR_Summary23.csv","Stat_CDR_Summary24.csv","Stat_CDR_Summary25.csv","Stat_CDR_Summary26.csv","Stat_CDR_Summary27.csv","Stat_CDR_Summary28.csv","Stat_CDR_Summary29.csv","Stat_CDR_Summary30.csv"
                           ]
         
         
