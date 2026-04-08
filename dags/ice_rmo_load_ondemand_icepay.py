@@ -183,7 +183,7 @@ def ice_rmo_load_ondemand_icepay():
         
         source_file_set = ["Stat_CDR_Summary01.csv","Stat_CDR_Summary02.csv","Stat_CDR_Summary03.csv","Stat_CDR_Summary04.csv","Stat_CDR_Summary05.csv","Stat_CDR_Summary06.csv","Stat_CDR_Summary07.csv","Stat_CDR_Summary08.csv","Stat_CDR_Summary09.csv","Stat_CDR_Summary10.csv",
                            "Stat_CDR_Summary11.csv","Stat_CDR_Summary12.csv","Stat_CDR_Summary13.csv","Stat_CDR_Summary14.csv","Stat_CDR_Summary15.csv","Stat_CDR_Summary16.csv","Stat_CDR_Summary17.csv","Stat_CDR_Summary18.csv","Stat_CDR_Summary19.csv","Stat_CDR_Summary20.csv",
-                           "Stat_CDR_Summary21.csv","Stat_CDR_Summary22.csv","Stat_CDR_Summary23.csv","Stat_CDR_Summary24.csv","Stat_CDR_Summary25.csv","Stat_CDR_Summary26.csv","Stat_CDR_Summary27.csv","Stat_CDR_Summary28.csv","Stat_CDR_Summary29.csv","Stat_CDR_Summary30.csv"
+                           "Stat_CDR_Summary21.csv","Stat_CDR_Summary22.csv","Stat_CDR_Summary23.csv","Stat_CDR_Summary24.csv","Stat_CDR_Summary25.csv","Stat_CDR_Summary26.csv","Stat_CDR_Summary27.csv","Stat_CDR_Summary28.csv","Stat_CDR_Summary29.csv"
                           ]
         
         
