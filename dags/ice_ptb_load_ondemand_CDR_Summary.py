@@ -141,8 +141,7 @@ def ice_ptb_load_ondemand_CDR_Summary():
             query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{pTableName}]
                     FROM '\\\\fs1.fin.gov.bc.ca\\ptb_ct_prod\\ondemand\\{psource_file}'
                     WITH
-	                ( FIELDTERMINATOR = '|',
-                      ROWTERMINATOR = '\r\n',                         
+	                ( FORMAT='CSV', 
                       MAXERRORS = 20, 
                       ERRORFILE='\\\\fs1.fin.gov.bc.ca\\ptb_ct_prod\\log\\{psource_file}_{dYmd}.log',
                       TABLOCK 
