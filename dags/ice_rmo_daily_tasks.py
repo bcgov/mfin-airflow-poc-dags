@@ -69,6 +69,7 @@ def email_notification():
 def choose_path():
     LogPath = Variable.get("vRMOLogPath")
     SourcePath = Variable.get("vRMOSourcePath")
+    substring = "iceDB_ICE_BCMOFRMO_"
     LogName = 'daily_etl.txt'
     conn_id = 'fs1_prod_conn'
     filefound = 0        
@@ -81,7 +82,8 @@ def choose_path():
         outfile.close()
         files = fs_hook.listdir(SourcePath)
         for f in files:
-            if f == 'iceDB_ICE_BCMOFRMO.zip':
+            #if f == 'iceDB_ICE_BCMOFRMO.zip':
+            if (substring in f):
                 filefound = 1
 				
         if filefound == 0:		    
@@ -128,7 +130,7 @@ def log_remove(pconn_id):
 def etl_unzip(pconn_id):
     SourcePath = Variable.get("vRMOSourcePath")
     DestPath = Variable.get("vRMOProgressPath")
-    file = 'iceDB_ICE_BCMOFRMO.zip'
+    file = 'iceDB_ICE_BCMOFRMO_ice15.zip'
     zip_loc = r'/tmp/'
     logging.info("Unzip daily file")  
         
@@ -154,14 +156,16 @@ def etl_backup(pconn_id):
     with SambaHook(samba_conn_id=pconn_id) as fs_hook:
         SourcePath = Variable.get("vRMOSourcePath")
         DestPath = Variable.get("vRMOCompletePath")
-        file = 'iceDB_ICE_BCMOFRMO.zip'
+        file = 'iceDB_ICE_BCMOFRMO_ice15.zip'
+        substring = "iceDB_ICE_BCMOFRMO_"
         # Set dYmd to yesterdays date
         dYmd = (dt.datetime.today() + timedelta(days=-1)).strftime('%Y%m%d')
         try:
             files = fs_hook.listdir(SourcePath)
  
             for f in files:
-                if f == 'iceDB_ICE_BCMOFRMO.zip':
+                if (substring in f):
+                #if f == 'iceDB_ICE_BCMOFRMO.zip':
                     fs_hook.replace(SourcePath + f, DestPath + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip') 
                     
         except Exception as e:
