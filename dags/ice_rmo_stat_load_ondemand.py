@@ -57,7 +57,8 @@ def ice_rmo_stat_load_ondemand():
             query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[ICE_Transactions]
                     FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\ondemand\\{psource_file}'
                     WITH
-	                ( FORMAT='CSV',                       
+	                ( FORMAT='CSV',  
+                      ROWTERMINATOR = '\r\n',                    
                       MAXERRORS = 100, 
                       ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{psource_file}.log',
                       TABLOCK
