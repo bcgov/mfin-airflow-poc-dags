@@ -80,7 +80,7 @@ def ice_rmo_stat_load_ondemand():
     @task
     def ondemand_stat_load_data():
         
-        source_file_set = ["Transactions01.csv"]#,"Transactions02.csv","Transactions03.csv", "Transactions04.csv","Transactions05.csv",
+        source_file_set = ["Transactions01.csv","Transactions02.csv","Transactions03.csv", "Transactions04.csv","Transactions05.csv"]
                            #"Transactions06.csv","Transactions07.csv","Transactions08.csv", "Transactions09.csv","Transactions10.csv",
                            #"Transactions11.csv","Transactions12.csv","Transactions13.csv", "Transactions14.csv","Transactions15.csv",
                            #"Transactions16.csv","Transactions17.csv","Transactions18.csv", "Transactions19.csv","Transactions20.csv",
