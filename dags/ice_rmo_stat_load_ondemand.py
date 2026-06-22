@@ -41,7 +41,7 @@ def ice_rmo_stat_load_ondemand():
     #                  MAXERRORS = 20, 
     #                  ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{psource_file}.log',
     #                  TABLOCK
-	
+	  
     
     
     def ondemand_stat_load_source(psource_file):
@@ -58,8 +58,8 @@ def ice_rmo_stat_load_ondemand():
                     FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\ondemand\\{psource_file}'
                     WITH
 	                ( FIELDTERMINATOR = '|',
-    #                  ROWTERMINATOR = '\r\n',                         
-    #                  MAXERRORS = 20,  
+                      ROWTERMINATOR = '\r\n',                         
+                      MAXERRORS = 20,  
                       ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{psource_file}.log',
                       TABLOCK
 	                );
