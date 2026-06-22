@@ -54,7 +54,7 @@ def ice_rmo_stat_load_ondemand():
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
-            query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[ICE_Transaction]
+            query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[ICE_Transactions]
                     FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\ondemand\\{psource_file}'
                     WITH
 	                ( FORMAT='CSV',
