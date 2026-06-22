@@ -35,29 +35,37 @@ def ice_rmo_stat_load_ondemand():
     logging.basicConfig(level=logging.INFO)
     
   
+    #                WITH
+	#                ( FIELDTERMINATOR = '|',
+    #                  ROWTERMINATOR = '\r\n',                         
+    #                  MAXERRORS = 20, 
+    #                  ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{psource_file}.log',
+    #                  TABLOCK
+	
+    
     
     def ondemand_stat_load_source(psource_file):
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
 
         try:
             
-            logging.info(f"loading table: ICE_Stat_AgentActivityByQueue_I")
+            logging.info(f"loading table: ICE_Transactions")
             
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
-            query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[ICE_Stat_AgentActivityByQueue_I]
+            query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[ICE_Transaction]
                     FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\ondemand\\{psource_file}'
                     WITH
-	                ( FIELDTERMINATOR = '|',
+	                ( FORMAT='CSV',
                       ROWTERMINATOR = '\r\n',                         
-                      MAXERRORS = 20, 
+                      MAXERRORS = 100, 
                       ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{psource_file}.log',
                       TABLOCK
 	                );
                 """
             logging.info(f"query: {query}")
-            logging.info(f"inserting table:  ICE_Stat_AgentActivityByQueue_I")
+            logging.info(f"inserting table:  ICE_Transactions")
             start_time = time.time()
             cursor.execute(query)
             conn.commit()
@@ -67,20 +75,18 @@ def ice_rmo_stat_load_ondemand():
        
         
         except Exception as e:
-            logging.error(f"Error bulk loading table: ICE_Stat_AgentActivityByQueue_I source file: {psource_file} {e}")
+            logging.error(f"Error bulk loading table: ICE_Transactions source file: {psource_file} {e}")
  
 
     @task
     def ondemand_stat_load_data():
         
-        source_file_set = ["Stat_AgentActivityByQueue_I_01.csv","Stat_AgentActivityByQueue_I_02.csv","Stat_AgentActivityByQueue_I_03.csv", "Stat_AgentActivityByQueue_I_04.csv",
-                           "Stat_AgentActivityByQueue_I_04.csv","Stat_AgentActivityByQueue_I_05.csv","Stat_AgentActivityByQueue_I_06.csv", "Stat_AgentActivityByQueue_I_07.csv",
-                           "Stat_AgentActivityByQueue_I_08.csv","Stat_AgentActivityByQueue_I_09.csv","Stat_AgentActivityByQueue_I_10.csv", "Stat_AgentActivityByQueue_I_11.csv",
-                           "Stat_AgentActivityByQueue_I_12.csv","Stat_AgentActivityByQueue_I_13.csv","Stat_AgentActivityByQueue_I_14.csv", "Stat_AgentActivityByQueue_I_15.csv",
-                           "Stat_AgentActivityByQueue_I_16.csv","Stat_AgentActivityByQueue_I_17.csv","Stat_AgentActivityByQueue_I_18.csv", "Stat_AgentActivityByQueue_I_19.csv",
-                           "Stat_AgentActivityByQueue_I_20.csv","Stat_AgentActivityByQueue_I_21.csv","Stat_AgentActivityByQueue_I_22.csv", "Stat_AgentActivityByQueue_I_23.csv",
-                           "Stat_AgentActivityByQueue_I_24.csv","Stat_AgentActivityByQueue_I_25.csv","Stat_AgentActivityByQueue_I_26.csv", "Stat_AgentActivityByQueue_I_27.csv",
-                           "Stat_AgentActivityByQueue_I_28.csv","Stat_AgentActivityByQueue_I_29.csv","Stat_AgentActivityByQueue_I_30.csv"]#, "Stat_AgentActivityByQueue_I_31.csv"]
+        source_file_set = ["Transactions01.csv","Transactions02.csv","Transactions03.csv", "Transactions04.csv","Transactions05.csv",
+                           "Transactions06.csv","Transactions07.csv","Transactions08.csv", "Transactions09.csv","Transactions10.csv",
+                           "Transactions11.csv","Transactions12.csv","Transactions13.csv", "Transactions14.csv","Transactions15.csv",
+                           "Transactions16.csv","Transactions17.csv","Transactions18.csv", "Transactions19.csv","Transactions20.csv",
+                           "Transactions21.csv","Transactions22.csv","Transactions23.csv", "Transactions24.csv","Transactions25.csv",
+                           "Transactions26.csv","Transactions27.csv","Transactions28.csv", "Transactions29.csv","Transactions30.csv"]
         
         
         for source_file in source_file_set:
