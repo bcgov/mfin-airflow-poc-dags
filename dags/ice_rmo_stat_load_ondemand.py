@@ -58,7 +58,7 @@ def ice_rmo_stat_load_ondemand():
                     FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\ondemand\\{psource_file}'
                     WITH
 	                ( FIELDTERMINATOR = '|',
-                      ROWTERMINATOR = '\r\n',                         
+                      ROWTERMINATOR = '\r\n',
                       MAXERRORS = 20,  
                       ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{psource_file}.log',
                       TABLOCK
@@ -81,12 +81,13 @@ def ice_rmo_stat_load_ondemand():
     @task
     def ondemand_stat_load_data():
         
-        source_file_set = ["Transactions01.csv","Transactions02.csv","Transactions03.csv", "Transactions04.csv","Transactions05.csv"]
-                           #"Transactions06.csv","Transactions07.csv","Transactions08.csv", "Transactions09.csv","Transactions10.csv",
+        source_file_set =  ["Transactions06.csv","Transactions07.csv","Transactions08.csv", "Transactions09.csv","Transactions10.csv"]
                            #"Transactions11.csv","Transactions12.csv","Transactions13.csv", "Transactions14.csv","Transactions15.csv",
                            #"Transactions16.csv","Transactions17.csv","Transactions18.csv", "Transactions19.csv","Transactions20.csv",
                            #"Transactions21.csv","Transactions22.csv","Transactions23.csv", "Transactions24.csv","Transactions25.csv",
                            #"Transactions26.csv","Transactions27.csv","Transactions28.csv", "Transactions29.csv","Transactions30.csv"]
+                           #["Transactions01.csv","Transactions02.csv","Transactions03.csv", "Transactions04.csv","Transactions05.csv"]
+                          
         
         
         for source_file in source_file_set:
