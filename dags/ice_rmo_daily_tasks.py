@@ -296,7 +296,6 @@ def etl_daily_load():
         
     conn_id = 'fs1_prod_conn'
     LogPath = Variable.get("vRMOLogPath")
-    #log_path = '/rmo_ct_prod/log/'
     ConfigPath = Variable.get("vRMOConfigPath")
     FileName = Variable.get("vConfigName")
     SourcePath = Variable.get("vRMOSourcePath")                
