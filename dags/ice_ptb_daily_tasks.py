@@ -22,7 +22,7 @@ from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
 from airflow.hooks.base_hook import BaseHook
 from airflow.models import Variable
 import pymssql
-#import re
+import re
 
 root = logging.getLogger()
 root.setLevel(logging.DEBUG)
@@ -34,17 +34,23 @@ root.addHandler(handler)
 
 
 def email_completion():
+    SupportEmail = Variable.get("vSupportEmail")
+    PTBNotification = Variable.get("vPTBNotification")
+
     dYmdHMS = (dt.datetime.today()+ timedelta(hours=-1)).strftime('%Y-%m-%d')
     
     with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
         sh.send_email_smtp(
-           to=['eloy.mendez@gov.bc.ca','alexandre.limoges-bourgault@gov.bc.ca'],
+           to=[{SupportEmail},{PTBNotification}],
            subject='Airflow ETL Process Notification',
-           html_content='<html><body><h2>Airflow PTB-ETL daily source file completion</h2><p>CT iceDB_ICE_BCMOFPT-' + dYmdHMS + '.zip daily file processed succesfully </p></body></html>'
+           html_content='<html><body><h2>Airflow PTB-ETL daily source file completion</h2><p>CT iceDB_ICE_BCMOFPT-' + dYmdHMS + '_0700.zip daily file processed succesfully </p></body></html>'
     )        
     return
 
 def email_notification():
+    SupportEmail = Variable.get("vSupportEmail")
+    PTBNotification = Variable.get("vPTBNotification")
+
     LogPath = Variable.get("vPTBLogPath") 
     log_name = 'daily_etl.txt'
     conn_id = 'fs1_prod_conn'
@@ -61,40 +67,36 @@ def email_notification():
     
     with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
         sh.send_email_smtp(
-           to=['eloy.mendez@gov.bc.ca','alexandre.limoges-bourgault@gov.bc.ca'],
+           to=[{SupportEmail},{PTBNotification}],
            subject='Airflow Email Notification',
-           html_content='<html><body><h2>Airflow PTB daily source file failure</h2><p>CT iceDB_ICE_BCMOFPT_' + dYmd + '.zip file not received/available</p></body></html>'
+           html_content='<html><body><h2>Airflow PTB daily source file failure</h2><p>CT iceDB_ICE_BCMOFPT_' + dYmd + '_0700.zip file not received/available</p></body></html>'
     )        
     return
 
 
 def choose_path():
     LogPath = Variable.get("vPTBLogPath") 
-    SourcePath = Variable.get("vPTBSourcePath")
-    substring = "iceDB_ICE_BCMOFPT_"
+    SourcePath = Variable.get("vPTBSourcePath")   
     log_name = 'daily_etl.txt'
     conn_id = 'fs1_prod_conn'
     #conn_id = 'fs1_rmo_ice'
     filefound = 0        
     dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
-    dYmd = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d')
+    dYmd = (dt.datetime.today()).strftime('%Y-%m-%d')
         
     with SambaHook(samba_conn_id=conn_id) as fs_hook:
         with fs_hook.open_file(LogPath + log_name,'w') as outfile:
             outfile.writelines("Time:%s,Step:1,Task:ETL process,Description:Starting ETL process\n" % dYmdHMS)
 
-            files = fs_hook.listdir(SourcePath)
-            for f in files:
-                if (substring in f):
-                #if ((f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0700.zip') or (f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0800.zip') or
-                #    (f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_1000.zip')):
-                    filefound = 1
-                    old_path = f"{SourcePath}/{f}"
-                    new_path = f"{SourcePath}/{'iceDB_ICE_BCMOFPT_'+ dYmd +'.zip'}"
-                    fs_hook.rename(old_path, new_path)
-				
         outfile.close()
-        if filefound == 0:
+        files = fs_hook.listdir(SourcePath)
+        pattern = "iceDB_ICE_BCMOFPT.*"
+        for f in files:
+            if re.search(pattern, f)
+            #if f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0700.zip' :
+                filefound = 1
+				
+        if filefound == 0:		    
             return 'path_email'
         else:
             return 'path_daily_load'
@@ -124,9 +126,8 @@ def log_remove(pconn_id):
 
         try:
             for file in files:
-                if file != 'daily_etl.txt':
-                    file_path = f"{DeletePath}/{file}"
-                    fs_hook.remove(file_path)
+                file_path = f"{DeletePath}/{file}"
+                fs_hook.remove(file_path)
         
         except Exception as e:
             logging.error(f"Error {e} removing files in log folder: {DeletePath}")
@@ -138,9 +139,8 @@ def log_remove(pconn_id):
 def etl_unzip(pconn_id):
     SourcePath = Variable.get("vPTBSourcePath")
     DestPath = Variable.get("vPTBProgressPath")
-    dYmd = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d')
-    file = 'iceDB_ICE_BCMOFPT_' + dYmd + '.zip'
-    #file = 'iceDB_ICE_BCMOFPT_' + dYmd + '_0700.zip'
+    dYmd = (dt.datetime.today()).strftime('%Y-%m-%d')
+    file = 'iceDB_ICE_BCMOFPT_' + dYmd + '_0700.zip'
     zip_loc = r'/tmp/'
     logging.info("Unzip daily file")  
         
@@ -160,24 +160,24 @@ def etl_unzip(pconn_id):
 
     return       
     
-# Task 4: Backup iceDB_ICE_BCMOFPTO-YYYY-MM-DD.zip to the completed folder    
+# Task 4: Backup iceDB_ICE_BCMOFPTO-YYYY-MM-DD_0700.zip to the completed folder    
 def etl_backup(pconn_id):
         
     with SambaHook(samba_conn_id=pconn_id) as fs_hook:
         SourcePath = Variable.get("vPTBSourcePath") 
         DestPath = Variable.get("vPTBCompletePath")
+        dYmd = (dt.datetime.today()).strftime('%Y-%m-%d')
+        file = 'iceDB_ICE_BCMOFPT_' + dYmd + '_0700.zip'
 
-        # Set dYmd to todays date        
-        dYmd = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d')
-        #file = 'iceDB_ICE_BCMOFPT_' + dYmd + '_0700.zip'
-        file = 'iceDB_ICE_BCMOFPT_' + dYmd + '.zip'
-
+        #file = 'iceDB_ICE_BCMOFRMO.zip'
+        # Set dYmd to yesterdays date
+        #dYmd = (dt.datetime.today() + timedelta(days=-1)).strftime('%Y%m%d')
         try:
             files = fs_hook.listdir(SourcePath)
  
             for f in files:
-                if f == 'iceDB_ICE_BCMOFPT_' + dYmd +'.zip':
-                    fs_hook.replace(SourcePath + f, DestPath + 'iceDB_ICE_BCMOFPT_'+ dYmd +'.zip') 
+                if f == 'iceDB_ICE_BCMOFPT_' + dYmd +'_0700.zip':
+                    fs_hook.replace(SourcePath + f, DestPath + 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0700.zip') 
                     
         except Exception as e:
             logging.error(f"Error backing up {file}-{dYmd}.zip source file")
@@ -309,7 +309,7 @@ def etl_daily_load():
 
     log_name = 'daily_set.txt' 
     log_etl = 'daily_etl.txt'    
-    #dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
+    dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
     source_file_set=[] 
     data = []      
 
@@ -320,7 +320,7 @@ def etl_daily_load():
             data_set = [x for x in data if str(x) != 'nan']
             
         with fs_hook.open_file(LogPath + log_etl,'a') as outfile:
-            dYmdHMS = (dt.datetime.today()  - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
+            dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
             outfile.writelines("Time:%s,Step:2,Task:Removing previous data extracted,Description:Remove previous CSV files Inprogress folder task\n" % dYmdHMS)
             etl_remove(conn_id)
 
@@ -364,11 +364,9 @@ def create_dag():
     dag = DAG(
         dag_id = 'ice_ptb_daily_task',
         start_date = days_ago(1),
-        schedule_interval = "05 15 * * *",
+        schedule_interval = None,
         catchup = False,
-        tags = ["ice","ptb","etl","daily_task"],
-        description='PTB Computer Talk ETL daily process',
-        
+        tags = ["ice","ptb","etl","daily_task"]
     )
     
     start = DummyOperator(
