@@ -193,7 +193,7 @@ def etl_truncate():
         connection =  pymssql.connect(host = host, database = dbname, user = user, password = password)
         cursor = connection.cursor()                    
         start_time = time.time()
-        cursor.execute("EXEC [dbo].[PROC_TELEPHONY_ICE_TRUNCATE]")            
+        cursor.execute("EXEC [FIN_SHARED_STAGING_DEV].[dbo].[PROC_TELEPHONY_ICE_TRUNCATE]")            
         connection.commit()                                  
         logging.info(f"truncate landing tables {time.time() - start_time} seconds")
         
