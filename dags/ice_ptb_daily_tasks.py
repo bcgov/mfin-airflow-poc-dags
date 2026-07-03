@@ -76,7 +76,8 @@ def email_notification():
 
 def choose_path():
     LogPath = Variable.get("vPTBLogPath") 
-    SourcePath = Variable.get("vPTBSourcePath")   
+    SourcePath = Variable.get("vPTBSourcePath")  
+    substring = "iceDB_ICE_BCMOFPT."   
     log_name = 'daily_etl.txt'
     conn_id = 'fs1_prod_conn'
     #conn_id = 'fs1_rmo_ice'
@@ -90,9 +91,10 @@ def choose_path():
 
         outfile.close()
         files = fs_hook.listdir(SourcePath)
-        pattern = "iceDB_ICE_BCMOFPT.*"
+        #pattern = "iceDB_ICE_BCMOFPT.*"
         for f in files:
-            if re.search(pattern, f)
+            if (substring in f):
+            #if re.search(pattern, f)
             #if f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0700.zip' :
                 filefound = 1
 				
