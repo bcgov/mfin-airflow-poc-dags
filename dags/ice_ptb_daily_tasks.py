@@ -54,7 +54,6 @@ def email_notification():
     LogPath = Variable.get("vPTBLogPath") 
     log_name = 'daily_etl.txt'
     conn_id = 'fs1_prod_conn'
-    #conn_id = 'fs1_rmo_ice'
     dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d')
         
     with SambaHook(samba_conn_id=conn_id) as fs_hook:
@@ -80,7 +79,6 @@ def choose_path():
     substring = "iceDB_ICE_BCMOFPT."   
     log_name = 'daily_etl.txt'
     conn_id = 'fs1_prod_conn'
-    #conn_id = 'fs1_rmo_ice'
     filefound = 0        
     dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')
     dYmd = (dt.datetime.today()).strftime('%Y-%m-%d')
@@ -206,7 +204,7 @@ def etl_truncate():
         connection =  pymssql.connect(host = host, database = dbname, user = user, password = password)
         cursor = connection.cursor()                    
         start_time = time.time()
-        cursor.execute("EXEC [dbo].[PROC_TELEPHONY_ICE_TRUNCATE]")            
+        cursor.execute("EXEC [FIN_SHARED_STAGING_DEV].[dbo].[PROC_TELEPHONY_ICE_TRUNCATE]")            
         connection.commit()                                  
         logging.info(f"truncate landing tables {time.time() - start_time} seconds")
         
@@ -301,7 +299,6 @@ def etl_daily_load():
               
         
     conn_id = 'fs1_prod_conn'
-    #conn_id = 'fs1_rmo_ice'
     LogPath = Variable.get("vPTBLogPath")
     
     ConfigPath = Variable.get("vPTBConfigPath")
