@@ -192,7 +192,7 @@ def etl_truncate():
     logging.basicConfig(level=logging.INFO) 
     logging.info(f"truncate_landing_tables procedure")
 
-    conn_id = 'mssql_default' . /?/.,
+    conn_id = 'mssql_default'
 #   conn_id = 'mssql_conn_finafdbt
 #   conn_id = 'mssql_conn_finafdbp    
     conn = BaseHook.get_connection(conn_id)
