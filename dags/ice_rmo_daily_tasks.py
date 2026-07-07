@@ -40,7 +40,7 @@ def email_completion():
     
     with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
         sh.send_email_smtp(
-           to=[{SuportEmail},{RMONotification}],
+           to=[{SupportEmail},{RMONotification}],
            subject='Airflow ETL Process Notification',
            html_content='<html><body><h2>Airflow RMO-ETL daily source file completion</h2><p>CT iceDB_ICE_BCMOFRMO-' + dYmdHMS + '.zip daily file processed succesfully </p></body></html>'
     )        
