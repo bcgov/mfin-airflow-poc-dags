@@ -1,5 +1,5 @@
 import csv, sys, argparse
-from airflow.sdk import DAG
+from airflow import DAG
 import os
 import numpy as np
 import pandas as pd
