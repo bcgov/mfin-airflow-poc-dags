@@ -35,13 +35,13 @@ root.addHandler(handler)
 
 def email_completion():
     dYmdHMS = (dt.datetime.today()+ timedelta(hours=-1)).strftime('%Y-%m-%d')
-    SupportEmail = str(Variable.get("vSupportEmail"))
+    #SupportEmail = str(Variable.get("vSupportEmail"))
     PTBNotification = str(Variable.get("vPTBNotification"))
 
     
     with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
         sh.send_email_smtp(
-           to=[{SupportEmail},{PTBNotification}],
+           to={PTBNotification},
            subject='Airflow ETL Process Notification',
            html_content='<html><body><h2>Airflow PTB-ETL daily source file completion</h2><p>CT iceDB_ICE_BCMOFPT-' + dYmdHMS + '_0700.zip daily file processed succesfully </p></body></html>'
     )        
