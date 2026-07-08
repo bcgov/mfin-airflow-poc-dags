@@ -36,7 +36,7 @@ root.addHandler(handler)
 def email_completion():
     dYmdHMS = (dt.datetime.today()+ timedelta(hours=-1)).strftime('%Y-%m-%d')
     #SupportEmail = str(Variable.get("vSupportEmail"))
-    PTBNotification = str(Variable.get("vPTBNotification"))
+    PTBNotification = Variable.get("vPTBNotification")
 
     
     with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
@@ -49,7 +49,7 @@ def email_completion():
 
 def email_notification():
     #SupportEmail = str(Variable.get("vSupportEmail"))
-    PTBNotification = str(Variable.get("vPTBNotification"))
+    PTBNotification = Variable.get("vPTBNotification")
 
     LogPath = Variable.get("vPTBLogPath") 
     log_name = 'daily_etl.txt'
