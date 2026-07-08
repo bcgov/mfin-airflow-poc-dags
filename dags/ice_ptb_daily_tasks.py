@@ -41,14 +41,14 @@ def email_completion():
     
     with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
         sh.send_email_smtp(
-           to={PTBNotification},
+           to=PTBNotification,
            subject='Airflow ETL Process Notification',
            html_content='<html><body><h2>Airflow PTB-ETL daily source file completion</h2><p>CT iceDB_ICE_BCMOFPT-' + dYmdHMS + '_0700.zip daily file processed succesfully </p></body></html>'
     )        
     return
 
 def email_notification():
-    SupportEmail = str(Variable.get("vSupportEmail"))
+    #SupportEmail = str(Variable.get("vSupportEmail"))
     PTBNotification = str(Variable.get("vPTBNotification"))
 
     LogPath = Variable.get("vPTBLogPath") 
@@ -66,7 +66,7 @@ def email_notification():
     
     with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
         sh.send_email_smtp(
-           to=[{SupportEmail},{PTBNotification}],
+           to=PTBNotification,
            subject='Airflow Email Notification',
            html_content='<html><body><h2>Airflow PTB daily source file failure</h2><p>CT iceDB_ICE_BCMOFPT_' + dYmd + '_0700.zip file not received/available</p></body></html>'
     )        
