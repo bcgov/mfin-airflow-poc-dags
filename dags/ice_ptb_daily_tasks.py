@@ -140,7 +140,7 @@ def etl_unzip(pconn_id):
     SourcePath = Variable.get("vPTBSourcePath")
     DestPath = Variable.get("vPTBProgressPath")
     dYmd = (dt.datetime.today()).strftime('%Y-%m-%d')
-    file = 'iceDB_ICE_BCMOFPT_' + dYmd + '_0700.zip'
+    file = 'iceDB_ICE_BCMOFPT_' + dYmd + '_0900.zip'
     zip_loc = r'/tmp/'
     logging.info("Unzip daily file")  
         
