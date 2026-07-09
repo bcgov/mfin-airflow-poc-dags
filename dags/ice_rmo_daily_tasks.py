@@ -34,21 +34,21 @@ root.addHandler(handler)
 
 def email_completion():
     dYmdHMS = (dt.datetime.today()+ timedelta(days=-1)).strftime('%Y-%m-%d:%H%M%S')
-    SupportEmail = Variable.get("vSupportEmail")
-    RMONotification = Variable.get("vRMONotification")
+    #SupportEmail = str(Variable.get("vSupportEmail"))
+    RMONotification = str(Variable.get("vRMONotification"))
 
     
     with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
         sh.send_email_smtp(
-           to=[{SupportEmail},{RMONotification}],
+           to=RMONotification,
            subject='Airflow ETL Process Notification',
            html_content='<html><body><h2>Airflow RMO-ETL daily source file completion</h2><p>CT iceDB_ICE_BCMOFRMO-' + dYmdHMS + '.zip daily file processed succesfully </p></body></html>'
     )        
     return
 
 def email_notification():
-    SupportEmail = Variable.get("vSupportEmail")
-    RMONotification = Variable.get("vRMONotification")
+    #SupportEmail = str(Variable.get("vSupportEmail"))
+    RMONotification = str(Variable.get("vRMONotification"))
     LogPath = Variable.get("vRMOLogPath")
     LogName = 'daily_etl.txt'
     conn_id = 'fs1_prod_conn'
@@ -64,7 +64,7 @@ def email_notification():
     
     with SmtpHook(smtp_conn_id = 'Email_Notification') as sh:
         sh.send_email_smtp(
-           to=[{SupportEmail},{RMONotification}],
+           to=RMONotification,
            subject='Airflow Email Notification',
            html_content='<html><body><h2>Airflow RMO daily source file failure</h2><p>CT iceDB_ICE_BCMOFRMO-' + dYmd + '.zip file not received/available</p></body></html>'
     )        
@@ -301,7 +301,7 @@ def etl_daily_load():
     SourcePath = Variable.get("vRMOSourcePath")                
     DBName = Variable.get("vDatabaseName")
 
-    log_name = 'daily_set.txt'  
+    log_name = 'daily_set.txt'
     log_etl = 'daily_etl.txt'    
     dYmdHMS = (dt.datetime.today() - timedelta(hours=7)).strftime('%Y-%m-%d:%H%M%S')    
     source_file_set=[] 
