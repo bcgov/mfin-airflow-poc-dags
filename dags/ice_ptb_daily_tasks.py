@@ -76,7 +76,7 @@ def email_notification():
 def choose_path():
     LogPath = Variable.get("vPTBLogPath") 
     SourcePath = Variable.get("vPTBSourcePath")  
-    substring = "iceDB_ICE_BCMOFPT_"   
+    substring = "iceDB_ICE_BCMOFPT"   
     log_name = 'daily_etl.txt'
     conn_id = 'fs1_prod_conn'
     filefound = 0        
