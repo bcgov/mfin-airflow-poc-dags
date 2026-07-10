@@ -80,7 +80,6 @@ def choose_path():
     filefound = 0        
     dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
     dYmd = (dt.datetime.today()).strftime('%Y-%m-%d')
-    zip_loc = r'/tmp/'
     newFileName='iceDB_ICE_BCMOFPT_' + dYmd + '.zip'
         
     with SambaHook(samba_conn_id=conn_id) as fs_hook:
@@ -89,15 +88,10 @@ def choose_path():
 
         outfile.close()
         files = fs_hook.listdir(SourcePath)
-        #pattern = "iceDB_ICE_BCMOFPT.*"
         for f in files:
             if (substring in f):
-            #if re.search(pattern, f)
-            #if f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0700.zip' :
                 filefound = 1
                 fs_hook.rename(SourcePath + f, SourcePath + newFileName)
-                #fs_hook.push_from_local(SourcePath + newFileName, SourcePath + newFileName)
-
 				
         if filefound == 0:		    
             return 'path_email'
@@ -108,12 +102,12 @@ def choose_path():
 def etl_remove(pconn_id):
         
     with SambaHook(samba_conn_id=pconn_id) as fs_hook:
-        DeletePath = Variable.get("vPTBProgressPath")
-        files = fs_hook.listdir(DeletePath)
+        ProgressPath = Variable.get("vPTBProgressPath")
+        files = fs_hook.listdir(ProgressPath)
 
         try:
             for file in files:
-                file_path = f"{DeletePath}/{file}"
+                file_path = f"{ProgressPath}/{file}"
                 fs_hook.remove(file_path)
         
         except Exception as e:
@@ -156,10 +150,10 @@ def etl_unzip(pconn_id):
                     logging.info(iceTable.filename)
                     z.extract(iceTable.filename,path=zip_loc)
             
-                    fs_hook.push_from_local(DestPath+iceTable.filename, os.path.join(zip_loc,iceTable.filename))
+                    fs_hook.push_from_local(DestPath + iceTable.filename, os.path.join(zip_loc,iceTable.filename))
                     
         except Exception as e:
-            logging.error(f"Error unzipping files: {e}")  
+            logging.error(f"Task 3: Error unzipping files: {e}")  
 
     return       
     
@@ -172,9 +166,6 @@ def etl_backup(pconn_id):
         dYmd = (dt.datetime.today()).strftime('%Y-%m-%d')
         file = 'iceDB_ICE_BCMOFPT_' + dYmd + '.zip'
 
-        #file = 'iceDB_ICE_BCMOFRMO.zip'
-        # Set dYmd to yesterdays date
-        #dYmd = (dt.datetime.today() + timedelta(days=-1)).strftime('%Y%m%d')
         try:
             files = fs_hook.listdir(SourcePath)
  
@@ -183,7 +174,7 @@ def etl_backup(pconn_id):
                     fs_hook.replace(SourcePath + f, DestPath + 'iceDB_ICE_BCMOFPT_'+ dYmd +'.zip') 
                     
         except Exception as e:
-            logging.error(f"Error backing up {file}-{dYmd}.zip source file")
+            logging.error(f"Task 4: Error backing up {file}-{dYmd}.zip source file")
         
     return   
    
