@@ -95,8 +95,8 @@ def choose_path():
             #if re.search(pattern, f)
             #if f == 'iceDB_ICE_BCMOFPT_'+ dYmd +'_0700.zip' :
                 filefound = 1
-                fs_hook.pull_file(SourcePath + f, zip_loc + newFileName)
-                fs_hook.push_from_local(SourcePath + newFileName, SourcePath + newFileName)
+                fs_hook.rename(SourcePath + f, SourcePath + newFileName)
+                #fs_hook.push_from_local(SourcePath + newFileName, SourcePath + newFileName)
 
 				
         if filefound == 0:		    
