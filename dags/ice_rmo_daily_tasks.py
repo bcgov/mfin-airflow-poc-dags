@@ -170,7 +170,7 @@ def etl_backup(pconn_id):
             files = fs_hook.listdir(SourcePath)
  
             for f in files:
-                if f == 'iceDB_ICE_BCMOFRMO' + dYmd +'.zip':
+                if f == 'iceDB_ICE_BCMOFRMO_' + dYmd +'.zip':
                     fs_hook.replace(SourcePath + f, DestPath + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip') 
                     
         except Exception as e:
