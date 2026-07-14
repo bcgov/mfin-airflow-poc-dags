@@ -92,6 +92,7 @@ def choose_path():
             if (substring in f):
                 filefound = 1
                 fs_hook.rename(SourcePath + f, SourcePath + newFileName)
+                break
 				
         if filefound == 0:		    
             return 'path_email'
