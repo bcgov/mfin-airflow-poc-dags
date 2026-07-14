@@ -171,7 +171,7 @@ def etl_backup(pconn_id):
  
             for f in files:
                 if f == 'iceDB_ICE_BCMOFRMO_' + dYmd +'.zip':
-                    fs_hook.replace(SourcePath + f, DestPath + 'iceDB_ICE_BCMOFRMO-' + dYmd+'.zip') 
+                    fs_hook.replace(SourcePath + f, DestPath + 'iceDB_ICE_BCMOFRMO_' + dYmd+'.zip') 
                     
         except Exception as e:
             logging.error(f"Task 4: Error backing up {file}-{dYmd}.zip source file")
