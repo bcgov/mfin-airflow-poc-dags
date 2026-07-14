@@ -77,8 +77,7 @@ def choose_path():
     conn_id = 'fs1_prod_conn'
     filefound = 0        
     dYmdHMS = (dt.datetime.today()).strftime('%Y-%m-%d:%H%M%S')
-    dYmd = (dt.datetime.today()+ timedelta(days=-1)).strftime('%Y-%m-%d')
-#    dYmd = (dt.datetime.today()).strftime('%Y-%m-%d')
+    dYmd = (dt.datetime.today()+ timedelta(days=-1)).strftime('%Y%m%d')
     newFileName='iceDB_ICE_BCMOFRMO_' + dYmd + '.zip'
          
     with SambaHook(samba_conn_id=conn_id) as fs_hook:
@@ -137,7 +136,7 @@ def log_remove(pconn_id):
 def etl_unzip(pconn_id):
     SourcePath = Variable.get("vRMOSourcePath")
     DestPath = Variable.get("vRMOProgressPath")
-    dYmd = (dt.datetime.today()+ timedelta(days=-1)).strftime('%Y-%m-%d')
+    dYmd = (dt.datetime.today()+ timedelta(days=-1)).strftime('%Y%m%d')
     file = 'iceDB_ICE_BCMOFRMO_' + dYmd + '.zip'
     zip_loc = r'/tmp/'
     logging.info("Unzip daily file")  
