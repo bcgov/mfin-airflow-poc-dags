@@ -42,7 +42,7 @@ def email_completion():
         sh.send_email_smtp(
            to=PTBNotification,
            subject='Airflow ETL Process Notification',
-           html_content='<html><body><h2>Airflow PTB-ETL daily source file completion</h2><p>CT iceDB_ICE_BCMOFPT-' + dYmdHMS + '_0700.zip daily file processed succesfully </p></body></html>'
+           html_content='<html><body><h2>Airflow PTB-ETL daily source file completion</h2><p>CT iceDB_ICE_BCMOFPT-' + dYmdHMS + '.zip daily file processed succesfully </p></body></html>'
     )        
     return
 
@@ -358,7 +358,8 @@ def create_dag():
     dag = DAG(
         dag_id = 'ice_ptb_daily_task',
         start_date = days_ago(1),
-        schedule_interval = None,
+        schedule_interval = "01 15 * * *",
+ #      schedule_interval = None,
         catchup = False,
         tags = ["ice","ptb","etl","daily_task"]
     )
