@@ -358,7 +358,7 @@ def create_dag():
     dag = DAG(
         dag_id = 'ice_ptb_daily_task',
         start_date = days_ago(1),
-        schedule_interval = "01 15 * * *",
+        schedule_interval = "10 15 * * *",
  #      schedule_interval = None,
         catchup = False,
         tags = ["ice","ptb","etl","daily_task"]
