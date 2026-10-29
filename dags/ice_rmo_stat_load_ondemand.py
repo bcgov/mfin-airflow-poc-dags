@@ -80,13 +80,12 @@ def ice_rmo_stat_load_ondemand():
             start_time = time.time()
             cursor.execute(query)
             conn.commit()
-            
-                      
+                            
             logging.info(f"bulk insert {time.time() - start_time} seconds")
        
         
         except Exception as e:
-            logging.error(f"Error bulk loading table: ICE_StatActivity source file: {psource_file} {e}")
+            logging.error(f"Error bulk loading table: ICE_StatActivity source file: {pSourceFile} {e}")
  
 
     @task
