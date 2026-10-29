@@ -52,7 +52,7 @@ def ice_rmo_stat_load_ondemand():
 	  
     
     
-    def ondemand_stat_load_source(psource_file):
+    def ondemand_stat_load_source(pSourceFile):
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
         dYmd = (dt.datetime.today() + timedelta(days = -1)).strftime('%Y%m%d')
 
@@ -106,8 +106,8 @@ def ice_rmo_stat_load_ondemand():
                           
         
         
-        for source_file in source_file_set:
-            ondemand_stat_load_source(source_file)
+        for SourceFile in source_file_set:
+            ondemand_stat_load_source(SourceFile)
 
     ondemand_stat_load_data()
     
