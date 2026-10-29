@@ -54,26 +54,29 @@ def ice_rmo_stat_load_ondemand():
     
     def ondemand_stat_load_source(psource_file):
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
+        dYmd = (dt.datetime.today() + timedelta(days = -1)).strftime('%Y%m%d')
 
         try:
-            
-            logging.info(f"loading table: ICE_Transactions")
-            
+            xlen = len(pSourceFile)-4
+            vTableName = 'ICE_' + pSourceFile[:xlen]
+            vSourceFile = pSourceFile
+            logging.info(f"loading table: {vTableName}")            
+
             conn = sql_hook.get_conn()
             cursor = conn.cursor()
             
-            query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[ICE_Transactions]
-                    FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\ondemand\\{psource_file}'
+            query = f""" BULK INSERT [FIN_SHARED_LANDING_DEV].[dbo].[{vTableName}]
+                    FROM '\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\ondemand\\{vSourceFile}'
                     WITH
 	                ( FIELDTERMINATOR = '|',
                       ROWTERMINATOR = '\r\n',
                       MAXERRORS = 20,  
-                      ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{psource_file}.log',
+                      ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{vTableName}_{dYmd}.log',
                       TABLOCK
 	                );
                 """
             logging.info(f"query: {query}")
-            logging.info(f"inserting table:  ICE_Transactions")
+            logging.info(f"inserting table:  ICE_StatAgent")
             start_time = time.time()
             cursor.execute(query)
             conn.commit()
@@ -83,7 +86,7 @@ def ice_rmo_stat_load_ondemand():
        
         
         except Exception as e:
-            logging.error(f"Error bulk loading table: ICE_Transactions source file: {psource_file} {e}")
+            logging.error(f"Error bulk loading table: ICE_StatActivity source file: {psource_file} {e}")
  
 
     @task
