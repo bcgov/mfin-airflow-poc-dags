@@ -15,6 +15,14 @@ from datetime import timedelta
 from airflow.operators.python import PythonOperator
 from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
 
+#
+# Author: Eloy Mendez
+# Date  : October 29, 2026 
+# Assumptions:
+#         Prior to executing this DAG source files need to be located in RMO's ondemand folder
+#         Include all required csv source files in the \\fs1.fin.gov.bc.ca\rmo_ct_prod\ondemand folder
+#         All files need to have a unique csv file name
+#
 
 root = logging.getLogger()
 root.setLevel(logging.DEBUG)
@@ -81,13 +89,17 @@ def ice_rmo_stat_load_ondemand():
     @task
     def ondemand_stat_load_data():
         
-        source_file_set =["Transactions01.csv","Transactions02.csv","Transactions03.csv", "Transactions04.csv","Transactions05.csv",
-                          "Transactions06.csv","Transactions07.csv","Transactions08.csv", "Transactions09.csv","Transactions10.csv",
-                          "Transactions11.csv","Transactions12.csv","Transactions13.csv", "Transactions14.csv","Transactions15.csv",
-                          "Transactions16.csv","Transactions17.csv","Transactions18.csv", "Transactions19.csv","Transactions20.csv",
-                          "Transactions21.csv","Transactions22.csv","Transactions23.csv", "Transactions24.csv","Transactions25.csv",
-                          "Transactions26.csv","Transactions27.csv","Transactions28.csv", "Transactions29.csv","Transactions30.csv",
-                          "Transactions31.csv","Transactions32.csv","Transactions33.csv"]
+        source_file_set =["Stat_ADR.csv",
+                          "Stat_AgentActivity_D.csv","Stat_AgentActivity_I.csv", "Stat_AgentActivity_M.csv","Stat_AgentActivity_W.csv","Stat_AgentActivity_Y.csv",
+                          "Stat_AgentActivityByQueue_D.csv","Stat_AgentActivityByQueue_I.csv","Stat_AgentActivityByQueue_M.csv", "Stat_AgentActivityByQueue_W.csv","Stat_AgentActivityByQueue_Y.csv",
+                          "Stat_AgentLineOfBusiness_D.csv","Stat_AgentLineOfBusiness_I.csv","Stat_AgentLineOfBusiness_M.csv", "Stat_AgentLineOfBusiness_W","Stat_AgentLineOfBusiness_Y.csv",
+                          "Stat_AgentNotReadyBreakdown_D.csv","Stat_AgentNotReadyBreakdown_I.csv","Stat_AgentNotReadyBreakdown_M.csv", "Stat_AgentNotReadyBreakdown_W.csv","Stat_AgentNotReadyBreakdown_Y.csv",
+                          "Stat_CDR.csv","Stat_CDR_Summary",
+                          "Stat_DNISActivity_D.csv","Stat_DNISActivity_I.csv","Stat_DNISActivity_M.csv","Stat_DNISActivity_W.csv","Stat_DNISActivity_Y.csv",
+                          "Stat_QueueActivity_D.csv","Stat_QueueActivity_I.csv","Stat_QueueActivity_M.csv","Stat_QueueActivity_W.csv","Stat_QueueActivity_Y.csv",
+                          "Stat_SkillActivity_D.csv","Stat_SkillActivity_I.csv","Stat_SkillActivity_M.csv","Stat_SkillActivity_W.csv","Stat_SkillActivity_Y.csv",
+                          "Stat_WorkflowActionActivity_D.csv","Stat_WorkflowActionActivity_I.csv","Stat_WorkflowActionActivity_M.csv","Stat_WorkflowActionActivity_W.csv","Stat_WorkflowActionActivity_Y.csv"
+                          ]
                           
         
         
