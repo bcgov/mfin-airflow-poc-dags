@@ -33,7 +33,7 @@ handler.setFormatter(formatter)
 root.addHandler(handler) 
 
 @dag(
-    description="DAG - RMO CT specific Stat dates bulk insert",
+    description="DAG - Ondemand loading source stat tables",
     schedule=None,
     catchup=False,
     tags=["ice","ondemand","load","source file"]
@@ -43,14 +43,6 @@ def ice_rmo_stat_load_ondemand():
     logging.basicConfig(level=logging.INFO)
     
   
-    #                WITH
-	#                ( FIELDTERMINATOR = '|',
-    #                  ROWTERMINATOR = '\r\n',                         
-    #                  MAXERRORS = 20, 
-    #                  ERRORFILE='\\\\fs1.fin.gov.bc.ca\\rmo_ct_prod\\log\\{psource_file}.log',
-    #                  TABLOCK
-	  
-    
     
     def ondemand_stat_load_source(pSourceFile):
         sql_hook = MsSqlHook(mssql_conn_id='mssql_conn_bulk')
@@ -76,7 +68,7 @@ def ice_rmo_stat_load_ondemand():
 	                );
                 """
             logging.info(f"query: {query}")
-            logging.info(f"inserting table:  ICE_StatAgent")
+            logging.info(f"inserting table: {vTableName}")
             start_time = time.time()
             cursor.execute(query)
             conn.commit()
@@ -85,28 +77,105 @@ def ice_rmo_stat_load_ondemand():
        
         
         except Exception as e:
-            logging.error(f"Error bulk loading table: ICE_StatActivity source file: {pSourceFile} {e}")
+            logging.error(f"Error bulk loading ondemand tables: {vTableName} source file: {vSourceFile} {e}")
+        
+        return
  
+ 
+    def truncate_target_tables_db():
+        logging.basicConfig(level=logging.INFO) 
+        logging.info(f"loading_ondemand_db_data")
+
+        conn_id = 'mssql_default'
+        conn = BaseHook.get_connection(conn_id)
+        dbname = Variable.get("vDatabaseName")
+        host = conn.host
+        user = conn.login
+        password = conn.password        
+        connection = None
+                
+        try:
+            connection =  pymssql.connect(host = host, database = dbname, user = user, password = password)
+            cursor = connection.cursor()                    
+            start_time = time.time()
+            cursor.execute("EXEC [FIN_SHARED_STAGING_DEV].[dbo].[PROC_TELEPHONY_ICE_ONDEMAND_TRUNCATE]")            
+            connection.commit()                                  
+            logging.info(f"Load OnDemand truncate tables {time.time() - start_time} seconds")
+        
+        except Exception as e:
+            logging.error(f"Task 6: Error OnDemand truncate target tables {e}")
+        
+        finally:
+            if connection:
+                connection.close()
+                logging.info(f"Database {dbname} - Connection closed")
+ 
+        return
+ 
+ 
+    def load_target_tables_db():
+        logging.basicConfig(level=logging.INFO) 
+        logging.info(f"loading_ondemand_db_data")
+
+        conn_id = 'mssql_default'
+        conn = BaseHook.get_connection(conn_id)
+        dbname = Variable.get("vDatabaseName")
+        host = conn.host
+        user = conn.login
+        password = conn.password        
+        connection = None
+                
+        try:
+            connection =  pymssql.connect(host = host, database = dbname, user = user, password = password)
+            cursor = connection.cursor()                    
+            start_time = time.time()
+            cursor.execute("EXEC [FIN_SHARED_STAGING_DEV].[dbo].[PROC_TELEPHONY_ICE_ONDEMAND_LOAD]")            
+            connection.commit()                                  
+            logging.info(f"Load OnDemand landing tables {time.time() - start_time} seconds")
+        
+        except Exception as e:
+            logging.error(f"Task 6: Error OnDemand data to db target tables {e}")
+        
+        finally:
+            if connection:
+                connection.close()
+                logging.info(f"Database {dbname} - Connection closed")
+ 
+        return
+       
 
     @task
     def ondemand_stat_load_data():
         
-        source_file_set =["Stat_ADR.csv",
-                          "Stat_AgentActivity_D.csv","Stat_AgentActivity_I.csv", "Stat_AgentActivity_M.csv","Stat_AgentActivity_W.csv","Stat_AgentActivity_Y.csv",
-                          "Stat_AgentActivityByQueue_D.csv","Stat_AgentActivityByQueue_I.csv","Stat_AgentActivityByQueue_M.csv", "Stat_AgentActivityByQueue_W.csv","Stat_AgentActivityByQueue_Y.csv",
-                          "Stat_AgentLineOfBusiness_D.csv","Stat_AgentLineOfBusiness_I.csv","Stat_AgentLineOfBusiness_M.csv", "Stat_AgentLineOfBusiness_W","Stat_AgentLineOfBusiness_Y.csv",
-                          "Stat_AgentNotReadyBreakdown_D.csv","Stat_AgentNotReadyBreakdown_I.csv","Stat_AgentNotReadyBreakdown_M.csv", "Stat_AgentNotReadyBreakdown_W.csv","Stat_AgentNotReadyBreakdown_Y.csv",
-                          "Stat_CDR.csv","Stat_CDR_Summary.csv",
-                          "Stat_DNISActivity_D.csv","Stat_DNISActivity_I.csv","Stat_DNISActivity_M.csv","Stat_DNISActivity_W.csv","Stat_DNISActivity_Y.csv",
-                          "Stat_QueueActivity_D.csv","Stat_QueueActivity_I.csv","Stat_QueueActivity_M.csv","Stat_QueueActivity_W.csv","Stat_QueueActivity_Y.csv",
-                          "Stat_SkillActivity_D.csv","Stat_SkillActivity_I.csv","Stat_SkillActivity_M.csv","Stat_SkillActivity_W.csv","Stat_SkillActivity_Y.csv",
-                          "Stat_WorkflowActionActivity_D.csv","Stat_WorkflowActionActivity_I.csv","Stat_WorkflowActionActivity_M.csv","Stat_WorkflowActionActivity_W.csv","Stat_WorkflowActionActivity_Y.csv"
-                          ]
-                          
+        conn_id = 'fs1_prod_conn'
+        ConfigPath = Variable.get("vRMOConfigPath")
+        FileName = 'ondemand_file_names.csv'
         
+        truncate_target_tables_db()
         
-        for SourceFile in source_file_set:
-            ondemand_stat_load_source(SourceFile)
+        with SambaHook(samba_conn_id=conn_id) as fs_hook:
+            with fs_hook.open_file(ConfigPath + FileName,'r') as f:
+                source_file_set = pd.read_csv(f, header = None, quoting=1)
+                data = source_file_set.values.flatten().tolist()
+                data_set = [x for x in data if str(x) != 'nan']
+        
+                #source_file_set =["Stat_ADR.csv",
+                #                  "Stat_AgentActivity_D.csv","Stat_AgentActivity_I.csv", "Stat_AgentActivity_M.csv","Stat_AgentActivity_W.csv","Stat_AgentActivity_Y.csv",
+                #                  "Stat_AgentActivityByQueue_D.csv","Stat_AgentActivityByQueue_I.csv","Stat_AgentActivityByQueue_M.csv", "Stat_AgentActivityByQueue_W.csv","Stat_AgentActivityByQueue_Y.csv",
+                #                  "Stat_AgentLineOfBusiness_D.csv","Stat_AgentLineOfBusiness_I.csv","Stat_AgentLineOfBusiness_M.csv", "Stat_AgentLineOfBusiness_W","Stat_AgentLineOfBusiness_Y.csv",
+                #                  "Stat_AgentNotReadyBreakdown_D.csv","Stat_AgentNotReadyBreakdown_I.csv","Stat_AgentNotReadyBreakdown_M.csv", "Stat_AgentNotReadyBreakdown_W.csv","Stat_AgentNotReadyBreakdown_Y.csv",
+                #                  "Stat_CDR.csv","Stat_CDR_Summary.csv",
+                #                  "Stat_DNISActivity_D.csv","Stat_DNISActivity_I.csv","Stat_DNISActivity_M.csv","Stat_DNISActivity_W.csv","Stat_DNISActivity_Y.csv",
+                #                  "Stat_QueueActivity_D.csv","Stat_QueueActivity_I.csv","Stat_QueueActivity_M.csv","Stat_QueueActivity_W.csv","Stat_QueueActivity_Y.csv",
+                #                  "Stat_SkillActivity_D.csv","Stat_SkillActivity_I.csv","Stat_SkillActivity_M.csv","Stat_SkillActivity_W.csv","Stat_SkillActivity_Y.csv",
+                #                  "Stat_WorkflowActionActivity_D.csv","Stat_WorkflowActionActivity_I.csv","Stat_WorkflowActionActivity_M.csv","Stat_WorkflowActionActivity_W.csv","Stat_WorkflowActionActivity_Y.csv"
+                #                 ]
+        
+                for SourceFile in data_set:
+                    ondemand_stat_load_source(SourceFile)
+                    
+        
+        load_target_tables_db()
 
     ondemand_stat_load_data()
     
